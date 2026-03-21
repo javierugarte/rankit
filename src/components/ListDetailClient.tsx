@@ -270,7 +270,7 @@ export default function ListDetailClient({
           }}
         >
           {votedItemId
-            ? `✓ Ya votaste hoy · vuelves en ${timeUntilMidnight}`
+            ? `✓ Ya votaste hoy · Regresa en ${timeUntilMidnight}`
             : "⚡ Tienes 1 voto disponible hoy"}
         </div>
       )}
