@@ -10,7 +10,7 @@ export default function BottomNav() {
   const isHome = pathname === "/home" || pathname === "/";
   const isProfile = pathname === "/profile";
 
-  if (!isHome) return null;
+  if (!isHome && !isProfile) return null;
 
   return (
     <nav
