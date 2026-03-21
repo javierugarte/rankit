@@ -64,6 +64,7 @@ export default async function ListPage({
       initialItems={items}
       userId={user.id}
       todayVotedItemId={todayVote?.item_id ?? null}
+      isOwner={list.owner_id === user.id}
     />
   );
 }

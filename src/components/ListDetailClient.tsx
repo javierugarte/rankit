@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
 import RankItem from "./RankItem";
@@ -14,6 +14,7 @@ interface Props {
   initialItems: Item[];
   userId: string;
   todayVotedItemId: string | null;
+  isOwner?: boolean;
 }
 
 export default function ListDetailClient({
@@ -21,6 +22,7 @@ export default function ListDetailClient({
   initialItems,
   userId,
   todayVotedItemId,
+  isOwner,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -28,6 +30,8 @@ export default function ListDetailClient({
     todayVotedItemId
   );
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [voting, setVoting] = useState(false);
 
   const router = useRouter();
@@ -139,6 +143,12 @@ export default function ListDetailClient({
     }
   }
 
+  async function handleDelete() {
+    setDeleting(true);
+    await supabase.from("lists").delete().eq("id", list.id);
+    router.replace("/home");
+  }
+
   function onItemAdded(newItem: Item) {
     setItems((prev) => [...prev, newItem]);
   }
@@ -159,13 +169,24 @@ export default function ListDetailClient({
           <h1 className="text-lg font-semibold text-text">{list.name}</h1>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-          style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
-        >
-          <Plus size={20} color="#c8a96e" />
-        </button>
+        <div className="flex items-center gap-2">
+          {isOwner && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-red-400 hover:bg-red-400/10"
+              aria-label="Eliminar lista"
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+            style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
+          >
+            <Plus size={20} color="#c8a96e" />
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -311,6 +332,56 @@ export default function ListDetailClient({
           onClose={() => setShowAddModal(false)}
           onAdded={onItemAdded}
         />
+      )}
+
+      {/* Delete confirmation */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+          onClick={(e) =>
+            e.target === e.currentTarget && setShowDeleteConfirm(false)
+          }
+        >
+          <div
+            className="w-full max-w-lg bg-surface-2 rounded-t-3xl p-6 border-t border-border"
+            style={{
+              paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
+            }}
+          >
+            <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
+
+            <div className="text-center mb-6">
+              <p className="text-3xl mb-3">{list.emoji}</p>
+              <h2 className="text-lg font-semibold text-text mb-1">
+                Eliminar lista
+              </h2>
+              <p className="text-muted text-sm">
+                ¿Seguro que quieres eliminar{" "}
+                <span className="text-text font-medium">{list.name}</span>? Esta
+                acción no se puede deshacer.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50"
+                style={{ backgroundColor: "#ef4444", color: "white" }}
+              >
+                {deleting ? "Eliminando..." : "Eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
