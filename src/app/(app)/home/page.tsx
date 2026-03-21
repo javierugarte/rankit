@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import ListCard from "@/components/ListCard";
+import HomeClient from "@/components/HomeClient";
 import CreateListButton from "@/components/CreateListButton";
 import type { List } from "@/lib/supabase/types";
 
@@ -134,33 +134,13 @@ export default async function HomePage() {
   );
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
-      {/* Header */}
-      <div className="mb-8">
-        <h1
-          className="text-3xl font-bold"
-          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
-        >
-          RankIt
-        </h1>
-        <p className="text-muted text-sm mt-1">Tus listas</p>
-      </div>
-
-      {/* Lists */}
-      <div className="flex flex-col gap-4">
-        {allLists.map((list) => (
-          <ListCard
-            key={list.id}
-            list={list}
-            sharingLabel={sharingMap[list.id] ?? "Privado"}
-            totalVotes={totalVotesMap[list.id] ?? 0}
-            votedToday={votedTodaySet.has(list.id)}
-            leader={leaderMap[list.id] ?? null}
-          />
-        ))}
-      </div>
-
-      <CreateListButton userId={user.id} />
-    </div>
+    <HomeClient
+      lists={allLists}
+      sharingMap={sharingMap}
+      totalVotesMap={totalVotesMap}
+      votedTodayIds={[...votedTodaySet]}
+      leaderMap={leaderMap}
+      userId={user.id}
+    />
   );
 }
