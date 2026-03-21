@@ -26,16 +26,25 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_profile_by_email(TEXT) TO authenticated;
 
 -- 3. Corregir política RLS de list_members para que el owner
---    pueda ver todos los miembros de sus listas
+--    pueda ver todos los miembros de sus listas.
+--    Usamos SECURITY DEFINER para evitar recursión infinita:
+--    lists → list_members → lists → ♾️
+CREATE OR REPLACE FUNCTION public.get_list_owner_id(p_list_id UUID)
+RETURNS UUID
+LANGUAGE SQL
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT owner_id FROM public.lists WHERE id = p_list_id;
+$$;
+
 DROP POLICY IF EXISTS "Members can view list memberships" ON public.list_members;
 
 CREATE POLICY "Members can view list memberships"
   ON public.list_members FOR SELECT USING (
     auth.uid() = user_id
-    OR EXISTS (
-      SELECT 1 FROM public.lists l
-      WHERE l.id = list_members.list_id AND l.owner_id = auth.uid()
-    )
+    OR public.get_list_owner_id(list_id) = auth.uid()
   );
 
 -- 4. Política de DELETE para items (miembros pueden borrar)
