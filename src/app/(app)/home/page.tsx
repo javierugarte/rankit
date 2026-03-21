@@ -66,7 +66,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-12 pb-4">
+    <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
       {/* Header */}
       <div className="mb-8">
         <h1

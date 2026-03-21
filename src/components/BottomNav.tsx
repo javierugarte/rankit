@@ -7,9 +7,10 @@ import { Home, User, Plus } from "lucide-react";
 export default function BottomNav() {
   const pathname = usePathname();
 
-  const isHome =
-    pathname === "/home" || pathname === "/" || pathname.startsWith("/list");
+  const isHome = pathname === "/home" || pathname === "/";
   const isProfile = pathname === "/profile";
+
+  if (!isHome && !isProfile) return null;
 
   return (
     <nav

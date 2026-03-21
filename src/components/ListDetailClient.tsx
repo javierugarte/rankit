@@ -33,6 +33,26 @@ export default function ListDetailClient({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [voting, setVoting] = useState(false);
+  const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
+
+  useEffect(() => {
+    if (!votedItemId) return;
+    const update = () => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now.getTime();
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setTimeUntilMidnight(
+        `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+      );
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [votedItemId]);
 
   const router = useRouter();
   const supabase = createClient();
@@ -254,7 +274,9 @@ export default function ListDetailClient({
             }`,
           }}
         >
-          {votedItemId ? "✓ Ya votaste hoy" : "⚡ Tienes 1 voto disponible hoy"}
+          {votedItemId
+            ? `✓ Ya votaste hoy · Regresa en ${timeUntilMidnight}`
+            : "⚡ Tienes 1 voto disponible hoy"}
         </div>
       )}
 
