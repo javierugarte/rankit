@@ -39,10 +39,16 @@ function applyOrder(lists: List[], order: string[]): List[] {
 
 function SortableListCard({
   list,
-  itemCount,
+  sharingLabel,
+  totalVotes,
+  votedToday,
+  leader,
 }: {
   list: List;
-  itemCount: number;
+  sharingLabel: string;
+  totalVotes: number;
+  votedToday: boolean;
+  leader: string | null;
 }) {
   const {
     attributes,
@@ -71,7 +77,7 @@ function SortableListCard({
         <GripVertical size={18} />
       </button>
       <div className="flex-1 pointer-events-none">
-        <ListCard list={list} itemCount={itemCount} />
+        <ListCard list={list} sharingLabel={sharingLabel} totalVotes={totalVotes} votedToday={votedToday} leader={leader} />
       </div>
     </div>
   );
@@ -79,11 +85,15 @@ function SortableListCard({
 
 interface Props {
   lists: List[];
-  countMap: Record<string, number>;
+  sharingMap: Record<string, string>;
+  totalVotesMap: Record<string, number>;
+  votedTodayIds: string[];
+  leaderMap: Record<string, string | null>;
   userId: string;
 }
 
-export default function HomeClient({ lists, countMap, userId }: Props) {
+export default function HomeClient({ lists, sharingMap, totalVotesMap, votedTodayIds, leaderMap, userId }: Props) {
+  const votedTodaySet = new Set(votedTodayIds);
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
@@ -182,7 +192,10 @@ export default function HomeClient({ lists, countMap, userId }: Props) {
                   <SortableListCard
                     key={list.id}
                     list={list}
-                    itemCount={countMap[list.id] ?? 0}
+                    sharingLabel={sharingMap[list.id] ?? "Privado"}
+                    totalVotes={totalVotesMap[list.id] ?? 0}
+                    votedToday={votedTodaySet.has(list.id)}
+                    leader={leaderMap[list.id] ?? null}
                   />
                 ))}
               </div>
@@ -195,7 +208,10 @@ export default function HomeClient({ lists, countMap, userId }: Props) {
             <ListCard
               key={list.id}
               list={list}
-              itemCount={countMap[list.id] ?? 0}
+              sharingLabel={sharingMap[list.id] ?? "Privado"}
+              totalVotes={totalVotesMap[list.id] ?? 0}
+              votedToday={votedTodaySet.has(list.id)}
+              leader={leaderMap[list.id] ?? null}
             />
           ))}
         </div>
