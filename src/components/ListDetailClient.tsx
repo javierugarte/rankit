@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
 import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
+import ShareModal, { type MemberWithProfile } from "./ShareModal";
 
 interface Props {
   list: List;
@@ -15,6 +15,7 @@ interface Props {
   userId: string;
   todayVotedItemId: string | null;
   isOwner?: boolean;
+  initialMembers: MemberWithProfile[];
 }
 
 export default function ListDetailClient({
@@ -23,6 +24,7 @@ export default function ListDetailClient({
   userId,
   todayVotedItemId,
   isOwner,
+  initialMembers,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -30,10 +32,12 @@ export default function ListDetailClient({
     todayVotedItemId
   );
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [voting, setVoting] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
+  const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
 
   useEffect(() => {
     if (!votedItemId) return;
@@ -196,13 +200,22 @@ export default function ListDetailClient({
 
         <div className="flex items-center gap-2">
           {isOwner && (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-red-400 hover:bg-red-400/10"
-              aria-label="Eliminar lista"
-            >
-              <Trash2 size={18} />
-            </button>
+            <>
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                aria-label="Compartir lista"
+              >
+                <UserPlus size={18} />
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-red-400 hover:bg-red-400/10"
+                aria-label="Eliminar lista"
+              >
+                <Trash2 size={18} />
+              </button>
+            </>
           )}
           <button
             onClick={() => setShowAddModal(true)}
@@ -213,6 +226,33 @@ export default function ListDetailClient({
           </button>
         </div>
       </div>
+
+      {/* Collaborators badge */}
+      {members.length > 0 && (
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex -space-x-1.5">
+            {members.slice(0, 4).map((m) => (
+              <div
+                key={m.user_id}
+                className="w-6 h-6 rounded-full border-2 flex items-center justify-center text-[10px] font-semibold"
+                style={{
+                  backgroundColor: "rgba(200, 169, 110, 0.2)",
+                  color: "#c8a96e",
+                  borderColor: "#0a0a0f",
+                }}
+                title={m.username}
+              >
+                {m.username[0].toUpperCase()}
+              </div>
+            ))}
+          </div>
+          <span className="text-xs text-muted">
+            {members.length === 1
+              ? `Compartida con ${members[0].username}`
+              : `Compartida con ${members.length} personas`}
+          </span>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-6">
@@ -359,6 +399,16 @@ export default function ListDetailClient({
           userId={userId}
           onClose={() => setShowAddModal(false)}
           onAdded={onItemAdded}
+        />
+      )}
+
+      {/* Share modal */}
+      {showShareModal && (
+        <ShareModal
+          listId={list.id}
+          members={members}
+          onClose={() => setShowShareModal(false)}
+          onMembersChange={setMembers}
         />
       )}
 

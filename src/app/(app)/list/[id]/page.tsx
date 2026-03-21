@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import ListDetailClient from "@/components/ListDetailClient";
 import type { Item, List } from "@/lib/supabase/types";
+import type { MemberWithProfile } from "@/components/ShareModal";
 
 export default async function ListPage({
   params,
@@ -26,9 +27,10 @@ export default async function ListPage({
   if (!listData) notFound();
 
   const list = listData as List;
+  const isOwner = list.owner_id === user.id;
 
   // Check access: owner or member
-  if (list.owner_id !== user.id) {
+  if (!isOwner) {
     const { data: membership } = await supabase
       .from("list_members")
       .select("list_id")
@@ -58,13 +60,29 @@ export default async function ListPage({
     .eq("voted_date", today)
     .single();
 
+  // Fetch list members with their profiles (only owner can see all members)
+  let members: MemberWithProfile[] = [];
+  if (isOwner) {
+    const { data: membersData } = await supabase
+      .from("list_members")
+      .select("user_id, profiles(username)")
+      .eq("list_id", id);
+
+    members = (membersData ?? []).map((m) => ({
+      user_id: m.user_id,
+      username:
+        (m.profiles as { username: string } | null)?.username ?? "Usuario",
+    }));
+  }
+
   return (
     <ListDetailClient
       list={list}
       initialItems={items}
       userId={user.id}
       todayVotedItemId={todayVote?.item_id ?? null}
-      isOwner={list.owner_id === user.id}
+      isOwner={isOwner}
+      initialMembers={members}
     />
   );
 }
