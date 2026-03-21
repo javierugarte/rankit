@@ -69,6 +69,10 @@ Las políticas RLS nunca deben crear dependencias circulares entre tablas. Si un
 
 Para romper ciclos, usar funciones `SECURITY DEFINER` que consultan la tabla sin pasar por RLS. Ver `supabase/migrations/fix_rls_recursion.sql` como ejemplo.
 
+# Antes de hacer commit
+
+Siempre ejecutar `npm run build` antes de hacer commit. Si el build falla, corregir los errores antes de continuar. No hacer commit de código que no compila.
+
 # Skills disponibles
 
 Usa el skill tool para invocarlos por nombre.
