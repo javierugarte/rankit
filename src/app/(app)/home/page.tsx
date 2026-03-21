@@ -48,22 +48,82 @@ export default async function HomePage() {
   }
 
   const allLists: List[] = [...(ownedLists ?? []), ...memberLists];
-
-  // Item counts per list
   const listIds = allLists.map((l) => l.id);
-  const countMap: Record<string, number> = {};
 
-  if (listIds.length > 0) {
-    const { data: itemCounts } = await supabase
+  if (listIds.length === 0) {
+    return (
+      <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
+        <div className="mb-8">
+          <h1
+            className="text-3xl font-bold"
+            style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+          >
+            RankIt
+          </h1>
+          <p className="text-muted text-sm mt-1">Tus listas</p>
+        </div>
+        <div className="text-center py-20">
+          <p className="text-4xl mb-4">🎬</p>
+          <p className="text-muted text-base">Aún no tienes listas.</p>
+          <p className="text-muted text-sm mt-1">
+            Pulsa el <span className="text-gold font-bold">+</span> para crear
+            la primera.
+          </p>
+        </div>
+        <CreateListButton userId={user.id} />
+      </div>
+    );
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+
+  // Fetch all data in parallel
+  const [itemsResult, membersResult, todayVotesResult] = await Promise.all([
+    supabase
       .from("items")
-      .select("list_id")
+      .select("list_id, total_votes, title")
       .in("list_id", listIds)
-      .eq("completed", false);
+      .eq("completed", false)
+      .order("total_votes", { ascending: false }),
+    supabase
+      .from("list_members")
+      .select("list_id")
+      .in("list_id", listIds),
+    supabase
+      .from("votes")
+      .select("list_id")
+      .eq("user_id", user.id)
+      .in("list_id", listIds)
+      .eq("voted_date", today),
+  ]);
 
-    for (const item of itemCounts ?? []) {
-      countMap[item.list_id] = (countMap[item.list_id] ?? 0) + 1;
+  // Build maps from items
+  const countMap: Record<string, number> = {};
+  const totalVotesMap: Record<string, number> = {};
+  const leaderMap: Record<string, string> = {};
+
+  for (const item of itemsResult.data ?? []) {
+    countMap[item.list_id] = (countMap[item.list_id] ?? 0) + 1;
+    totalVotesMap[item.list_id] =
+      (totalVotesMap[item.list_id] ?? 0) + item.total_votes;
+    if (!(item.list_id in leaderMap) && item.total_votes > 0) {
+      leaderMap[item.list_id] = item.title;
     }
   }
+
+  // Member count (+ 1 for owner)
+  const memberCountMap: Record<string, number> = {};
+  for (const row of membersResult.data ?? []) {
+    memberCountMap[row.list_id] = (memberCountMap[row.list_id] ?? 0) + 1;
+  }
+  for (const list of allLists) {
+    memberCountMap[list.id] = (memberCountMap[list.id] ?? 0) + 1;
+  }
+
+  // Voted today set
+  const votedTodaySet = new Set(
+    (todayVotesResult.data ?? []).map((r) => r.list_id)
+  );
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
@@ -79,26 +139,19 @@ export default async function HomePage() {
       </div>
 
       {/* Lists */}
-      {allLists.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-4xl mb-4">🎬</p>
-          <p className="text-muted text-base">Aún no tienes listas.</p>
-          <p className="text-muted text-sm mt-1">
-            Pulsa el <span className="text-gold font-bold">+</span> para crear
-            la primera.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {allLists.map((list) => (
-            <ListCard
-              key={list.id}
-              list={list}
-              itemCount={countMap[list.id] ?? 0}
-            />
-          ))}
-        </div>
-      )}
+      <div className="space-y-4">
+        {allLists.map((list) => (
+          <ListCard
+            key={list.id}
+            list={list}
+            itemCount={countMap[list.id] ?? 0}
+            totalVotes={totalVotesMap[list.id] ?? 0}
+            memberCount={memberCountMap[list.id] ?? 1}
+            votedToday={votedTodaySet.has(list.id)}
+            leader={leaderMap[list.id] ?? null}
+          />
+        ))}
+      </div>
 
       <CreateListButton userId={user.id} />
     </div>
