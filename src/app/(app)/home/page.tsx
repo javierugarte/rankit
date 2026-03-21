@@ -95,6 +95,7 @@ export default async function HomePage() {
               key={list.id}
               list={list}
               itemCount={countMap[list.id] ?? 0}
+              isOwner={list.owner_id === user.id}
             />
           ))}
         </div>
