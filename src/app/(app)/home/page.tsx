@@ -87,7 +87,7 @@ export default async function HomePage() {
       .order("total_votes", { ascending: false }),
     supabase
       .from("list_members")
-      .select("list_id")
+      .select("list_id, user_id, profiles(username)")
       .in("list_id", listIds),
     supabase
       .from("votes")
@@ -98,12 +98,10 @@ export default async function HomePage() {
   ]);
 
   // Build maps from items
-  const countMap: Record<string, number> = {};
   const totalVotesMap: Record<string, number> = {};
   const leaderMap: Record<string, string> = {};
 
   for (const item of itemsResult.data ?? []) {
-    countMap[item.list_id] = (countMap[item.list_id] ?? 0) + 1;
     totalVotesMap[item.list_id] =
       (totalVotesMap[item.list_id] ?? 0) + item.total_votes;
     if (!(item.list_id in leaderMap) && item.total_votes > 0) {
@@ -111,13 +109,23 @@ export default async function HomePage() {
     }
   }
 
-  // Member count (+ 1 for owner)
-  const memberCountMap: Record<string, number> = {};
+  // Sharing label per list (excluding current user)
+  const otherMembersPerList: Record<string, string[]> = {};
   for (const row of membersResult.data ?? []) {
-    memberCountMap[row.list_id] = (memberCountMap[row.list_id] ?? 0) + 1;
+    if (row.user_id === user.id) continue;
+    const username =
+      (row.profiles as { username: string } | null)?.username ?? "alguien";
+    otherMembersPerList[row.list_id] = [
+      ...(otherMembersPerList[row.list_id] ?? []),
+      username,
+    ];
   }
+  const sharingMap: Record<string, string> = {};
   for (const list of allLists) {
-    memberCountMap[list.id] = (memberCountMap[list.id] ?? 0) + 1;
+    const others = otherMembersPerList[list.id] ?? [];
+    if (others.length === 0) sharingMap[list.id] = "Privado";
+    else if (others.length === 1) sharingMap[list.id] = `Con ${others[0]}`;
+    else sharingMap[list.id] = `Con ${others.length} personas`;
   }
 
   // Voted today set
@@ -139,14 +147,13 @@ export default async function HomePage() {
       </div>
 
       {/* Lists */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {allLists.map((list) => (
           <ListCard
             key={list.id}
             list={list}
-            itemCount={countMap[list.id] ?? 0}
+            sharingLabel={sharingMap[list.id] ?? "Privado"}
             totalVotes={totalVotesMap[list.id] ?? 0}
-            memberCount={memberCountMap[list.id] ?? 1}
             votedToday={votedTodaySet.has(list.id)}
             leader={leaderMap[list.id] ?? null}
           />

@@ -3,21 +3,22 @@ import type { List } from "@/lib/supabase/types";
 
 interface Props {
   list: List;
-  itemCount: number;
+  sharingLabel: string;
   totalVotes: number;
-  memberCount: number;
   votedToday: boolean;
   leader: string | null;
 }
 
 export default function ListCard({
   list,
-  itemCount,
+  sharingLabel,
   totalVotes,
-  memberCount,
   votedToday,
   leader,
 }: Props) {
+  const votesLabel =
+    totalVotes === 1 ? "1 voto" : `${totalVotes} votos`;
+
   const bottomLine = [
     leader ? `🥇 ${leader}` : null,
     votedToday ? "✓ Votaste hoy" : null,
@@ -43,17 +44,9 @@ export default function ListCard({
               {list.name}
             </h3>
             <p className="text-muted text-sm mt-0.5">
-              {itemCount === 0
-                ? "Sin items pendientes"
-                : `${itemCount} item${itemCount !== 1 ? "s" : ""} pendiente${itemCount !== 1 ? "s" : ""}`}
+              {sharingLabel}
               {" · "}
-              <span>👥 {memberCount}</span>
-              {totalVotes > 0 && (
-                <>
-                  {" · "}
-                  <span>⚡ {totalVotes} votos</span>
-                </>
-              )}
+              {votesLabel}
             </p>
           </div>
 
