@@ -50,15 +50,15 @@ export default async function ListPage({
 
   const items = (itemsData ?? []) as Item[];
 
-  // Check if user already voted today in this list
-  const today = new Date().toISOString().split("T")[0];
-  const { data: todayVote } = await supabase
+  // Fetch the latest vote — the client will compare voted_date to local today
+  const { data: latestVote } = await supabase
     .from("votes")
-    .select("item_id")
+    .select("item_id, voted_date")
     .eq("user_id", user.id)
     .eq("list_id", id)
-    .eq("voted_date", today)
-    .single();
+    .order("voted_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   // Fetch list members with their profiles (only owner can see all members)
   let members: MemberWithProfile[] = [];
@@ -80,7 +80,7 @@ export default async function ListPage({
       list={list}
       initialItems={items}
       userId={user.id}
-      todayVotedItemId={todayVote?.item_id ?? null}
+      latestVote={latestVote ?? null}
       isOwner={isOwner}
       initialMembers={members}
     />

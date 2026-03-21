@@ -9,11 +9,16 @@ import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
 
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 interface Props {
   list: List;
   initialItems: Item[];
   userId: string;
-  todayVotedItemId: string | null;
+  latestVote: { item_id: string; voted_date: string } | null;
   isOwner?: boolean;
   initialMembers: MemberWithProfile[];
 }
@@ -22,14 +27,14 @@ export default function ListDetailClient({
   list,
   initialItems,
   userId,
-  todayVotedItemId,
+  latestVote,
   isOwner,
   initialMembers,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
   const [items, setItems] = useState<Item[]>(initialItems);
   const [votedItemId, setVotedItemId] = useState<string | null>(
-    todayVotedItemId
+    latestVote?.voted_date === localToday() ? latestVote.item_id : null
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -43,9 +48,14 @@ export default function ListDetailClient({
     if (!votedItemId) return;
     const update = () => {
       const now = new Date();
+      // Use local midnight — voted_date is stored as local date
       const midnight = new Date(now);
       midnight.setHours(24, 0, 0, 0);
       const diff = midnight.getTime() - now.getTime();
+      if (diff <= 0) {
+        setVotedItemId(null);
+        return;
+      }
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
@@ -119,7 +129,8 @@ export default function ListDetailClient({
 
     setVoting(true);
 
-    const today = new Date().toISOString().split("T")[0];
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
     const { error: voteError } = await supabase.from("votes").insert({
       item_id: itemId,
