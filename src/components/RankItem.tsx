@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import type { Item } from "@/lib/supabase/types";
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
   isVoted: boolean;
   onVote: () => void;
   onMarkDone: () => void;
+  onDelete: () => void;
   isFirst: boolean;
 }
 
@@ -17,6 +19,7 @@ export default function RankItem({
   isVoted,
   onVote,
   onMarkDone,
+  onDelete,
   isFirst,
 }: Props) {
   return (
@@ -77,6 +80,15 @@ export default function RankItem({
             ✓
           </button>
         )}
+
+        {/* Delete item */}
+        <button
+          onClick={onDelete}
+          className="w-7 h-7 rounded-full flex items-center justify-center transition-colors text-muted hover:text-red-400 hover:bg-red-400/10"
+          title="Eliminar item"
+        >
+          <Trash2 size={14} />
+        </button>
 
         {/* Vote button */}
         <button
