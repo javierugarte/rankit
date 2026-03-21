@@ -147,7 +147,7 @@ export default async function HomePage() {
       </div>
 
       {/* Lists */}
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         {allLists.map((list) => (
           <ListCard
             key={list.id}
