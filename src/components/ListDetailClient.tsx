@@ -143,6 +143,11 @@ export default function ListDetailClient({
     }
   }
 
+  async function handleDeleteItem(itemId: string) {
+    await supabase.from("items").delete().eq("id", itemId);
+    setItems((prev) => prev.filter((i) => i.id !== itemId));
+  }
+
   async function handleDelete() {
     setDeleting(true);
     await supabase.from("lists").delete().eq("id", list.id);
@@ -276,6 +281,7 @@ export default function ListDetailClient({
                   isVoted={votedItemId === item.id}
                   onVote={() => handleVote(item.id)}
                   onMarkDone={() => handleMarkDone(item.id)}
+                  onDelete={() => handleDeleteItem(item.id)}
                   isFirst={index === 0}
                 />
               ))}
