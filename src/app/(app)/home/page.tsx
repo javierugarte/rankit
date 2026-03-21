@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import ListCard from "@/components/ListCard";
-import CreateListButton from "@/components/CreateListButton";
+import HomeClient from "@/components/HomeClient";
 import type { List } from "@/lib/supabase/types";
 
 export default async function HomePage() {
@@ -66,41 +65,6 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
-      {/* Header */}
-      <div className="mb-8">
-        <h1
-          className="text-3xl font-bold"
-          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
-        >
-          RankIt
-        </h1>
-        <p className="text-muted text-sm mt-1">Tus listas</p>
-      </div>
-
-      {/* Lists */}
-      {allLists.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-4xl mb-4">🎬</p>
-          <p className="text-muted text-base">Aún no tienes listas.</p>
-          <p className="text-muted text-sm mt-1">
-            Pulsa el <span className="text-gold font-bold">+</span> para crear
-            la primera.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {allLists.map((list) => (
-            <ListCard
-              key={list.id}
-              list={list}
-              itemCount={countMap[list.id] ?? 0}
-            />
-          ))}
-        </div>
-      )}
-
-      <CreateListButton userId={user.id} />
-    </div>
+    <HomeClient lists={allLists} countMap={countMap} userId={user.id} />
   );
 }
