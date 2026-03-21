@@ -106,10 +106,6 @@ create policy "Owners can delete their lists"
 create policy "Members can view list memberships"
   on public.list_members for select using (
     auth.uid() = user_id
-    or exists (
-      select 1 from public.lists l
-      where l.id = list_members.list_id and l.owner_id = auth.uid()
-    )
   );
 
 create policy "Owners can add members"

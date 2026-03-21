@@ -59,7 +59,11 @@ export default function ListDetailClient({
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setItems((prev) => [...prev, payload.new as Item]);
+            setItems((prev) => {
+              const newItem = payload.new as Item;
+              if (prev.some((i) => i.id === newItem.id)) return prev;
+              return [...prev, newItem];
+            });
           } else if (payload.eventType === "UPDATE") {
             setItems((prev) =>
               prev.map((item) =>

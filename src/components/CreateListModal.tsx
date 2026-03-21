@@ -35,18 +35,22 @@ export default function CreateListModal({ userId, onClose, onCreated }: Props) {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
+    console.log("handleCreate called, name:", name, "userId:", userId);
     if (!name.trim()) return;
 
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.from("lists").insert({
+    const { data, error } = await supabase.from("lists").insert({
       name: name.trim(),
       emoji,
       owner_id: userId,
-    });
+    }).select();
+
+    console.log("Insert result:", { data, error });
 
     if (error) {
+      console.error("Create list error:", error);
       setError(error.message);
       setLoading(false);
     } else {
@@ -120,7 +124,7 @@ export default function CreateListModal({ userId, onClose, onCreated }: Props) {
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm">{error}</p>
+            <p style={{ color: "#f87171", fontSize: "0.875rem" }}>{error}</p>
           )}
 
           <div className="flex gap-3">

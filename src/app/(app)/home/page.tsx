@@ -13,6 +13,13 @@ export default async function HomePage() {
 
   if (!user) redirect("/login");
 
+  // Ensure profile exists (trigger may have failed on signup)
+  const { error: profileError } = await supabase.from("profiles").upsert(
+    { id: user.id, username: user.email?.split("@")[0] ?? "user" },
+    { onConflict: "id", ignoreDuplicates: true }
+  );
+  if (profileError) console.error("Profile upsert failed:", profileError);
+
   // Owned lists
   const { data: ownedLists } = await supabase
     .from("lists")
