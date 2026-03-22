@@ -42,6 +42,7 @@ export async function GET(
 
   if (service === "movies") return searchMovies(q.trim(), apiKey);
   if (service === "tv") return searchTV(q.trim(), apiKey);
+  if (service === "books") return searchBooks(q.trim());
 
   return NextResponse.json({ error: "Unknown service" }, { status: 400 });
 }
@@ -70,6 +71,39 @@ async function searchMovies(query: string, apiKey: string): Promise<NextResponse
       poster_path: (r.poster_path as string | null) ?? null,
       overview: (r.overview as string | null) ?? null,
     }));
+
+  return NextResponse.json(results);
+}
+
+async function searchBooks(query: string): Promise<NextResponse> {
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=7&langRestrict=es`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, { next: { revalidate: 60 } });
+  } catch {
+    return NextResponse.json({ error: "Network error" }, { status: 502 });
+  }
+
+  if (!res.ok) return NextResponse.json({ error: "Google Books error" }, { status: 502 });
+
+  const data = await res.json();
+
+  const results: ExternalResult[] = (data.items ?? [])
+    .slice(0, 7)
+    .map((item: Record<string, unknown>) => {
+      const info = (item.volumeInfo ?? {}) as Record<string, unknown>;
+      const imageLinks = (info.imageLinks ?? {}) as Record<string, string>;
+      const authors = (info.authors as string[] | undefined) ?? [];
+      return {
+        external_id: String(item.id),
+        title: (info.title ?? "") as string,
+        year: ((info.publishedDate as string)?.slice(0, 4) ?? null),
+        genre: authors.length > 0 ? authors[0] : null,
+        poster_path: imageLinks.thumbnail?.replace("http://", "https://") ?? null,
+        overview: (info.description as string | null) ?? null,
+      };
+    });
 
   return NextResponse.json(results);
 }

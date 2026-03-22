@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { X, Trash2, Plus } from "lucide-react";
 import type { List } from "@/lib/supabase/types";
-import { LIST_TYPE_OPTIONS } from "@/lib/services";
+import { LIST_TYPE_OPTIONS, getService } from "@/lib/services";
 
 const EMOJI_OPTIONS = [
   "🎬",
@@ -234,13 +234,13 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
               Tipo de contenido{" "}
               <span className="normal-case text-muted/60">(opcional)</span>
             </label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {LIST_TYPE_OPTIONS.map((opt) => (
                 <button
                   key={String(opt.value)}
                   type="button"
                   onClick={() => setListType(opt.value)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border"
+                  className="py-2.5 rounded-xl text-sm font-medium transition-all border"
                   style={{
                     backgroundColor:
                       listType === opt.value
@@ -258,9 +258,9 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                 </button>
               ))}
             </div>
-            {listType && listType !== null && (
+            {listType && (
               <p className="text-xs text-muted mt-1.5">
-                Autocomplete con TMDB al anadir items.
+                Autocompletado con {getService(listType)?.apiLabel ?? listType} al añadir items.
               </p>
             )}
           </div>
