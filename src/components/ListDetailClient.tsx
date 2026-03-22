@@ -158,6 +158,23 @@ export default function ListDetailClient({
     setVoting(false);
   }
 
+  async function handleUnmarkDone(itemId: string) {
+    const { error } = await supabase
+      .from("items")
+      .update({ completed: false, completed_at: null })
+      .eq("id", itemId);
+
+    if (!error) {
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === itemId
+            ? { ...item, completed: false, completed_at: null }
+            : item
+        )
+      );
+    }
+  }
+
   async function handleMarkDone(itemId: string) {
     const { error } = await supabase
       .from("items")
@@ -383,8 +400,10 @@ export default function ListDetailClient({
                   className="bg-surface border border-border rounded-2xl p-4 flex items-center gap-3 opacity-60"
                 >
                   <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
                     style={{ backgroundColor: "rgba(200, 169, 110, 0.2)" }}
+                    onClick={() => handleUnmarkDone(item.id)}
+                    title="Volver a pendientes"
                   >
                     <span className="text-xs">✓</span>
                   </div>
