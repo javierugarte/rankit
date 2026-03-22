@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Trash2, UserPlus, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, UserPlus, Pencil } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
@@ -254,13 +254,6 @@ export default function ListDetailClient({
               >
                 <UserPlus size={18} />
               </button>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-red-400 hover:bg-red-400/10"
-                aria-label="Eliminar lista"
-              >
-                <Trash2 size={18} />
-              </button>
             </>
           )}
           <button
@@ -460,6 +453,10 @@ export default function ListDetailClient({
             setListName(updated.name);
             setListEmoji(updated.emoji);
             setShowEditListModal(false);
+          }}
+          onDelete={() => {
+            setShowEditListModal(false);
+            setShowDeleteConfirm(true);
           }}
         />
       )}

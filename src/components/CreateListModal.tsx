@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import type { List } from "@/lib/supabase/types";
 import { LIST_TYPE_OPTIONS } from "@/lib/services";
 
@@ -27,9 +27,10 @@ interface Props {
   onCreated: () => void;
   editList?: List;
   onUpdated?: (list: List) => void;
+  onDelete?: () => void;
 }
 
-export default function CreateListModal({ userId, onClose, onCreated, editList, onUpdated }: Props) {
+export default function CreateListModal({ userId, onClose, onCreated, editList, onUpdated, onDelete }: Props) {
   const [name, setName] = useState(editList?.name ?? "");
   const [emoji, setEmoji] = useState(editList?.emoji ?? "🎬");
   const [listType, setListType] = useState<string | null>(editList?.list_type ?? null);
@@ -181,6 +182,18 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
 
           {error && (
             <p style={{ color: "#f87171", fontSize: "0.875rem" }}>{error}</p>
+          )}
+
+          {editList && onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-colors"
+              style={{ color: "#f87171", backgroundColor: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}
+            >
+              <Trash2 size={15} />
+              Eliminar lista
+            </button>
           )}
 
           <div className="flex gap-3">
