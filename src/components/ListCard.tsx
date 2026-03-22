@@ -27,7 +27,7 @@ export default function ListCard({
     .join(" · ");
 
   return (
-    <Link href={`/list/${list.id}`}>
+    <Link href={`/list/${list.id}`} className="block">
       <div className="bg-surface border border-border rounded-2xl p-4 hover:border-gold/40 transition-colors active:scale-[0.98] active:transition-none">
         <div className="flex items-center gap-4">
           {/* Emoji */}

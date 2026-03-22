@@ -187,7 +187,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap, votedToda
               items={orderedLists.map((l) => l.id)}
               strategy={verticalListSortingStrategy}
             >
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {orderedLists.map((list) => (
                   <SortableListCard
                     key={list.id}
@@ -203,7 +203,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap, votedToda
           </DndContext>
         </>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {orderedLists.map((list) => (
             <ListCard
               key={list.id}
