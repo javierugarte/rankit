@@ -30,6 +30,24 @@ export default async function ProfilePage() {
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id);
 
+  const { count: totalCompleted } = await supabase
+    .from("items")
+    .select("list_id", { count: "exact", head: true })
+    .eq("completed", true)
+    .in(
+      "list_id",
+      await supabase
+        .from("lists")
+        .select("id")
+        .eq("owner_id", user.id)
+        .then(({ data }) => (data ?? []).map((l) => l.id))
+    );
+
+  const { count: sharedLists } = await supabase
+    .from("list_members")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
   const initials = (profile?.username ?? user.email ?? "?")
     .slice(0, 2)
     .toUpperCase();
@@ -72,6 +90,24 @@ export default async function ProfilePage() {
             {totalVotes ?? 0}
           </p>
           <p className="text-muted text-sm mt-1">Votos emitidos</p>
+        </div>
+        <div className="bg-surface border border-border rounded-xl p-4 text-center">
+          <p
+            className="text-3xl font-bold"
+            style={{ color: "#c8a96e", fontFamily: "Georgia, serif" }}
+          >
+            {totalCompleted ?? 0}
+          </p>
+          <p className="text-muted text-sm mt-1">Ítems vistos</p>
+        </div>
+        <div className="bg-surface border border-border rounded-xl p-4 text-center">
+          <p
+            className="text-3xl font-bold"
+            style={{ color: "#c8a96e", fontFamily: "Georgia, serif" }}
+          >
+            {sharedLists ?? 0}
+          </p>
+          <p className="text-muted text-sm mt-1">Listas compartidas</p>
         </div>
       </div>
 
