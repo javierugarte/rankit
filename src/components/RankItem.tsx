@@ -65,13 +65,12 @@ export default function RankItem({
         const path = (item.external_data as Record<string, unknown>).poster_path as string;
         const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
         return (
-          <Image
-            src={src}
-            alt={item.title}
-            width={isLandscape ? 72 : 36}
-            height={isLandscape ? 40 : 54}
-            className="rounded object-cover shrink-0"
-          />
+          <div
+            className="rounded overflow-hidden shrink-0 relative"
+            style={{ width: isLandscape ? 56 : 36, height: isLandscape ? 32 : 54 }}
+          >
+            <Image src={src} alt={item.title} fill className="object-cover" />
+          </div>
         );
       })()}
 

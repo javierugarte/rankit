@@ -411,13 +411,12 @@ export default function ListDetailClient({
                     const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
                     const isLandscape = getService(list.list_type)?.posterAspect === "landscape";
                     return (
-                      <Image
-                        src={src}
-                        alt={item.title}
-                        width={isLandscape ? 56 : 28}
-                        height={isLandscape ? 32 : 42}
-                        className="rounded object-cover shrink-0 opacity-60"
-                      />
+                      <div
+                        className="rounded overflow-hidden shrink-0 relative opacity-60"
+                        style={{ width: isLandscape ? 44 : 28, height: isLandscape ? 25 : 42 }}
+                      >
+                        <Image src={src} alt={item.title} fill className="object-cover" />
+                      </div>
                     );
                   })()}
                   <div className="flex-1 min-w-0">
