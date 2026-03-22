@@ -86,11 +86,11 @@ export default function AddItemModal({
     setSelectedResult(result);
     setTitle(result.title);
     setCategory(
-      [result.type, result.year].filter(Boolean).join(" · ")
+      [result.genre, result.year].filter(Boolean).join(" • ")
     );
     setExternalId(result.external_id);
     setExternalData({
-      type: result.type,
+      genre: result.genre,
       year: result.year,
       poster_path: result.poster_path,
       overview: result.overview,
@@ -257,9 +257,9 @@ export default function AddItemModal({
                     {selectedResult.title}
                   </p>
                   <p className="text-muted text-xs mt-0.5">
-                    {[selectedResult.type, selectedResult.year]
+                    {[selectedResult.genre, selectedResult.year]
                       .filter(Boolean)
-                      .join(" · ")}
+                      .join(" • ")}
                   </p>
                 </div>
                 <button
@@ -338,7 +338,7 @@ export default function AddItemModal({
                         {r.title}
                       </p>
                       <p className="text-muted text-xs">
-                        {[r.type, r.year].filter(Boolean).join(" · ")}
+                        {[r.genre, r.year].filter(Boolean).join(" • ")}
                       </p>
                     </div>
                   </button>
