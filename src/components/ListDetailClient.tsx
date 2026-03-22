@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Trash2, UserPlus } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, UserPlus, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
 import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
+import CreateListModal from "./CreateListModal";
 
 function localToday() {
   const d = new Date();
@@ -36,7 +37,10 @@ export default function ListDetailClient({
   const [votedItemId, setVotedItemId] = useState<string | null>(
     latestVote?.voted_date === localToday() ? latestVote.item_id : null
   );
+  const [listName, setListName] = useState(list.name);
+  const [listEmoji, setListEmoji] = useState(list.emoji);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditListModal, setShowEditListModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -227,13 +231,20 @@ export default function ListDetailClient({
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{list.emoji}</span>
-          <h1 className="text-lg font-semibold text-text">{list.name}</h1>
+          <span className="text-2xl">{listEmoji}</span>
+          <h1 className="text-lg font-semibold text-text">{listName}</h1>
         </div>
 
         <div className="flex items-center gap-2">
           {isOwner && (
             <>
+              <button
+                onClick={() => setShowEditListModal(true)}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                aria-label="Editar lista"
+              >
+                <Pencil size={16} />
+              </button>
               <button
                 onClick={() => setShowShareModal(true)}
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
@@ -427,6 +438,21 @@ export default function ListDetailClient({
         </>
       )}
 
+      {/* Edit list modal */}
+      {showEditListModal && (
+        <CreateListModal
+          userId={userId}
+          editList={{ ...list, name: listName, emoji: listEmoji }}
+          onClose={() => setShowEditListModal(false)}
+          onCreated={() => {}}
+          onUpdated={(updated) => {
+            setListName(updated.name);
+            setListEmoji(updated.emoji);
+            setShowEditListModal(false);
+          }}
+        />
+      )}
+
       {/* Add item modal */}
       {showAddModal && (
         <AddItemModal
@@ -480,13 +506,13 @@ export default function ListDetailClient({
             <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
 
             <div className="text-center mb-6">
-              <p className="text-3xl mb-3">{list.emoji}</p>
+              <p className="text-3xl mb-3">{listEmoji}</p>
               <h2 className="text-lg font-semibold text-text mb-1">
                 Eliminar lista
               </h2>
               <p className="text-muted text-sm">
                 ¿Seguro que quieres eliminar{" "}
-                <span className="text-text font-medium">{list.name}</span>? Esta
+                <span className="text-text font-medium">{listName}</span>? Esta
                 acción no se puede deshacer.
               </p>
             </div>
