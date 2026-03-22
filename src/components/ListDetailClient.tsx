@@ -400,8 +400,10 @@ export default function ListDetailClient({
                   className="bg-surface border border-border rounded-2xl p-4 flex items-center gap-3 opacity-60"
                 >
                   <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
                     style={{ backgroundColor: "rgba(200, 169, 110, 0.2)" }}
+                    onClick={() => handleUnmarkDone(item.id)}
+                    title="Volver a pendientes"
                   >
                     <span className="text-xs">✓</span>
                   </div>
@@ -415,17 +417,9 @@ export default function ListDetailClient({
                       </p>
                     )}
                   </div>
-                  <span className="text-muted text-xs mr-2">
+                  <span className="text-muted text-xs">
                     {item.total_votes} voto{item.total_votes !== 1 ? "s" : ""}
                   </span>
-                  <button
-                    onClick={() => handleUnmarkDone(item.id)}
-                    className="text-xs px-2 py-1 rounded-lg transition-colors text-muted hover:text-text shrink-0"
-                    style={{ border: "1px solid #2a2a38" }}
-                    title="Volver a pendientes"
-                  >
-                    ↩
-                  </button>
                 </div>
               ))}
             </div>
