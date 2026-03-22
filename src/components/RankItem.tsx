@@ -79,7 +79,7 @@ export default function RankItem({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="text-xs mt-0.5 truncate block hover:underline"
+              className="text-xs mt-0.5 truncate inline-flex hover:underline"
               style={{ color: "#c8a96e" }}
             >
               {parsed.label}
