@@ -10,6 +10,7 @@ A collaborative ranking app for movies, series, books — anything worth debatin
 - **Daily voting** — one vote per user per list per day, resets at midnight
 - **Real-time updates** — changes from collaborators appear instantly via Supabase Realtime
 - **Completed items** — mark items as done and keep a history of what you've watched
+- **External service autocomplete** — link a list to TMDB (or other services) to autocomplete items with poster, year, and metadata
 - **Mobile-first** — designed as a PWA-ready experience with safe-area support
 
 ---
@@ -47,10 +48,12 @@ src/
 │   ├── RankItem.tsx         # Single ranked item with vote action
 │   ├── ListCard.tsx         # List summary card
 │   └── BottomNav.tsx        # Bottom navigation bar
-└── lib/supabase/
-    ├── client.ts            # Browser client (Client Components)
-    ├── server.ts            # Server client (Server Components + middleware)
-    └── types.ts             # Generated Supabase types
+├── lib/supabase/
+│   ├── client.ts            # Browser client (Client Components)
+│   ├── server.ts            # Server client (Server Components + middleware)
+│   └── types.ts             # Generated Supabase types
+└── lib/services/
+    └── index.ts             # External service registry (TMDB, etc.)
 ```
 
 ---
@@ -59,13 +62,33 @@ src/
 
 ```
 profiles       ← mirrors auth.users (auto-created via trigger)
-lists          ← owned by a profile
+lists          ← owned by a profile; list_type links to an external service
 list_members   ← N:M join between lists and collaborator profiles
-items          ← belong to a list, tracked with vote count
+items          ← belong to a list; external_id + external_data store service metadata
 votes          ← one per (user, list, date)
 ```
 
 All tables use Row Level Security. See [`supabase/schema.sql`](supabase/schema.sql) for the full schema and [`supabase/migrations/`](supabase/migrations/) for incremental changes.
+
+---
+
+## External services
+
+Lists can be linked to an external service to enable autocomplete when adding items. The service is set at list creation time via the **Content type** selector.
+
+| `list_type` | Service | What it fills in |
+|---|---|---|
+| `movies` | [TMDB](https://www.themoviedb.org/documentation/api) | Title, year, type (Movie/Series), poster |
+
+API keys are server-side only (never sent to the client). Searches are proxied through `/api/search/[service]`.
+
+### Adding a new service
+
+1. **Register it** in `src/lib/services/index.ts` — extend `ServiceId`, add an entry to `SERVICES`, and add an option to `LIST_TYPE_OPTIONS`.
+2. **Implement the handler** in `src/app/api/search/[service]/route.ts` — add a branch for the new service ID and return `ExternalResult[]`.
+3. **Add the API key** to `.env.local`.
+
+`AddItemModal` picks it up automatically — no further changes needed.
 
 ---
 
@@ -91,6 +114,7 @@ Create a `.env.local` file:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+TMDB_API_KEY=your-tmdb-api-key   # https://www.themoviedb.org/settings/api
 ```
 
 ### 3. Set up the database

@@ -33,6 +33,7 @@ export interface Database {
           id: string;
           name: string;
           emoji: string;
+          list_type: string | null;
           owner_id: string;
           created_at: string;
         };
@@ -40,12 +41,14 @@ export interface Database {
           id?: string;
           name: string;
           emoji?: string;
+          list_type?: string | null;
           owner_id: string;
           created_at?: string;
         };
         Update: {
           name?: string;
           emoji?: string;
+          list_type?: string | null;
         };
         Relationships: [
           {
@@ -94,6 +97,8 @@ export interface Database {
           list_id: string;
           title: string;
           category: string | null;
+          external_id: string | null;
+          external_data: Record<string, unknown> | null;
           added_by: string | null;
           completed: boolean;
           completed_at: string | null;
@@ -105,6 +110,8 @@ export interface Database {
           list_id: string;
           title: string;
           category?: string | null;
+          external_id?: string | null;
+          external_data?: Record<string, unknown> | null;
           added_by?: string | null;
           completed?: boolean;
           completed_at?: string | null;
@@ -114,6 +121,8 @@ export interface Database {
         Update: {
           title?: string;
           category?: string | null;
+          external_id?: string | null;
+          external_data?: Record<string, unknown> | null;
           completed?: boolean;
           completed_at?: string | null;
           total_votes?: number;

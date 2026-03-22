@@ -27,10 +27,12 @@ src/
 │   ├── ListCard.tsx         → Tarjeta de lista en home
 │   ├── BottomNav.tsx        → Navegación inferior (Home / Perfil)
 │   └── LogoutButton.tsx     → Botón de cerrar sesión
-└── lib/supabase/
-    ├── client.ts            → Cliente browser (componentes client)
-    ├── server.ts            → Cliente servidor (Server Components y middleware)
-    └── types.ts             → Tipos del schema de Supabase (actualizar al añadir tablas/funciones)
+├── lib/supabase/
+│   ├── client.ts            → Cliente browser (componentes client)
+│   ├── server.ts            → Cliente servidor (Server Components y middleware)
+│   └── types.ts             → Tipos del schema de Supabase (actualizar al añadir tablas/funciones)
+└── lib/services/
+    └── index.ts             → Registry de servicios externos (TMDB, etc.)
 ```
 
 ## Patrones clave
@@ -62,6 +64,34 @@ Todas las tablas tienen RLS habilitado. Funciones RPC disponibles: `get_profile_
 - Para cambios en la base de datos, crear un archivo nuevo en `supabase/migrations/` con el SQL incremental.
 - Nunca re-ejecutar `supabase/schema.sql` completo en producción — es solo el estado inicial.
 - Actualizar también `supabase/schema.sql` para que refleje el estado final tras la migración.
+
+# Servicios externos (autocompletado)
+
+Las listas pueden asociarse a un servicio externo mediante el campo `list_type` en la tabla `lists`. Cuando un item se añade a una lista con servicio, `AddItemModal` muestra un buscador con autocompletado que rellena `title`, `category`, `external_id` y `external_data` (JSONB).
+
+La API key de cada servicio vive en `.env.local` como variable de entorno server-side (nunca expuesta al cliente). Las búsquedas se proxyan a través de `/api/search/[service]`.
+
+## Servicios activos
+
+| `list_type` | Servicio | API key env var |
+|---|---|---|
+| `movies` | TMDB (películas y series) | `TMDB_API_KEY` |
+
+## Cómo añadir un nuevo servicio
+
+1. **Añadir el tipo** en `src/lib/services/index.ts`:
+   - Extender `ServiceId` con el nuevo valor (ej. `"wine"`)
+   - Añadir entrada en `SERVICES` con `id`, `label`, `searchEndpoint`, `placeholder` y `posterBase`
+   - Añadir opción en `LIST_TYPE_OPTIONS` para que aparezca en `CreateListModal`
+
+2. **Implementar el handler** en `src/app/api/search/[service]/route.ts`:
+   - Añadir `if (service === "wine") return searchWine(q);`
+   - Implementar la función que llama a la API externa y devuelve un array de `ExternalResult`
+   - `ExternalResult` tiene: `external_id`, `title`, `year`, `type`, `poster_path`, `overview`
+
+3. **Añadir la API key** en `.env.local` y documentar en esta sección.
+
+No hace falta tocar `AddItemModal`, `ListDetailClient` ni la base de datos: el sistema es plug-and-play una vez que el servicio devuelve `ExternalResult[]`.
 
 # Base de datos: RLS sin recursión
 

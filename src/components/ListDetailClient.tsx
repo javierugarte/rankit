@@ -458,6 +458,7 @@ export default function ListDetailClient({
         <AddItemModal
           listId={list.id}
           userId={userId}
+          listType={list.list_type}
           onClose={() => setShowAddModal(false)}
           onSaved={onItemSaved}
         />
@@ -468,6 +469,7 @@ export default function ListDetailClient({
         <AddItemModal
           listId={list.id}
           userId={userId}
+          listType={list.list_type}
           editItem={editingItem}
           onClose={() => setEditingItem(null)}
           onSaved={onItemSaved}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { X } from "lucide-react";
 import type { List } from "@/lib/supabase/types";
+import { LIST_TYPE_OPTIONS } from "@/lib/services";
 
 const EMOJI_OPTIONS = [
   "🎬",
@@ -31,6 +32,7 @@ interface Props {
 export default function CreateListModal({ userId, onClose, onCreated, editList, onUpdated }: Props) {
   const [name, setName] = useState(editList?.name ?? "");
   const [emoji, setEmoji] = useState(editList?.emoji ?? "🎬");
+  const [listType, setListType] = useState<string | null>(editList?.list_type ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +48,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
     if (editList) {
       const { data, error } = await supabase
         .from("lists")
-        .update({ name: name.trim(), emoji })
+        .update({ name: name.trim(), emoji, list_type: listType })
         .eq("id", editList.id)
         .select()
         .single();
@@ -62,6 +64,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
       const { data, error } = await supabase.from("lists").insert({
         name: name.trim(),
         emoji,
+        list_type: listType,
         owner_id: userId,
       }).select();
 
@@ -137,6 +140,43 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
               placeholder="Series pendientes, Viajes, Restaurantes..."
               className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
             />
+          </div>
+
+          {/* List type / service */}
+          <div>
+            <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
+              Tipo de contenido{" "}
+              <span className="normal-case text-muted/60">(opcional)</span>
+            </label>
+            <div className="flex gap-2">
+              {LIST_TYPE_OPTIONS.map((opt) => (
+                <button
+                  key={String(opt.value)}
+                  type="button"
+                  onClick={() => setListType(opt.value)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border"
+                  style={{
+                    backgroundColor:
+                      listType === opt.value
+                        ? "rgba(200, 169, 110, 0.15)"
+                        : "#111117",
+                    borderColor:
+                      listType === opt.value
+                        ? "rgba(200, 169, 110, 0.5)"
+                        : "#2a2a38",
+                    color: listType === opt.value ? "#c8a96e" : "#8888a0",
+                  }}
+                >
+                  {opt.emoji !== "—" && <span className="mr-1">{opt.emoji}</span>}
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {listType && listType !== null && (
+              <p className="text-xs text-muted mt-1.5">
+                Autocomplete con TMDB al anadir items.
+              </p>
+            )}
           </div>
 
           {error && (
