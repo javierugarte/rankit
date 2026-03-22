@@ -62,6 +62,8 @@ export default async function ListPage({
 
   // Fetch list members with their profiles (only owner can see all members)
   let members: MemberWithProfile[] = [];
+  let ownerUsername: string | null = null;
+
   if (isOwner) {
     const { data: membersData } = await supabase
       .from("list_members")
@@ -73,6 +75,13 @@ export default async function ListPage({
       username:
         (m.profiles as { username: string } | null)?.username ?? "Usuario",
     }));
+  } else {
+    const { data: ownerData } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", list.owner_id)
+      .single();
+    ownerUsername = ownerData?.username ?? null;
   }
 
   return (
@@ -83,6 +92,7 @@ export default async function ListPage({
       latestVote={latestVote ?? null}
       isOwner={isOwner}
       initialMembers={members}
+      ownerUsername={ownerUsername}
     />
   );
 }
