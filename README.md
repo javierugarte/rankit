@@ -1,6 +1,22 @@
-# RankIt
+<div align="center">
 
-A collaborative ranking app for movies, series, books — anything worth debating. Create shared lists, add items, and vote once a day to surface what the group actually wants to watch next.
+<img src="src/app/icon.svg" width="96" height="96" alt="RankIt icon" />
+
+<img src="public/readme-title.svg" width="240" alt="RankIt" />
+
+**Rank together. Watch better.**
+
+*A collaborative ranking app for movies, series, books — anything worth debating.*
+
+<br/>
+
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com)
+
+</div>
 
 ---
 
