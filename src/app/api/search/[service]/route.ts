@@ -43,6 +43,7 @@ export async function GET(
   if (service === "movies") return searchMovies(q.trim(), apiKey);
   if (service === "tv") return searchTV(q.trim(), apiKey);
   if (service === "books") return searchBooks(q.trim());
+  if (service === "games") return searchGames(q.trim(), process.env.RAWG_API_KEY ?? "");
 
   return NextResponse.json({ error: "Unknown service" }, { status: 400 });
 }
@@ -102,6 +103,41 @@ async function searchBooks(query: string): Promise<NextResponse> {
         genre: authors.length > 0 ? authors[0] : null,
         poster_path: imageLinks.thumbnail?.replace("http://", "https://") ?? null,
         overview: (info.description as string | null) ?? null,
+      };
+    });
+
+  return NextResponse.json(results);
+}
+
+async function searchGames(query: string, apiKey: string): Promise<NextResponse> {
+  if (!apiKey) {
+    return NextResponse.json({ error: "RAWG_API_KEY not configured" }, { status: 500 });
+  }
+
+  const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&key=${apiKey}&page_size=7&exclude_additions=true`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, { next: { revalidate: 60 } });
+  } catch {
+    return NextResponse.json({ error: "Network error" }, { status: 502 });
+  }
+
+  if (!res.ok) return NextResponse.json({ error: "RAWG error" }, { status: 502 });
+
+  const data = await res.json();
+
+  const results: ExternalResult[] = (data.results ?? [])
+    .slice(0, 7)
+    .map((r: Record<string, unknown>) => {
+      const genres = (r.genres as { name: string }[] | undefined) ?? [];
+      return {
+        external_id: String(r.id),
+        title: (r.name ?? "") as string,
+        year: ((r.released as string)?.slice(0, 4) ?? null),
+        genre: genres.length > 0 ? genres[0].name : null,
+        poster_path: (r.background_image as string | null) ?? null,
+        overview: null,
       };
     });
 

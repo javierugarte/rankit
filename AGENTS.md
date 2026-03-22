@@ -73,9 +73,14 @@ La API key de cada servicio vive en `.env.local` como variable de entorno server
 
 ## Servicios activos
 
-| `list_type` | Servicio | API key env var |
-|---|---|---|
-| `movies` | TMDB (películas y series) | `TMDB_API_KEY` |
+| `list_type` | Servicio | API | API key env var |
+|---|---|---|---|
+| `movies` | Películas | TMDB | `TMDB_API_KEY` |
+| `tv` | Series | TMDB | `TMDB_API_KEY` |
+| `books` | Libros | Google Books | — (sin key) |
+| `games` | Videojuegos | RAWG | `RAWG_API_KEY` |
+
+Cuando `posterBase` en `ServiceConfig` está vacío (`""`), el `poster_path` almacenado en `external_data` es una URL absoluta. Si no está vacío, el src de la imagen es `posterBase + poster_path`.
 
 ## Cómo añadir un nuevo servicio
 

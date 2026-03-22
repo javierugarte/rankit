@@ -76,9 +76,12 @@ All tables use Row Level Security. See [`supabase/schema.sql`](supabase/schema.s
 
 Lists can be linked to an external service to enable autocomplete when adding items. The service is set at list creation time via the **Content type** selector.
 
-| `list_type` | Service | What it fills in |
-|---|---|---|
-| `movies` | [TMDB](https://www.themoviedb.org/documentation/api) | Title, year, type (Movie/Series), poster |
+| `list_type` | Service | API | What it fills in |
+|---|---|---|---|
+| `movies` | Movies | [TMDB](https://www.themoviedb.org/documentation/api) | Title, year, genre, poster |
+| `tv` | TV series | [TMDB](https://www.themoviedb.org/documentation/api) | Title, year, genre, poster |
+| `books` | Books | [Google Books](https://developers.google.com/books/docs/v1/using) | Title, author, year, cover |
+| `games` | Video games | [RAWG](https://rawg.io/apidocs) | Title, year, genre, cover art |
 
 API keys are server-side only (never sent to the client). Searches are proxied through `/api/search/[service]`.
 
@@ -114,7 +117,9 @@ Create a `.env.local` file:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-TMDB_API_KEY=your-tmdb-api-key   # https://www.themoviedb.org/settings/api
+TMDB_API_KEY=your-tmdb-api-key       # https://www.themoviedb.org/settings/api
+RAWG_API_KEY=your-rawg-api-key       # https://rawg.io/apidocs (free, register required)
+# Google Books works without a key
 ```
 
 ### 3. Set up the database

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { Item } from "@/lib/supabase/types";
-import { TMDB_POSTER_BASE } from "@/lib/services";
+import { TMDB_POSTER_BASE, getService } from "@/lib/services";
 
 function parseDescription(value: string): { isUrl: true; href: string; label: string } | { isUrl: false } {
   try {
@@ -21,6 +21,7 @@ interface Props {
   onMarkDone: () => void;
   onEdit: () => void;
   isFirst: boolean;
+  listType?: string | null;
 }
 
 export default function RankItem({
@@ -32,7 +33,9 @@ export default function RankItem({
   onMarkDone,
   onEdit,
   isFirst,
+  listType,
 }: Props) {
+  const isLandscape = getService(listType)?.posterAspect === "landscape";
   return (
     <div
       className="rounded-2xl p-4 flex items-center gap-4 transition-all"
@@ -62,13 +65,12 @@ export default function RankItem({
         const path = (item.external_data as Record<string, unknown>).poster_path as string;
         const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
         return (
-          <Image
-            src={src}
-            alt={item.title}
-            width={36}
-            height={54}
-            className="rounded object-cover shrink-0"
-          />
+          <div
+            className="rounded overflow-hidden shrink-0 relative"
+            style={{ width: isLandscape ? 56 : 36, height: isLandscape ? 32 : 54 }}
+          >
+            <Image src={src} alt={item.title} fill className="object-cover" />
+          </div>
         );
       })()}
 
