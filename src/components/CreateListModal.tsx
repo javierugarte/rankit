@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Plus } from "lucide-react";
 import type { List } from "@/lib/supabase/types";
 import { LIST_TYPE_OPTIONS } from "@/lib/services";
 
@@ -19,7 +19,19 @@ const EMOJI_OPTIONS = [
   "🎯",
   "🍜",
   "💡",
+  "🏆",
 ];
+
+function isValidEmoji(str: string): boolean {
+  if (!str.trim()) return false;
+  try {
+    const segments = [...new Intl.Segmenter().segment(str.trim())];
+    if (segments.length !== 1) return false;
+    return /\p{Emoji_Presentation}|\p{Extended_Pictographic}/u.test(str.trim());
+  } catch {
+    return false;
+  }
+}
 
 interface Props {
   userId: string;
@@ -31,11 +43,18 @@ interface Props {
 }
 
 export default function CreateListModal({ userId, onClose, onCreated, editList, onUpdated, onDelete }: Props) {
+  const initialEmoji = editList?.emoji ?? "🎬";
+  const isInitialCustom = !EMOJI_OPTIONS.includes(initialEmoji);
+
   const [name, setName] = useState(editList?.name ?? "");
-  const [emoji, setEmoji] = useState(editList?.emoji ?? "🎬");
+  const [emoji, setEmoji] = useState(initialEmoji);
   const [listType, setListType] = useState<string | null>(editList?.list_type ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCustomInput, setShowCustomInput] = useState(isInitialCustom);
+  const [customValue, setCustomValue] = useState(isInitialCustom ? initialEmoji : "");
+  const [customError, setCustomError] = useState(false);
+  const customInputRef = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
 
@@ -109,15 +128,20 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                 <button
                   key={e}
                   type="button"
-                  onClick={() => setEmoji(e)}
+                  onClick={() => {
+                    setEmoji(e);
+                    setShowCustomInput(false);
+                    setCustomValue("");
+                    setCustomError(false);
+                  }}
                   className="w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all"
                   style={{
                     backgroundColor:
-                      emoji === e
+                      emoji === e && !showCustomInput
                         ? "rgba(200, 169, 110, 0.2)"
                         : "#111117",
                     border:
-                      emoji === e
+                      emoji === e && !showCustomInput
                         ? "1px solid rgba(200, 169, 110, 0.5)"
                         : "1px solid #2a2a38",
                   }}
@@ -125,7 +149,68 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                   {e}
                 </button>
               ))}
+
+              {/* Custom emoji button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCustomInput(true);
+                  setTimeout(() => customInputRef.current?.focus(), 50);
+                }}
+                className="w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all"
+                style={{
+                  backgroundColor: showCustomInput
+                    ? "rgba(200, 169, 110, 0.2)"
+                    : "#111117",
+                  border: showCustomInput
+                    ? "1px solid rgba(200, 169, 110, 0.5)"
+                    : "1px solid #2a2a38",
+                }}
+              >
+                {showCustomInput && isValidEmoji(customValue) ? (
+                  <span>{customValue}</span>
+                ) : (
+                  <Plus size={16} color={showCustomInput ? "#c8a96e" : "#8888a0"} />
+                )}
+              </button>
             </div>
+
+            {/* Custom emoji input */}
+            {showCustomInput && (
+              <div className="mt-3">
+                <input
+                  ref={customInputRef}
+                  type="text"
+                  value={customValue}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCustomValue(val);
+                    if (isValidEmoji(val)) {
+                      setEmoji(val.trim());
+                      setCustomError(false);
+                    } else if (val.length > 0) {
+                      setCustomError(true);
+                    } else {
+                      setCustomError(false);
+                    }
+                  }}
+                  placeholder="Abre el teclado emoji 😀"
+                  className="w-full bg-surface border rounded-xl px-4 py-3 text-text text-2xl text-center placeholder-muted focus:outline-none transition-colors"
+                  style={{
+                    borderColor: customError
+                      ? "#ef4444"
+                      : isValidEmoji(customValue)
+                      ? "rgba(200, 169, 110, 0.5)"
+                      : "#2a2a38",
+                  }}
+                />
+                {customError && (
+                  <p className="text-xs mt-1.5" style={{ color: "#ef4444" }}>
+                    Escribe un único emoji válido
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Name */}
