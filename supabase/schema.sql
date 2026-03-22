@@ -20,6 +20,7 @@ create table public.lists (
   id uuid default gen_random_uuid() primary key,
   name text not null,
   emoji text default '🎬' not null,
+  list_type text,
   owner_id uuid references public.profiles(id) on delete cascade not null,
   created_at timestamptz default now() not null
 );
@@ -36,6 +37,8 @@ create table public.items (
   list_id uuid references public.lists(id) on delete cascade not null,
   title text not null,
   category text,
+  external_id text,
+  external_data jsonb,
   added_by uuid references public.profiles(id) on delete set null,
   completed boolean default false not null,
   completed_at timestamptz,

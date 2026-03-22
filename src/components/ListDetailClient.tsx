@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Trash2, UserPlus, Pencil } from "lucide-react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
+import { TMDB_POSTER_BASE } from "@/lib/services";
 import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
@@ -418,6 +420,15 @@ export default function ListDetailClient({
                   >
                     <span className="text-xs">✓</span>
                   </div>
+                  {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (
+                    <Image
+                      src={`${TMDB_POSTER_BASE}${(item.external_data as Record<string, unknown>).poster_path as string}`}
+                      alt={item.title}
+                      width={28}
+                      height={42}
+                      className="rounded object-cover shrink-0 opacity-60"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-text text-sm line-through truncate">
                       {item.title}
@@ -458,6 +469,7 @@ export default function ListDetailClient({
         <AddItemModal
           listId={list.id}
           userId={userId}
+          listType={list.list_type}
           onClose={() => setShowAddModal(false)}
           onSaved={onItemSaved}
         />
@@ -468,6 +480,7 @@ export default function ListDetailClient({
         <AddItemModal
           listId={list.id}
           userId={userId}
+          listType={list.list_type}
           editItem={editingItem}
           onClose={() => setEditingItem(null)}
           onSaved={onItemSaved}

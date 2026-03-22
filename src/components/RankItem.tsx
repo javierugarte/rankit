@@ -1,4 +1,6 @@
+import Image from "next/image";
 import type { Item } from "@/lib/supabase/types";
+import { TMDB_POSTER_BASE } from "@/lib/services";
 
 interface Props {
   item: Item;
@@ -44,6 +46,17 @@ export default function RankItem({
           </span>
         )}
       </div>
+
+      {/* Poster */}
+      {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (
+        <Image
+          src={`${TMDB_POSTER_BASE}${(item.external_data as Record<string, unknown>).poster_path as string}`}
+          alt={item.title}
+          width={36}
+          height={54}
+          className="rounded object-cover shrink-0"
+        />
+      )}
 
       {/* Content */}
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
