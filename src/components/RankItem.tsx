@@ -61,22 +61,9 @@ export default function RankItem({
       {/* Content */}
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
         <p className="text-text font-medium text-sm truncate">{item.title}</p>
-        <div className="flex items-center gap-2 mt-0.5">
-          {item.category && (
-            <span
-              className="text-xs px-2 py-0.5 rounded-full"
-              style={{
-                backgroundColor: "rgba(200, 169, 110, 0.1)",
-                color: "#c8a96e",
-              }}
-            >
-              {item.category}
-            </span>
-          )}
-          <span className="text-muted text-xs">
-            {item.total_votes} voto{item.total_votes !== 1 ? "s" : ""}
-          </span>
-        </div>
+        {item.category && (
+          <p className="text-muted text-xs mt-0.5 truncate">{item.category}</p>
+        )}
       </div>
 
       {/* Actions */}
@@ -97,7 +84,7 @@ export default function RankItem({
         <button
           onClick={onVote}
           disabled={!canVote}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-10 rounded-xl flex flex-col items-center justify-center gap-0.5 py-2 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
             backgroundColor: isVoted
               ? "#c8a96e"
@@ -109,17 +96,18 @@ export default function RankItem({
               : "1px solid rgba(200, 169, 110, 0.3)",
           }}
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-          >
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
             <path
               d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7L7 1z"
               fill={isVoted ? "#0a0a0f" : "#c8a96e"}
             />
           </svg>
+          <span
+            className="text-[11px] font-semibold leading-none"
+            style={{ color: isVoted ? "#0a0a0f" : "#c8a96e" }}
+          >
+            {item.total_votes}
+          </span>
         </button>
       </div>
     </div>
