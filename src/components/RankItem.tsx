@@ -58,15 +58,19 @@ export default function RankItem({
       </div>
 
       {/* Poster */}
-      {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (
-        <Image
-          src={`${TMDB_POSTER_BASE}${(item.external_data as Record<string, unknown>).poster_path as string}`}
-          alt={item.title}
-          width={36}
-          height={54}
-          className="rounded object-cover shrink-0"
-        />
-      )}
+      {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
+        const path = (item.external_data as Record<string, unknown>).poster_path as string;
+        const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
+        return (
+          <Image
+            src={src}
+            alt={item.title}
+            width={36}
+            height={54}
+            className="rounded object-cover shrink-0"
+          />
+        );
+      })()}
 
       {/* Content */}
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>

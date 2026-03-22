@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
         hostname: "image.tmdb.org",
         pathname: "/t/p/**",
       },
+      {
+        protocol: "http",
+        hostname: "books.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "books.google.com",
+      },
     ],
   },
 };

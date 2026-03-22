@@ -272,7 +272,7 @@ export default function AddItemModal({
               >
                 {selectedResult.poster_path && (
                   <Image
-                    src={`https://image.tmdb.org/t/p/w92${selectedResult.poster_path}`}
+                    src={`${service?.posterBase ?? ""}${selectedResult.poster_path}`}
                     alt={selectedResult.title}
                     width={36}
                     height={54}

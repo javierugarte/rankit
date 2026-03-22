@@ -405,15 +405,19 @@ export default function ListDetailClient({
                   >
                     <span className="text-xs">✓</span>
                   </div>
-                  {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (
-                    <Image
-                      src={`${TMDB_POSTER_BASE}${(item.external_data as Record<string, unknown>).poster_path as string}`}
-                      alt={item.title}
-                      width={28}
-                      height={42}
-                      className="rounded object-cover shrink-0 opacity-60"
-                    />
-                  )}
+                  {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
+                    const path = (item.external_data as Record<string, unknown>).poster_path as string;
+                    const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
+                    return (
+                      <Image
+                        src={src}
+                        alt={item.title}
+                        width={28}
+                        height={42}
+                        className="rounded object-cover shrink-0 opacity-60"
+                      />
+                    );
+                  })()}
                   <div className="flex-1 min-w-0">
                     <p className="text-text text-sm line-through truncate">
                       {item.title}
