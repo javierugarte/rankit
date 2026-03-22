@@ -359,7 +359,6 @@ export default function ListDetailClient({
                   isVoted={votedItemId === item.id}
                   onVote={() => handleVote(item.id)}
                   onMarkDone={() => handleMarkDone(item.id)}
-                  onDelete={() => handleDeleteItem(item.id)}
                   onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
                 />
@@ -427,6 +426,10 @@ export default function ListDetailClient({
           editItem={editingItem}
           onClose={() => setEditingItem(null)}
           onSaved={onItemSaved}
+          onDelete={() => {
+            handleDeleteItem(editingItem.id);
+            setEditingItem(null);
+          }}
         />
       )}
 
