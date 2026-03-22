@@ -114,7 +114,7 @@ async function searchGames(query: string, apiKey: string): Promise<NextResponse>
     return NextResponse.json({ error: "RAWG_API_KEY not configured" }, { status: 500 });
   }
 
-  const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&key=${apiKey}&page_size=7&ordering=-added&exclude_additions=true`;
+  const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&key=${apiKey}&page_size=7&exclude_additions=true`;
 
   let res: Response;
   try {
