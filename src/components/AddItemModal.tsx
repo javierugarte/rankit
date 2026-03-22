@@ -346,7 +346,7 @@ export default function AddItemModal({
                   >
                     {r.poster_path ? (
                       <Image
-                        src={`https://image.tmdb.org/t/p/w92${r.poster_path}`}
+                        src={`${service?.posterBase ?? ""}${r.poster_path}`}
                         alt={r.title}
                         width={28}
                         height={42}

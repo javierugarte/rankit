@@ -356,7 +356,7 @@ export default function ListDetailClient({
         <>
           {pendingItems.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-3xl mb-3">🎬</p>
+              <p className="text-3xl mb-3">{list.emoji}</p>
               <p className="text-muted">
                 No hay items pendientes.
                 <br />
