@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Trash2, UserPlus, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, UserPlus, Pencil } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
@@ -224,81 +224,66 @@ export default function ListDetailClient({
   return (
     <div className="max-w-lg mx-auto px-4 pt-10 pb-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <button
-          onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-text transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </button>
+      <div className="mb-6">
+        {/* Top bar */}
+        <div className="flex items-center justify-between mb-5">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1.5 text-muted hover:text-text transition-colors"
+          >
+            <ArrowLeft size={18} />
+            <span className="text-sm font-medium">Inicio</span>
+          </button>
 
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{listEmoji}</span>
-          <h1 className="text-lg font-semibold text-text">{listName}</h1>
+          <div className="flex items-center gap-1">
+            {isOwner && (
+              <>
+                <button
+                  onClick={() => setShowEditListModal(true)}
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                  aria-label="Editar lista"
+                >
+                  <Pencil size={16} />
+                </button>
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                  aria-label="Compartir lista"
+                >
+                  <UserPlus size={18} />
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
+            >
+              <Plus size={20} color="#c8a96e" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isOwner && (
-            <>
-              <button
-                onClick={() => setShowEditListModal(true)}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
-                aria-label="Editar lista"
-              >
-                <Pencil size={16} />
-              </button>
-              <button
-                onClick={() => setShowShareModal(true)}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
-                aria-label="Compartir lista"
-              >
-                <UserPlus size={18} />
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors text-muted hover:text-red-400 hover:bg-red-400/10"
-                aria-label="Eliminar lista"
-              >
-                <Trash2 size={18} />
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-            style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
+        {/* List info */}
+        <div className="flex items-center gap-4">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            style={{
+              backgroundColor: "rgba(200, 169, 110, 0.12)",
+              border: "1px solid rgba(200, 169, 110, 0.2)",
+            }}
           >
-            <Plus size={20} color="#c8a96e" />
-          </button>
+            {listEmoji}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-text leading-tight">{listName}</h1>
+            <p className="text-muted text-sm mt-0.5">
+              {members.length > 0 && `${members.length} miembro${members.length !== 1 ? "s" : ""} · `}
+              {pendingItems.length} pendiente{pendingItems.length !== 1 ? "s" : ""}
+            </p>
+          </div>
         </div>
       </div>
-
-      {/* Collaborators badge */}
-      {members.length > 0 && (
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex -space-x-1.5">
-            {members.slice(0, 4).map((m) => (
-              <div
-                key={m.user_id}
-                className="w-6 h-6 rounded-full border-2 flex items-center justify-center text-[10px] font-semibold"
-                style={{
-                  backgroundColor: "rgba(200, 169, 110, 0.2)",
-                  color: "#c8a96e",
-                  borderColor: "#0a0a0f",
-                }}
-                title={m.username}
-              >
-                {m.username[0].toUpperCase()}
-              </div>
-            ))}
-          </div>
-          <span className="text-xs text-muted">
-            {members.length === 1
-              ? `Compartida con ${members[0].username}`
-              : `Compartida con ${members.length} personas`}
-          </span>
-        </div>
-      )}
 
       {/* Tabs */}
       <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-6">
@@ -460,6 +445,10 @@ export default function ListDetailClient({
             setListName(updated.name);
             setListEmoji(updated.emoji);
             setShowEditListModal(false);
+          }}
+          onDelete={() => {
+            setShowEditListModal(false);
+            setShowDeleteConfirm(true);
           }}
         />
       )}
