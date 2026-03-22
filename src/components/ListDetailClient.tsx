@@ -24,6 +24,7 @@ interface Props {
   latestVote: { item_id: string; voted_date: string } | null;
   isOwner?: boolean;
   initialMembers: MemberWithProfile[];
+  ownerUsername?: string | null;
 }
 
 export default function ListDetailClient({
@@ -32,6 +33,7 @@ export default function ListDetailClient({
   userId,
   latestVote,
   isOwner,
+  ownerUsername,
   initialMembers,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
@@ -278,7 +280,13 @@ export default function ListDetailClient({
           <div>
             <h1 className="text-2xl font-bold text-text leading-tight">{listName}</h1>
             <p className="text-muted text-sm mt-0.5">
-              {members.length > 0 && `${members.length} miembro${members.length !== 1 ? "s" : ""} · `}
+              {(() => {
+                let label: string | null = null;
+                if (!isOwner && ownerUsername) label = `De ${ownerUsername}`;
+                else if (isOwner && members.length === 1) label = `Con ${members[0].username}`;
+                else if (isOwner && members.length > 1) label = `Con ${members.length} personas`;
+                return label ? `${label} · ` : null;
+              })()}
               {pendingItems.length} pendiente{pendingItems.length !== 1 ? "s" : ""}
             </p>
           </div>
