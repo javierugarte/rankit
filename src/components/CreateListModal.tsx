@@ -260,7 +260,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
             </div>
             {listType && (
               <p className="text-xs text-muted mt-1.5">
-                Autocompletado con {getService(listType)?.label ?? listType} al añadir items.
+                Autocompletado con {getService(listType)?.apiLabel ?? listType} al añadir items.
               </p>
             )}
           </div>
