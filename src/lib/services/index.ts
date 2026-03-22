@@ -1,4 +1,4 @@
-export type ServiceId = "movies" | "tv" | "books";
+export type ServiceId = "movies" | "tv" | "books" | "games";
 
 export interface ExternalResult {
   external_id: string;
@@ -43,6 +43,14 @@ export const SERVICES: Record<ServiceId, ServiceConfig> = {
     placeholder: "Buscar libro...",
     posterBase: "",
   },
+  games: {
+    id: "games",
+    label: "Videojuegos",
+    apiLabel: "RAWG",
+    searchEndpoint: "/api/search/games",
+    placeholder: "Buscar videojuego...",
+    posterBase: "",
+  },
 };
 
 export function getService(listType: string | null | undefined): ServiceConfig | null {
@@ -55,6 +63,7 @@ export const LIST_TYPE_OPTIONS: { value: string | null; label: string; emoji: st
   { value: "movies", label: "Peliculas", emoji: "🎬" },
   { value: "tv", label: "Series", emoji: "📺" },
   { value: "books", label: "Libros", emoji: "📚" },
+  { value: "games", label: "Videojuegos", emoji: "🎮" },
 ];
 
 export const TMDB_POSTER_BASE = "https://image.tmdb.org/t/p/w185";

@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "books.google.com",
       },
+      {
+        protocol: "https",
+        hostname: "media.rawg.io",
+      },
     ],
   },
 };
