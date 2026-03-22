@@ -6,7 +6,7 @@ import { ArrowLeft, Plus, UserPlus, Pencil } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
-import { TMDB_POSTER_BASE } from "@/lib/services";
+import { TMDB_POSTER_BASE, getService } from "@/lib/services";
 import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
@@ -376,6 +376,7 @@ export default function ListDetailClient({
                   onMarkDone={() => handleMarkDone(item.id)}
                   onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
+                  listType={list.list_type}
                 />
               ))}
             </div>
@@ -408,12 +409,13 @@ export default function ListDetailClient({
                   {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
                     const path = (item.external_data as Record<string, unknown>).poster_path as string;
                     const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
+                    const isLandscape = getService(list.list_type)?.posterAspect === "landscape";
                     return (
                       <Image
                         src={src}
                         alt={item.title}
-                        width={28}
-                        height={42}
+                        width={isLandscape ? 56 : 28}
+                        height={isLandscape ? 32 : 42}
                         className="rounded object-cover shrink-0 opacity-60"
                       />
                     );

@@ -16,6 +16,7 @@ export interface ServiceConfig {
   searchEndpoint: string;
   placeholder: string;
   posterBase: string;
+  posterAspect: "portrait" | "landscape";
 }
 
 export const SERVICES: Record<ServiceId, ServiceConfig> = {
@@ -26,6 +27,7 @@ export const SERVICES: Record<ServiceId, ServiceConfig> = {
     searchEndpoint: "/api/search/movies",
     placeholder: "Buscar pelicula...",
     posterBase: "https://image.tmdb.org/t/p/w92",
+    posterAspect: "portrait",
   },
   tv: {
     id: "tv",
@@ -34,6 +36,7 @@ export const SERVICES: Record<ServiceId, ServiceConfig> = {
     searchEndpoint: "/api/search/tv",
     placeholder: "Buscar serie...",
     posterBase: "https://image.tmdb.org/t/p/w92",
+    posterAspect: "portrait",
   },
   books: {
     id: "books",
@@ -42,6 +45,7 @@ export const SERVICES: Record<ServiceId, ServiceConfig> = {
     searchEndpoint: "/api/search/books",
     placeholder: "Buscar libro...",
     posterBase: "",
+    posterAspect: "portrait",
   },
   games: {
     id: "games",
@@ -50,6 +54,7 @@ export const SERVICES: Record<ServiceId, ServiceConfig> = {
     searchEndpoint: "/api/search/games",
     placeholder: "Buscar videojuego...",
     posterBase: "",
+    posterAspect: "landscape",
   },
 };
 
