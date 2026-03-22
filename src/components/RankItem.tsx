@@ -2,6 +2,16 @@ import Image from "next/image";
 import type { Item } from "@/lib/supabase/types";
 import { TMDB_POSTER_BASE } from "@/lib/services";
 
+function parseDescription(value: string): { isUrl: true; href: string; label: string } | { isUrl: false } {
+  try {
+    const url = new URL(value.trim());
+    const label = url.hostname.replace(/^www\./, "");
+    return { isUrl: true, href: url.href, label };
+  } catch {
+    return { isUrl: false };
+  }
+}
+
 interface Props {
   item: Item;
   rank: number;
@@ -61,9 +71,23 @@ export default function RankItem({
       {/* Content */}
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
         <p className="text-text font-medium text-sm truncate">{item.title}</p>
-        {item.category && (
-          <p className="text-muted text-xs mt-0.5 truncate">{item.category}</p>
-        )}
+        {item.category && (() => {
+          const parsed = parseDescription(item.category);
+          return parsed.isUrl ? (
+            <a
+              href={parsed.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs mt-0.5 truncate inline-flex hover:underline"
+              style={{ color: "#c8a96e" }}
+            >
+              {parsed.label}
+            </a>
+          ) : (
+            <p className="text-muted text-xs mt-0.5 truncate">{item.category}</p>
+          );
+        })()}
       </div>
 
       {/* Actions */}

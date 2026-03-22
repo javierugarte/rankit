@@ -376,14 +376,14 @@ export default function AddItemModal({
 
           <div>
             <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
-              Categoria{" "}
+              Descripción{" "}
               <span className="normal-case text-muted/60">(opcional)</span>
             </label>
             <input
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="Drama, Japon, Restaurante..."
+              placeholder="Drama, Japón, https://amazon.com/..."
               className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
             />
           </div>

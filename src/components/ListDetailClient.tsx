@@ -418,11 +418,28 @@ export default function ListDetailClient({
                     <p className="text-text text-sm line-through truncate">
                       {item.title}
                     </p>
-                    {item.category && (
-                      <p className="text-muted text-xs mt-0.5">
-                        {item.category}
-                      </p>
-                    )}
+                    {item.category && (() => {
+                      try {
+                        const url = new URL(item.category.trim());
+                        const label = url.hostname.replace(/^www\./, "");
+                        return (
+                          <a
+                            href={url.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs mt-0.5 truncate inline-flex hover:underline"
+                            style={{ color: "#c8a96e" }}
+                          >
+                            {label}
+                          </a>
+                        );
+                      } catch {
+                        return (
+                          <p className="text-muted text-xs mt-0.5">{item.category}</p>
+                        );
+                      }
+                    })()}
                   </div>
                   <span className="text-muted text-xs">
                     {item.total_votes} voto{item.total_votes !== 1 ? "s" : ""}
