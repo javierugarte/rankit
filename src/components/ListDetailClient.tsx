@@ -473,6 +473,10 @@ export default function ListDetailClient({
           editItem={editingItem}
           onClose={() => setEditingItem(null)}
           onSaved={onItemSaved}
+          onMarkDone={() => {
+            handleMarkDone(editingItem.id);
+            setEditingItem(null);
+          }}
           onDelete={() => {
             handleDeleteItem(editingItem.id);
             setEditingItem(null);

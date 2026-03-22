@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { X, Trash2, Search, Loader2 } from "lucide-react";
+import { X, Trash2, Search, Loader2, CheckCircle } from "lucide-react";
 import type { Item } from "@/lib/supabase/types";
 import { getService, type ExternalResult } from "@/lib/services";
 import Image from "next/image";
@@ -15,6 +15,7 @@ interface Props {
   onSaved: (item: Item) => void;
   editItem?: Item;
   onDelete?: () => void;
+  onMarkDone?: () => void;
 }
 
 export default function AddItemModal({
@@ -25,6 +26,7 @@ export default function AddItemModal({
   onSaved,
   editItem,
   onDelete,
+  onMarkDone,
 }: Props) {
   const [title, setTitle] = useState(editItem?.title ?? "");
   const [category, setCategory] = useState(editItem?.category ?? "");
@@ -192,6 +194,16 @@ export default function AddItemModal({
             {editItem ? "Editar item" : "Anadir item"}
           </h2>
           <div className="flex items-center gap-2">
+            {editItem && onMarkDone && (
+              <button
+                type="button"
+                onClick={onMarkDone}
+                className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-green-400 hover:bg-green-400/10 transition-colors"
+                title="Marcar como visto"
+              >
+                <CheckCircle size={14} />
+              </button>
+            )}
             {editItem && onDelete && (
               <button
                 type="button"
