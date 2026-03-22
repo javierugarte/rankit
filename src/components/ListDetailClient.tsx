@@ -37,6 +37,7 @@ export default function ListDetailClient({
     latestVote?.voted_date === localToday() ? latestVote.item_id : null
   );
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -189,8 +190,12 @@ export default function ListDetailClient({
     router.replace("/home");
   }
 
-  function onItemAdded(newItem: Item) {
-    setItems((prev) => [...prev, newItem]);
+  function onItemSaved(savedItem: Item) {
+    setItems((prev) => {
+      const exists = prev.some((i) => i.id === savedItem.id);
+      if (exists) return prev.map((i) => (i.id === savedItem.id ? savedItem : i));
+      return [...prev, savedItem];
+    });
   }
 
   return (
@@ -355,6 +360,7 @@ export default function ListDetailClient({
                   onVote={() => handleVote(item.id)}
                   onMarkDone={() => handleMarkDone(item.id)}
                   onDelete={() => handleDeleteItem(item.id)}
+                  onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
                 />
               ))}
@@ -409,7 +415,18 @@ export default function ListDetailClient({
           listId={list.id}
           userId={userId}
           onClose={() => setShowAddModal(false)}
-          onAdded={onItemAdded}
+          onSaved={onItemSaved}
+        />
+      )}
+
+      {/* Edit item modal */}
+      {editingItem && (
+        <AddItemModal
+          listId={list.id}
+          userId={userId}
+          editItem={editingItem}
+          onClose={() => setEditingItem(null)}
+          onSaved={onItemSaved}
         />
       )}
 

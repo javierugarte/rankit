@@ -9,6 +9,7 @@ interface Props {
   onVote: () => void;
   onMarkDone: () => void;
   onDelete: () => void;
+  onEdit: () => void;
   isFirst: boolean;
 }
 
@@ -20,6 +21,7 @@ export default function RankItem({
   onVote,
   onMarkDone,
   onDelete,
+  onEdit,
   isFirst,
 }: Props) {
   return (
@@ -47,7 +49,7 @@ export default function RankItem({
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
         <p className="text-text font-medium text-sm truncate">{item.title}</p>
         <div className="flex items-center gap-2 mt-0.5">
           {item.category && (

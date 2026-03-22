@@ -9,47 +9,69 @@ interface Props {
   listId: string;
   userId: string;
   onClose: () => void;
-  onAdded: (item: Item) => void;
+  onSaved: (item: Item) => void;
+  editItem?: Item;
 }
 
 export default function AddItemModal({
   listId,
   userId,
   onClose,
-  onAdded,
+  onSaved,
+  editItem,
 }: Props) {
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState(editItem?.title ?? "");
+  const [category, setCategory] = useState(editItem?.category ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const supabase = createClient();
 
-  async function handleAdd(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
 
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase
-      .from("items")
-      .insert({
-        list_id: listId,
-        title: title.trim(),
-        category: category.trim() || null,
-        added_by: userId,
-        total_votes: 0,
-      })
-      .select()
-      .single();
+    if (editItem) {
+      const { data, error } = await supabase
+        .from("items")
+        .update({
+          title: title.trim(),
+          category: category.trim() || null,
+        })
+        .eq("id", editItem.id)
+        .select()
+        .single();
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      } else {
+        onSaved(data);
+        onClose();
+      }
     } else {
-      onAdded(data);
-      onClose();
+      const { data, error } = await supabase
+        .from("items")
+        .insert({
+          list_id: listId,
+          title: title.trim(),
+          category: category.trim() || null,
+          added_by: userId,
+          total_votes: 0,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      } else {
+        onSaved(data);
+        onClose();
+      }
     }
   }
 
@@ -64,7 +86,7 @@ export default function AddItemModal({
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
 
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-text">Añadir item</h2>
+          <h2 className="text-lg font-semibold text-text">{editItem ? "Editar item" : "Añadir item"}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-text"
@@ -73,7 +95,7 @@ export default function AddItemModal({
           </button>
         </div>
 
-        <form onSubmit={handleAdd} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
               Título
@@ -119,7 +141,7 @@ export default function AddItemModal({
               className="flex-1 py-3 rounded-xl text-bg text-sm font-semibold transition-opacity disabled:opacity-50"
               style={{ backgroundColor: "#c8a96e" }}
             >
-              {loading ? "Añadiendo..." : "Añadir"}
+              {loading ? (editItem ? "Guardando..." : "Añadiendo...") : editItem ? "Guardar" : "Añadir"}
             </button>
           </div>
         </form>
