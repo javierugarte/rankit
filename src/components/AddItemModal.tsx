@@ -37,7 +37,22 @@ export default function AddItemModal({
   const [results, setResults] = useState<ExternalResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<ExternalResult | null>(null);
+
+  const initialSelected: ExternalResult | null = (() => {
+    if (!editItem || !editItem.external_id) return null;
+    const data = editItem.external_data as Record<string, unknown> | null;
+    return {
+      external_id: editItem.external_id as string,
+      title: editItem.title,
+      poster_path: (data?.poster_path as string | undefined) ?? null,
+      genre: (data?.genre as string | undefined) ?? null,
+      year: (data?.year as string | undefined) ?? null,
+      overview: (data?.overview as string | undefined) ?? null,
+      type: null,
+    };
+  })();
+
+  const [selectedResult, setSelectedResult] = useState<ExternalResult | null>(initialSelected);
   const [externalId, setExternalId] = useState<string | null>(
     (editItem?.external_id as string | null) ?? null
   );
