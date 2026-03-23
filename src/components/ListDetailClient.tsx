@@ -134,13 +134,46 @@ export default function ListDetailClient({
   }, [list.id, supabase]);
 
   async function handleVote(itemId: string) {
-    if (votedItemId || voting) return;
+    if (voting) return;
 
     setVoting(true);
 
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
+    // Unvote current item if already voted
+    if (votedItemId) {
+      const { error: deleteError } = await supabase
+        .from("votes")
+        .delete()
+        .eq("user_id", userId)
+        .eq("list_id", list.id)
+        .eq("voted_date", today);
+
+      if (deleteError) {
+        setVoting(false);
+        return;
+      }
+
+      const oldItem = items.find((i) => i.id === votedItemId);
+      if (oldItem) {
+        await supabase
+          .from("items")
+          .update({ total_votes: Math.max(0, oldItem.total_votes - 1) })
+          .eq("id", votedItemId);
+      }
+
+      // If tapping the already-voted item, just unvote and stop
+      if (votedItemId === itemId) {
+        setVotedItemId(null);
+        setVoting(false);
+        return;
+      }
+
+      setVotedItemId(null);
+    }
+
+    // Vote for the new item
     const { error: voteError } = await supabase.from("votes").insert({
       item_id: itemId,
       user_id: userId,
@@ -153,7 +186,6 @@ export default function ListDetailClient({
       return;
     }
 
-    // Update total_votes counter
     const item = items.find((i) => i.id === itemId);
     if (item) {
       await supabase
@@ -354,7 +386,7 @@ export default function ListDetailClient({
           }}
         >
           {votedItemId
-            ? `✓ Ya votaste hoy · Regresa en ${timeUntilMidnight}`
+            ? "✓ Ya votaste hoy · Toca tu voto para cambiarlo"
             : "⚡ Tienes 1 voto disponible hoy"}
         </div>
       )}
@@ -378,7 +410,7 @@ export default function ListDetailClient({
                   key={item.id}
                   item={item}
                   rank={index + 1}
-                  canVote={!votedItemId && !voting}
+                  canVote={!voting}
                   isVoted={votedItemId === item.id}
                   onVote={() => handleVote(item.id)}
                   onMarkDone={() => handleMarkDone(item.id)}
