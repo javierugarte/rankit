@@ -141,8 +141,33 @@ export default function ListDetailClient({
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-    // Unvote current item if already voted
-    if (votedItemId) {
+    // Capture current state before any async operations
+    const prevVotedItemId = votedItemId;
+    const prevItems = items;
+
+    const isRevoke = prevVotedItemId === itemId;
+
+    // Optimistic UI update immediately
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.id === prevVotedItemId)
+          return { ...i, total_votes: Math.max(0, i.total_votes - 1) };
+        if (i.id === itemId && !isRevoke)
+          return { ...i, total_votes: i.total_votes + 1 };
+        return i;
+      })
+    );
+    setVotedItemId(isRevoke ? null : itemId);
+
+    // Revert helper
+    const revert = (restoreVotedId: string | null) => {
+      setItems(prevItems);
+      setVotedItemId(restoreVotedId);
+      setVoting(false);
+    };
+
+    // Remove existing vote from DB
+    if (prevVotedItemId) {
       const { error: deleteError } = await supabase
         .from("votes")
         .delete()
@@ -151,29 +176,23 @@ export default function ListDetailClient({
         .eq("voted_date", today);
 
       if (deleteError) {
-        setVoting(false);
+        revert(prevVotedItemId);
         return;
       }
 
-      const oldItem = items.find((i) => i.id === votedItemId);
-      if (oldItem) {
-        await supabase
-          .from("items")
-          .update({ total_votes: Math.max(0, oldItem.total_votes - 1) })
-          .eq("id", votedItemId);
-      }
-
-      // If tapping the already-voted item, just revoke the vote
-      if (votedItemId === itemId) {
-        setVotedItemId(null);
-        setVoting(false);
-        return;
-      }
-
-      setVotedItemId(null);
+      const oldVotes = prevItems.find((i) => i.id === prevVotedItemId)?.total_votes ?? 0;
+      await supabase
+        .from("items")
+        .update({ total_votes: Math.max(0, oldVotes - 1) })
+        .eq("id", prevVotedItemId);
     }
 
-    // Vote for the new item
+    if (isRevoke) {
+      setVoting(false);
+      return;
+    }
+
+    // Insert new vote
     const { error: voteError } = await supabase.from("votes").insert({
       item_id: itemId,
       user_id: userId,
@@ -182,19 +201,16 @@ export default function ListDetailClient({
     });
 
     if (voteError) {
-      setVoting(false);
+      revert(prevVotedItemId);
       return;
     }
 
-    const item = items.find((i) => i.id === itemId);
-    if (item) {
-      await supabase
-        .from("items")
-        .update({ total_votes: item.total_votes + 1 })
-        .eq("id", itemId);
-    }
+    const newVotes = prevItems.find((i) => i.id === itemId)?.total_votes ?? 0;
+    await supabase
+      .from("items")
+      .update({ total_votes: newVotes + 1 })
+      .eq("id", itemId);
 
-    setVotedItemId(itemId);
     setVoting(false);
   }
 
