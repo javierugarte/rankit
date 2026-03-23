@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
 import { TMDB_POSTER_BASE, getService } from "@/lib/services";
 import RankItem from "./RankItem";
-import OgImage from "./OgImage";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
 import CreateListModal from "./CreateListModal";
@@ -463,7 +462,7 @@ export default function ListDetailClient({
                   >
                     <span className="text-xs">✓</span>
                   </div>
-                  {(item.external_data as Record<string, unknown> | null)?.poster_path ? (() => {
+                  {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
                     const path = (item.external_data as Record<string, unknown>).poster_path as string;
                     const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
                     const isLandscape = getService(list.list_type)?.posterAspect === "landscape";
@@ -475,9 +474,6 @@ export default function ListDetailClient({
                         <Image src={src} alt={item.title} fill className="object-cover" />
                       </div>
                     );
-                  })() : item.category && (() => {
-                    try { new URL(item.category.trim()); return <div className="opacity-60"><OgImage url={item.category.trim()} /></div>; }
-                    catch { return null; }
                   })()}
                   <div className="flex-1 min-w-0">
                     <p className="text-text text-sm line-through truncate">
