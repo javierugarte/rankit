@@ -163,9 +163,8 @@ export default function ListDetailClient({
           .eq("id", votedItemId);
       }
 
-      // If tapping the already-voted item, just unvote and stop
+      // If tapping the already-voted item, do nothing
       if (votedItemId === itemId) {
-        setVotedItemId(null);
         setVoting(false);
         return;
       }
@@ -386,7 +385,7 @@ export default function ListDetailClient({
           }}
         >
           {votedItemId
-            ? "✓ Ya votaste hoy · Toca tu voto para cambiarlo"
+            ? `✓ Ya votaste hoy · Regresa en ${timeUntilMidnight}`
             : "⚡ Tienes 1 voto disponible hoy"}
         </div>
       )}
