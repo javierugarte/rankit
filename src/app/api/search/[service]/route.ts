@@ -35,6 +35,9 @@ export async function GET(
     return NextResponse.json([]);
   }
 
+  if (service === "albums") return searchAlbums(q.trim());
+  if (service === "books") return searchBooks(q.trim());
+
   const apiKey = process.env.TMDB_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "TMDB_API_KEY not configured" }, { status: 500 });
@@ -42,7 +45,6 @@ export async function GET(
 
   if (service === "movies") return searchMovies(q.trim(), apiKey);
   if (service === "tv") return searchTV(q.trim(), apiKey);
-  if (service === "books") return searchBooks(q.trim());
   if (service === "games") return searchGames(q.trim(), process.env.RAWG_API_KEY ?? "");
 
   return NextResponse.json({ error: "Unknown service" }, { status: 400 });
@@ -137,6 +139,42 @@ async function searchGames(query: string, apiKey: string): Promise<NextResponse>
         year: ((r.released as string)?.slice(0, 4) ?? null),
         genre: genres.length > 0 ? genres[0].name : null,
         poster_path: (r.background_image as string | null) ?? null,
+        overview: null,
+      };
+    });
+
+  return NextResponse.json(results);
+}
+
+async function searchAlbums(query: string): Promise<NextResponse> {
+  const url = `https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(query)}&fmt=json&limit=7`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { "User-Agent": "Rankit/1.0 (https://github.com/javierugarte/rankit)" },
+      next: { revalidate: 60 },
+    });
+  } catch {
+    return NextResponse.json({ error: "Network error" }, { status: 502 });
+  }
+
+  if (!res.ok) return NextResponse.json({ error: "MusicBrainz error" }, { status: 502 });
+
+  const data = await res.json();
+
+  const results: ExternalResult[] = (data.releases ?? [])
+    .slice(0, 7)
+    .map((r: Record<string, unknown>) => {
+      const credits = (r["artist-credit"] as { name?: string; artist?: { name: string } }[] | undefined) ?? [];
+      const artist = credits[0]?.name ?? credits[0]?.artist?.name ?? null;
+      const mbid = r.id as string;
+      return {
+        external_id: mbid,
+        title: (r.title ?? "") as string,
+        year: ((r.date as string)?.slice(0, 4) ?? null),
+        genre: artist,
+        poster_path: `https://coverartarchive.org/release/${mbid}/front`,
         overview: null,
       };
     });
