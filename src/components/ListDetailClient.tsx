@@ -163,8 +163,9 @@ export default function ListDetailClient({
           .eq("id", votedItemId);
       }
 
-      // If tapping the already-voted item, do nothing
+      // If tapping the already-voted item, just revoke the vote
       if (votedItemId === itemId) {
+        setVotedItemId(null);
         setVoting(false);
         return;
       }
