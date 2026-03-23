@@ -134,13 +134,65 @@ export default function ListDetailClient({
   }, [list.id, supabase]);
 
   async function handleVote(itemId: string) {
-    if (votedItemId || voting) return;
+    if (voting) return;
 
     setVoting(true);
 
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
+    // Capture current state before any async operations
+    const prevVotedItemId = votedItemId;
+    const prevItems = items;
+
+    const isRevoke = prevVotedItemId === itemId;
+
+    // Optimistic UI update immediately
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.id === prevVotedItemId)
+          return { ...i, total_votes: Math.max(0, i.total_votes - 1) };
+        if (i.id === itemId && !isRevoke)
+          return { ...i, total_votes: i.total_votes + 1 };
+        return i;
+      })
+    );
+    setVotedItemId(isRevoke ? null : itemId);
+
+    // Revert helper
+    const revert = (restoreVotedId: string | null) => {
+      setItems(prevItems);
+      setVotedItemId(restoreVotedId);
+      setVoting(false);
+    };
+
+    // Remove existing vote from DB
+    if (prevVotedItemId) {
+      const { error: deleteError } = await supabase
+        .from("votes")
+        .delete()
+        .eq("user_id", userId)
+        .eq("list_id", list.id)
+        .eq("voted_date", today);
+
+      if (deleteError) {
+        revert(prevVotedItemId);
+        return;
+      }
+
+      const oldVotes = prevItems.find((i) => i.id === prevVotedItemId)?.total_votes ?? 0;
+      await supabase
+        .from("items")
+        .update({ total_votes: Math.max(0, oldVotes - 1) })
+        .eq("id", prevVotedItemId);
+    }
+
+    if (isRevoke) {
+      setVoting(false);
+      return;
+    }
+
+    // Insert new vote
     const { error: voteError } = await supabase.from("votes").insert({
       item_id: itemId,
       user_id: userId,
@@ -149,20 +201,16 @@ export default function ListDetailClient({
     });
 
     if (voteError) {
-      setVoting(false);
+      revert(prevVotedItemId);
       return;
     }
 
-    // Update total_votes counter
-    const item = items.find((i) => i.id === itemId);
-    if (item) {
-      await supabase
-        .from("items")
-        .update({ total_votes: item.total_votes + 1 })
-        .eq("id", itemId);
-    }
+    const newVotes = prevItems.find((i) => i.id === itemId)?.total_votes ?? 0;
+    await supabase
+      .from("items")
+      .update({ total_votes: newVotes + 1 })
+      .eq("id", itemId);
 
-    setVotedItemId(itemId);
     setVoting(false);
   }
 
@@ -378,7 +426,7 @@ export default function ListDetailClient({
                   key={item.id}
                   item={item}
                   rank={index + 1}
-                  canVote={!votedItemId && !voting}
+                  canVote={!voting}
                   isVoted={votedItemId === item.id}
                   onVote={() => handleVote(item.id)}
                   onMarkDone={() => handleMarkDone(item.id)}

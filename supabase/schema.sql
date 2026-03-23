@@ -212,6 +212,11 @@ create policy "Users can vote in their lists"
     )
   );
 
+create policy "Users can delete their own votes"
+  on public.votes for delete using (
+    auth.uid() = user_id
+  );
+
 -- =============================================
 -- 8. TRIGGER — AUTO-CREAR PERFIL EN SIGNUP
 -- =============================================
