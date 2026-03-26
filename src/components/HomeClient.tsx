@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   DndContext,
   closestCenter,
@@ -93,9 +94,20 @@ interface Props {
 }
 
 export default function HomeClient({ lists, sharingMap, totalVotesMap, votedTodayIds, leaderMap, userId }: Props) {
+  const router = useRouter();
   const votedTodaySet = new Set(votedTodayIds);
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        router.refresh();
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [router]);
 
   useEffect(() => {
     try {
