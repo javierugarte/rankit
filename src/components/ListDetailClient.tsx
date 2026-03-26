@@ -136,6 +136,7 @@ export default function ListDetailClient({
   async function handleVote(itemId: string) {
     if (voting) return;
 
+    navigator.vibrate?.(10);
     setVoting(true);
 
     const d = new Date();
@@ -279,7 +280,7 @@ export default function ListDetailClient({
         <div className="flex items-center justify-between mb-5">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-muted hover:text-text transition-colors"
+            className="flex items-center gap-1.5 text-muted hover:text-text transition-colors active:scale-95 active:transition-none"
           >
             <ArrowLeft size={18} />
             <span className="text-sm font-medium">Inicio</span>
@@ -290,14 +291,14 @@ export default function ListDetailClient({
               <>
                 <button
                   onClick={() => setShowEditListModal(true)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
                   aria-label="Editar lista"
                 >
                   <Pencil size={16} />
                 </button>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
                   aria-label="Compartir lista"
                 >
                   <UserPlus size={18} />
@@ -306,7 +307,7 @@ export default function ListDetailClient({
             )}
             <button
               onClick={() => setShowAddModal(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95 active:transition-none"
               style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
             >
               <Plus size={20} color="#c8a96e" />
@@ -345,7 +346,7 @@ export default function ListDetailClient({
       <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-6">
         <button
           onClick={() => setTab("pending")}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.97] active:transition-none ${
             tab === "pending"
               ? "bg-gold text-bg"
               : "text-muted hover:text-text"
@@ -366,7 +367,7 @@ export default function ListDetailClient({
         </button>
         <button
           onClick={() => setTab("done")}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.97] active:transition-none ${
             tab === "done" ? "bg-gold text-bg" : "text-muted hover:text-text"
           }`}
         >
@@ -455,7 +456,7 @@ export default function ListDetailClient({
                   className="bg-surface border border-border rounded-2xl p-4 flex items-center gap-3 opacity-60"
                 >
                   <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
+                    className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity active:scale-90 active:transition-none"
                     style={{ backgroundColor: "rgba(200, 169, 110, 0.2)" }}
                     onClick={() => handleUnmarkDone(item.id)}
                     title="Volver a pendientes"
