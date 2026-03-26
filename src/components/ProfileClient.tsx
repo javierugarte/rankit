@@ -62,20 +62,19 @@ export default function ProfileClient({
           className="relative w-20 h-20 rounded-full overflow-hidden mb-4 transition-transform active:scale-95 active:transition-none"
           aria-label="Editar foto de perfil"
         >
-          {avatarUrl ? (
+          <div
+            className="absolute inset-0 flex items-center justify-center text-2xl font-bold"
+            style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
+          >
+            {initials}
+          </div>
+          {avatarUrl && (
             <Image
               src={avatarUrl}
               alt={username}
               fill
               className="object-cover"
             />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center text-2xl font-bold"
-              style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
-            >
-              {initials}
-            </div>
           )}
         </button>
         <h3 className="text-xl font-semibold text-text">{username}</h3>

@@ -118,7 +118,13 @@ export default function EditProfileModal({
               className="relative w-20 h-20 rounded-full overflow-hidden transition-transform active:scale-95 active:transition-none"
               aria-label="Cambiar foto de perfil"
             >
-              {displayAvatar ? (
+              <div
+                className="absolute inset-0 flex items-center justify-center text-2xl font-bold"
+                style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
+              >
+                {initials}
+              </div>
+              {displayAvatar && (
                 <Image
                   src={displayAvatar}
                   alt="Avatar"
@@ -126,13 +132,6 @@ export default function EditProfileModal({
                   className="object-cover"
                   unoptimized={!!avatarPreview}
                 />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-2xl font-bold"
-                  style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
-                >
-                  {initials}
-                </div>
               )}
               <div
                 className="absolute inset-0 flex items-center justify-center"
