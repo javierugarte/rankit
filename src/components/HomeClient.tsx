@@ -152,6 +152,12 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
     setVotedTodayIds((todayVotesResult.data ?? []).map((r) => r.list_id));
   }
 
+  // Fetch fresh data on mount — catches votes made while navigating away
+  useEffect(() => {
+    refreshVoteData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Stable Realtime subscription — created once on mount, never recreated
   useEffect(() => {
     const channel = supabase
