@@ -230,47 +230,84 @@ declare
   travel_list_id  uuid;
   top_series_item uuid;
 begin
+  -- ── Series ─────────────────────────────────────────────────
   insert into public.lists (name, emoji, list_type, owner_id)
-  values ('Series que debes ver', '📺', 'tv', target_user_id)
+  values ('Series', '📺', 'tv', target_user_id)
   returning id into series_list_id;
 
-  insert into public.items (list_id, title, total_votes, external_id, external_data) values
-    (series_list_id, 'Breaking Bad',       28, '1396',   '{"poster_path":"/ggFHVNu6YYI5L9pCfOacjizRGt.jpg","year":"2008","genre":"Drama, Crime","overview":"Un profesor de química se convierte en fabricante de metanfetamina."}'),
-    (series_list_id, 'The Wire',           24, '1438',   '{"poster_path":"/4lbClFySvugI51fwsyxBTOm4DqK.jpg","year":"2002","genre":"Drama, Crime","overview":"La vida en las calles de Baltimore vista desde ambos lados de la ley."}'),
-    (series_list_id, 'Los Soprano',        21, '1398',   '{"poster_path":"/rTc7ZXdroqjkKivFPvCPX0Ru7dn.jpg","year":"1999","genre":"Drama, Crime","overview":"Tony Soprano equilibra su vida familiar con su rol como jefe de la mafia."}'),
-    (series_list_id, 'Chernobyl',          19, '87108',  '{"poster_path":"/hlLXt2tOPT6RRnjiUmoxyG1LTFi.jpg","year":"2019","genre":"Drama, History","overview":"La historia real de uno de los peores desastres nucleares de la historia."}'),
-    (series_list_id, 'True Detective T1',  17, '46648',  '{"poster_path":"/wFMPPBaADHaMkwzq1JGnMw6sLBY.jpg","year":"2014","genre":"Drama, Crime, Mystery","overview":"Dos detectives investigan un misterioso asesinato a lo largo de 17 años."}'),
-    (series_list_id, 'Band of Brothers',   15, '4613',   '{"poster_path":"/fGCEH3oPBWNlNdmNnOaGmv1g8Gn.jpg","year":"2001","genre":"Drama, War, History","overview":"La historia de la Compañía E del 506 de paracaidistas en la WWII."}'),
-    (series_list_id, 'Six Feet Under',     12, '1621',   '{"poster_path":"/4kqSVd1FLPB5BCAK8IcFzgHnFG3.jpg","year":"2001","genre":"Drama","overview":"Una familia de pompas fúnebres navega la vida y la muerte en Los Ángeles."}'),
-    (series_list_id, 'The Shield',         10, '2309',   '{"poster_path":"/jlIxSbkUxL0eFmZqIJPGQIqXjIq.jpg","year":"2002","genre":"Drama, Crime","overview":"Un policía corrupto pero efectivo opera en un barrio difícil de LA."}'),
-    (series_list_id, 'Deadwood',            8, '1424',   '{"poster_path":"/g8R8pvNGmO4eMxcmFm0mRFd3R39.jpg","year":"2004","genre":"Drama, Western","overview":"Un pueblo del Lejano Oeste construye su propia ley."}'),
-    (series_list_id, 'Roma',                6, '1689',   '{"poster_path":"/kHITELIxicPrHGYjAzfL5UwGWFX.jpg","year":"2005","genre":"Drama, History","overview":"La vida en la Roma del siglo I a.C. durante el ascenso de Julio César."}');
+  insert into public.items (list_id, title, total_votes, external_id, external_data, category) values
+    (series_list_id, 'Breaking Bad',              27, '1396',
+     '{"poster_path":"/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg","year":"2008","genre":"Drama","overview":"Un profesor de química con cáncer terminal se asocia con un exalumno suyo para fabricar y vender metanfetamina a fin de que su familia no pase apuros económicos."}',
+     'Drama • 2008'),
+    (series_list_id, 'Bajo escucha',              25, '1438',
+     '{"poster_path":"/v5m7os416ER2a9dTE0M017KqRmZ.jpg","year":"2002","genre":"Crimen","overview":"Un sencillo y extremadamente realista drama que sigue una caótica investigación de drogas y asesinatos en Baltimore, mostrando ambas perspectivas: la policía y los criminales."}',
+     'Crimen • 2002'),
+    (series_list_id, 'Los Soprano',               21, '1398',
+     '{"poster_path":"/p7XPjx5jTFl32TGbbIW8exdY8QW.jpg","year":"1999","genre":"Crimen","overview":"La trama gira en torno al mafioso de Nueva Jersey Tony Soprano y las dificultades que enfrenta tanto en su hogar como en la organización criminal que dirige."}',
+     'Crimen • 1999'),
+    (series_list_id, 'Chernobyl',                 19, '87108',
+     '{"poster_path":"/hlLXt2tOPT6RRnjiUmoxyG1LTFi.jpg","year":"2019","genre":"Drama","overview":"La serie relata lo que aconteció en 1986, en uno de los mayores desastres provocados por el hombre en la historia reciente, así como los sacrificios realizados para salvar al continente."}',
+     'Drama • 2019'),
+    (series_list_id, 'True Detective',             17, '46648',
+     '{"poster_path":"/xZSuQm2KQQKoVKf31HgUWkjAVga.jpg","year":"2014","genre":"Drama","overview":"En Luisiana, en 1995, dos detectives investigan el atroz asesinato de una joven. En 2012, unos policías los interrogan de nuevo, sospechando que el asesino de 1995 ha regresado."}',
+     'Drama • 2014'),
+    (series_list_id, 'Hermanos de sangre',         15, '4613',
+     '{"poster_path":"/kq9KiusAWPPITQrGovbgdhD9R1R.jpg","year":"2001","genre":"Drama","overview":"Miniserie basada en el bestseller de Stephen E. Ambrose. Narra la historia de la Easy Company, un batallón americano de paracaidistas que luchó en Europa durante la II Guerra Mundial."}',
+     'Drama • 2001'),
+    (series_list_id, 'A dos metros bajo tierra',  12, '1274',
+     '{"poster_path":"/Al4RjjnnTNyLEn5idIxl2zfqYV5.jpg","year":"2001","genre":"Drama","overview":"El día de Nochebuena Nathaniel Fisher muere en un accidente. Su familia, al frente de una funeraria, navega el duelo, secretos y relaciones mientras gestiona el negocio familiar."}',
+     'Drama • 2001'),
+    (series_list_id, 'The Shield: Al margen de la ley', 10, '1414',
+     '{"poster_path":"/AfdZXqqlFsPUEfi6kWWWthxw7Nz.jpg","year":"2002","genre":"Crimen","overview":"El detective Vic Mackey dirige una unidad especial en Los Ángeles, muy eficaz contra el crimen pero con métodos tan cuestionables como la extorsión o el chantaje cuando los considera necesarios."}',
+     'Crimen • 2002'),
+    (series_list_id, 'Deadwood',                   8, '1406',
+     '{"poster_path":"/fWwxYAuqY4Na7fKI3Qq2nFWCwG8.jpg","year":"2004","genre":"Western","overview":"Deadwood recrea la historia de la ciudad homónima durante el siglo XIX, combinando personajes reales, tramas noveladas y leyendas de una ciudad sin ley en territorio robado."}',
+     'Western • 2004'),
+    (series_list_id, 'Juego de tronos',             6, '1399',
+     '{"poster_path":"/3hDtRuwTfQQYRst3kjhvp4Cogjw.jpg","year":"2011","genre":"Ciencia ficcion","overview":"Dos poderosas familias mantienen un enfrentamiento letal por gobernar los Siete Reinos de Poniente, mientras fuerzas sobrenaturales acechan más allá del gran muro del norte."}',
+     'Ciencia ficcion • 2011');
 
+  -- ── Movies ─────────────────────────────────────────────────
   insert into public.lists (name, emoji, list_type, owner_id)
-  values ('Películas que debes ver', '🎬', 'movies', target_user_id)
+  values ('Películas', '🎬', 'movies', target_user_id)
   returning id into movies_list_id;
 
-  insert into public.items (list_id, title, total_votes, external_id, external_data) values
-    (movies_list_id, 'El Padrino',                  30, '238',    '{"poster_path":"/3bhkrj58Vtu7enYsLeBid05ICAZ.jpg","year":"1972","genre":"Drama, Crime","overview":"La historia de la familia Corleone, una poderosa organización criminal de NY."}'),
-    (movies_list_id, 'La Lista de Schindler',        26, '424',    '{"poster_path":"/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg","year":"1993","genre":"Drama, History, War","overview":"Oskar Schindler salva la vida de más de mil judíos durante el Holocausto."}'),
-    (movies_list_id, 'Pulp Fiction',                 23, '680',    '{"poster_path":"/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg","year":"1994","genre":"Thriller, Crime","overview":"Historias entrelazadas de criminales en Los Ángeles."}'),
-    (movies_list_id, 'El Club de la Lucha',          20, '550',    '{"poster_path":"/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg","year":"1999","genre":"Drama, Thriller","overview":"Un empleado insatisfecho forma un club de lucha clandestino."}'),
-    (movies_list_id, 'Parásitos',                    18, '496243', '{"poster_path":"/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg","year":"2019","genre":"Comedy, Thriller, Drama","overview":"Una familia pobre se infiltra en la vida de una familia adinerada."}'),
-    (movies_list_id, 'Interstellar',                 16, '157336', '{"poster_path":"/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg","year":"2014","genre":"Adventure, Drama, Sci-Fi","overview":"Exploradores viajan a través de un agujero de gusano para salvar a la humanidad."}'),
-    (movies_list_id, 'Blade Runner 2049',            13, '335984', '{"poster_path":"/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg","year":"2017","genre":"Sci-Fi, Drama","overview":"Un blade runner descubre un secreto que podría sumir a la sociedad en el caos."}'),
-    (movies_list_id, '2001: Una Odisea del Espacio', 11, '62',     '{"poster_path":"/ve72VxNqjU9ft5djrMFrCDPnKa0.jpg","year":"1968","genre":"Sci-Fi, Mystery","overview":"Una misión espacial a Júpiter se complica cuando la IA se vuelve hostil."}'),
-    (movies_list_id, 'Pozos de Ambición',             8, '7345',   '{"poster_path":"/fa0RDkAlCec0STeMNAhPaF89q6U.jpg","year":"2007","genre":"Drama","overview":"Un ambicioso prospector de petróleo en California a principios del siglo XX."}'),
-    (movies_list_id, 'El Gran Lebowski',              6, '115',    '{"poster_path":"/dH0X3V1ToNl7K8VCZ6e4tQBd5WL.jpg","year":"1998","genre":"Comedy, Crime","overview":"El Nota es confundido con un millonario y se ve arrastrado a un extravagante secuestro."}');
+  insert into public.items (list_id, title, total_votes, completed, external_id, external_data, category) values
+    (movies_list_id, 'El padrino',               30, true,  '238',
+     '{"poster_path":"/ApiEfzSkrqS4m1L5a2GwWXzIiAs.jpg","year":"1972","genre":"Drama","overview":"Don Vito Corleone es el patriarca de una de las cinco familias que mandan en la Cosa Nostra de Nueva York. Cuando rechaza entrar en el negocio de los estupefacientes, empieza una cruenta guerra entre familias del crimen organizado."}',
+     'Drama • 1972'),
+    (movies_list_id, 'La lista de Schindler',     26, false, '424',
+     '{"poster_path":"/3Ho0pXsnMxpGJWqdOi0KDNdaTkT.jpg","year":"1993","genre":"Drama","overview":"Oskar Schindler, usando sus relaciones con los nazis, consigue la propiedad de una fábrica en Cracovia y emplea a cientos de judíos, salvando más de mil vidas durante el Holocausto."}',
+     'Drama • 1993'),
+    (movies_list_id, 'Pulp Fiction',              23, false, '680',
+     '{"poster_path":"/hNcQAuquJxTxl2fJFs1R42DrWcf.jpg","year":"1994","genre":"Suspense","overview":"Jules y Vincent, dos asesinos a sueldo, trabajan para Marsellus Wallace. Sus misiones y las de otros personajes se entrelazan en una serie de historias violentas y con mucho humor negro."}',
+     'Suspense • 1994'),
+    (movies_list_id, 'El club de la lucha',       20, false, '550',
+     '{"poster_path":"/sgTAWJFaB2kBvdQxRGabYFiQqEK.jpg","year":"1999","genre":"Drama","overview":"Un hombre consumido por el insomnio conoce a Tyler Durden, un carismático anarquista que lo arrastra a un club secreto. Lo que comienza como liberación se convierte en una guerra contra el sistema."}',
+     'Drama • 1999'),
+    (movies_list_id, 'Parásitos',                 18, false, '496243',
+     '{"poster_path":"/4N55tgxDW0RRATyrZHbx0q9HUKv.jpg","year":"2019","genre":"Comedia","overview":"La familia Kim, en paro, consigue infiltrarse en la vida de la adinerada familia Park. Lo que empieza como una oportunidad pronto deriva en consecuencias imprevistas para ambas familias."}',
+     'Comedia • 2019'),
+    (movies_list_id, 'Blade Runner 2049',         13, false, '335984',
+     '{"poster_path":"/cOt8SQwrxpoTv9Bc3kyce3etkZX.jpg","year":"2017","genre":"Ciencia ficcion","overview":"El oficial K, blade runner del LAPD, descubre un secreto enterrado durante décadas. Su investigación le lleva a buscar al legendario Rick Deckard, desaparecido desde hace 30 años."}',
+     'Ciencia ficcion • 2017'),
+    (movies_list_id, '2001: Una odisea del espacio', 11, false, '62',
+     '{"poster_path":"/sln50uQYigvu5AvN72JfYfu1ckq.jpg","year":"1968","genre":"Ciencia ficcion","overview":"Una misión espacial a Júpiter se complica cuando HAL 9000, la inteligencia artificial de la nave, comienza a actuar de forma hostil contra su propia tripulación."}',
+     'Ciencia ficcion • 1968'),
+    (movies_list_id, 'El gran Lebowski',           6, false, '115',
+     '{"poster_path":"/EJFkJD9BH400jfzKz3W5xLYHQa.jpg","year":"1998","genre":"Comedia","overview":"El Nota es confundido con un millonario del mismo nombre. Junto a su compinche Walter se ven atrapados en un thriller con toques humorísticos donde se mezclan extorsión, chantaje y las drogas."}',
+     'Comedia • 1998');
 
+  -- ── Travel ─────────────────────────────────────────────────
   insert into public.lists (name, emoji, list_type, owner_id)
   values ('Próximos viajes', '✈️', null, target_user_id)
   returning id into travel_list_id;
 
   insert into public.items (list_id, title, total_votes) values
-    (travel_list_id, 'Japón',        25),
-    (travel_list_id, 'Islandia',     19),
-    (travel_list_id, 'Corea del Sur',14),
-    (travel_list_id, 'Tailandia',    10);
+    (travel_list_id, 'Japón',         25),
+    (travel_list_id, 'Islandia',      19),
+    (travel_list_id, 'Corea del Sur', 14),
+    (travel_list_id, 'Tailandia',     10);
 
   -- Seed one vote so "Votaste hoy" badge is visible on the home screen
   select id into top_series_item from public.items
