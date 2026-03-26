@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import {
   DndContext,
   closestCenter,
@@ -25,6 +24,11 @@ import { createClient } from "@/lib/supabase/client";
 import type { List } from "@/lib/supabase/types";
 
 const STORAGE_KEY = "rankit_list_order";
+
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function applyOrder(lists: List[], order: string[]): List[] {
   if (!order.length) return lists;
@@ -94,36 +98,78 @@ interface Props {
   userId: string;
 }
 
-export default function HomeClient({ lists, sharingMap, totalVotesMap, votedTodayIds, leaderMap, userId }: Props) {
-  const router = useRouter();
-  const votedTodaySet = new Set(votedTodayIds);
+export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTotalVotesMap, votedTodayIds: initialVotedTodayIds, leaderMap: initialLeaderMap, userId }: Props) {
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
-  // Realtime: refresh when votes or items change in any of the user's lists
+  // Live vote data managed client-side so Realtime can update it directly
+  const [totalVotesMap, setTotalVotesMap] = useState(initialTotalVotesMap);
+  const [leaderMap, setLeaderMap] = useState(initialLeaderMap);
+  const [votedTodayIds, setVotedTodayIds] = useState(initialVotedTodayIds);
+
+  const votedTodaySet = new Set(votedTodayIds);
+
+  // Fetch fresh vote data directly from Supabase (client-side)
+  const refreshVoteData = useCallback(async () => {
+    const listIds = lists.map((l) => l.id);
+    if (listIds.length === 0) return;
+
+    const supabase = createClient();
+    const today = localToday();
+
+    const [itemsResult, todayVotesResult] = await Promise.all([
+      supabase
+        .from("items")
+        .select("list_id, total_votes, title")
+        .in("list_id", listIds)
+        .eq("completed", false)
+        .order("total_votes", { ascending: false }),
+      supabase
+        .from("votes")
+        .select("list_id")
+        .eq("user_id", userId)
+        .in("list_id", listIds)
+        .eq("voted_date", today),
+    ]);
+
+    const newTotalVotesMap: Record<string, number> = {};
+    const newLeaderMap: Record<string, string | null> = {};
+    for (const item of itemsResult.data ?? []) {
+      newTotalVotesMap[item.list_id] = (newTotalVotesMap[item.list_id] ?? 0) + item.total_votes;
+      if (!(item.list_id in newLeaderMap) && item.total_votes > 0) {
+        newLeaderMap[item.list_id] = item.title;
+      }
+    }
+
+    setTotalVotesMap(newTotalVotesMap);
+    setLeaderMap(newLeaderMap);
+    setVotedTodayIds((todayVotesResult.data ?? []).map((r) => r.list_id));
+  }, [lists, userId]);
+
+  // Realtime: re-fetch when items or votes change
   useEffect(() => {
     if (lists.length === 0) return;
     const supabase = createClient();
     const channel = supabase
       .channel("home-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "votes" }, () => {
-        router.refresh();
-      })
       .on("postgres_changes", { event: "*", schema: "public", table: "items" }, () => {
-        router.refresh();
+        refreshVoteData();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "votes" }, () => {
+        refreshVoteData();
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [lists.length, router]);
+  }, [lists.length, refreshVoteData]);
 
   // Fallback: refresh when returning to the tab
   useEffect(() => {
     function handleVisibilityChange() {
-      if (document.visibilityState === "visible") router.refresh();
+      if (document.visibilityState === "visible") refreshVoteData();
     }
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [router]);
+  }, [refreshVoteData]);
 
   useEffect(() => {
     try {
