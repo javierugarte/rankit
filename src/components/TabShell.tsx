@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import HomeClient from "./HomeClient";
 import ProfileClient from "./ProfileClient";
 import ListDetailClient from "./ListDetailClient";
@@ -47,6 +48,13 @@ interface Props {
 
 export default function TabShell({ homeProps, profileProps, listDetails, isAnonymous, children }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleCreateAccount() {
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
   const isHome = pathname === "/home" || pathname === "/";
   const isProfile = pathname === "/profile";
   const isTabRoute = isHome || isProfile;
@@ -59,8 +67,8 @@ export default function TabShell({ homeProps, profileProps, listDetails, isAnony
     <div className="flex flex-col min-h-full bg-bg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       {isAnonymous && (
         <div className="text-center py-2 px-4 text-xs" style={{ backgroundColor: "rgba(200,169,110,0.1)", borderBottom: "1px solid rgba(200,169,110,0.2)", color: "#c8a96e" }}>
-          Modo demo · Datos de ejemplo · Se borran en 24h ·{" "}
-          <Link href="/login" className="underline font-medium">Crear cuenta gratis</Link>
+          Modo demo · Se borran en 24h ·{" "}
+          <button onClick={handleCreateAccount} className="underline font-medium">Crear cuenta gratis</button>
         </div>
       )}
       <main className="flex-1">
