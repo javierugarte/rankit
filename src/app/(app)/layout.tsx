@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import TabShell from "@/components/TabShell";
-import type { List, Profile } from "@/lib/supabase/types";
+import type { List, Item, Profile } from "@/lib/supabase/types";
+import type { MemberWithProfile } from "@/components/ShareModal";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -58,44 +59,59 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const listIds = allLists.map((l) => l.id);
   const ownedListIds = (ownedListsResult.data ?? []).map((l) => l.id);
 
-  // Fetch list-dependent data in parallel
+  // ── Fetch list-dependent data in parallel ──────────────────────────────────
+  // Full items (all fields, all states) — used for both home stats and list detail
   const today = new Date().toISOString().split("T")[0];
-  const [itemsResult, membersResult, todayVotesResult, totalCompletedResult] = await Promise.all([
+  const [allItemsResult, membersResult, todayVotesResult, latestVotesResult, totalCompletedResult] = await Promise.all([
     listIds.length > 0
-      ? supabase.from("items").select("list_id, total_votes, title").in("list_id", listIds).eq("completed", false).order("total_votes", { ascending: false })
-      : Promise.resolve({ data: [] as { list_id: string; total_votes: number; title: string }[] }),
+      ? supabase.from("items").select("*").in("list_id", listIds).order("total_votes", { ascending: false })
+      : Promise.resolve({ data: [] as Item[] }),
     listIds.length > 0
       ? supabase.from("list_members").select("list_id, user_id, profiles(username)").in("list_id", listIds)
       : Promise.resolve({ data: [] }),
     listIds.length > 0
       ? supabase.from("votes").select("list_id").eq("user_id", user.id).in("list_id", listIds).eq("voted_date", today)
       : Promise.resolve({ data: [] }),
+    listIds.length > 0
+      ? supabase.from("votes").select("list_id, item_id, voted_date").eq("user_id", user.id).in("list_id", listIds).order("voted_date", { ascending: false })
+      : Promise.resolve({ data: [] as { list_id: string; item_id: string; voted_date: string }[] }),
     ownedListIds.length > 0
       ? supabase.from("items").select("*", { count: "exact", head: true }).eq("completed", true).in("list_id", ownedListIds)
       : Promise.resolve({ count: 0 }),
   ]);
 
-  // Build totalVotesMap and leaderMap
+  // ── Build home data ─────────────────────────────────────────────────────────
   const totalVotesMap: Record<string, number> = {};
   const leaderMap: Record<string, string> = {};
-  for (const item of itemsResult.data ?? []) {
-    totalVotesMap[item.list_id] = (totalVotesMap[item.list_id] ?? 0) + item.total_votes;
-    if (!(item.list_id in leaderMap) && item.total_votes > 0) {
-      leaderMap[item.list_id] = item.title;
+  const itemsByList: Record<string, Item[]> = {};
+
+  for (const item of allItemsResult.data ?? []) {
+    // Group all items for list detail
+    if (!itemsByList[item.list_id]) itemsByList[item.list_id] = [];
+    itemsByList[item.list_id].push(item);
+
+    // Only non-completed items count for home stats
+    if (!item.completed) {
+      totalVotesMap[item.list_id] = (totalVotesMap[item.list_id] ?? 0) + item.total_votes;
+      if (!(item.list_id in leaderMap) && item.total_votes > 0) {
+        leaderMap[item.list_id] = item.title;
+      }
     }
   }
 
   // Build sharingMap
   const otherMembersPerList: Record<string, string[]> = {};
+  const membersByList: Record<string, MemberWithProfile[]> = {};
+
   for (const row of membersResult.data ?? []) {
-    if (row.user_id === user.id) continue;
-    const username =
-      (row.profiles as { username: string } | null)?.username ?? "alguien";
-    otherMembersPerList[row.list_id] = [
-      ...(otherMembersPerList[row.list_id] ?? []),
-      username,
-    ];
+    const username = (row.profiles as { username: string } | null)?.username ?? "alguien";
+    if (!membersByList[row.list_id]) membersByList[row.list_id] = [];
+    membersByList[row.list_id].push({ user_id: row.user_id, username });
+    if (row.user_id !== user.id) {
+      otherMembersPerList[row.list_id] = [...(otherMembersPerList[row.list_id] ?? []), username];
+    }
   }
+
   const memberListIdSet = new Set(memberIds);
   const sharingMap: Record<string, string> = {};
   for (const list of allLists) {
@@ -110,6 +126,27 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   const votedTodaySet = new Set((todayVotesResult.data ?? []).map((r) => r.list_id));
+
+  // Latest vote per list (for list detail)
+  const latestVoteByList: Record<string, { item_id: string; voted_date: string }> = {};
+  for (const vote of latestVotesResult.data ?? []) {
+    if (!latestVoteByList[vote.list_id]) {
+      latestVoteByList[vote.list_id] = { item_id: vote.item_id, voted_date: vote.voted_date };
+    }
+  }
+
+  // Build list detail props for each list
+  const listDetails = allLists.map((list) => {
+    const isOwner = list.owner_id === user.id;
+    return {
+      list,
+      initialItems: itemsByList[list.id] ?? [],
+      latestVote: latestVoteByList[list.id] ?? null,
+      isOwner,
+      initialMembers: isOwner ? (membersByList[list.id] ?? []) : [],
+      ownerUsername: isOwner ? null : (ownerUsernameMap[list.id] ?? null),
+    };
+  });
 
   return (
     <TabShell
@@ -130,6 +167,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         totalCompleted: (totalCompletedResult as { count: number | null }).count ?? 0,
         sharedLists: sharedListsResult.count ?? 0,
       }}
+      listDetails={listDetails}
     >
       {children}
     </TabShell>
