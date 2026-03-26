@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
   closestCenter,
@@ -20,9 +20,15 @@ import { CSS } from "@dnd-kit/utilities";
 import { ArrowUpDown, Check, GripVertical } from "lucide-react";
 import ListCard from "./ListCard";
 import CreateListButton from "./CreateListButton";
+import { createClient } from "@/lib/supabase/client";
 import type { List } from "@/lib/supabase/types";
 
 const STORAGE_KEY = "rankit_list_order";
+
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function applyOrder(lists: List[], order: string[]): List[] {
   if (!order.length) return lists;
@@ -92,10 +98,94 @@ interface Props {
   userId: string;
 }
 
-export default function HomeClient({ lists, sharingMap, totalVotesMap, votedTodayIds, leaderMap, userId }: Props) {
-  const votedTodaySet = new Set(votedTodayIds);
+export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTotalVotesMap, votedTodayIds: initialVotedTodayIds, leaderMap: initialLeaderMap, userId }: Props) {
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
+
+  // Live vote data managed client-side
+  const [totalVotesMap, setTotalVotesMap] = useState(initialTotalVotesMap);
+  const [leaderMap, setLeaderMap] = useState(initialLeaderMap);
+  const [votedTodayIds, setVotedTodayIds] = useState(initialVotedTodayIds);
+
+  const votedTodaySet = new Set(votedTodayIds);
+
+  // Single stable Supabase client instance for this component
+  const supabase = useRef(createClient()).current;
+
+  // Refs to always have fresh values inside the stable realtime callback
+  const listsRef = useRef(lists);
+  const userIdRef = useRef(userId);
+  useEffect(() => { listsRef.current = lists; }, [lists]);
+  useEffect(() => { userIdRef.current = userId; }, [userId]);
+
+  async function refreshVoteData() {
+    const listIds = listsRef.current.map((l) => l.id);
+    if (listIds.length === 0) return;
+
+    const today = localToday();
+    const [itemsResult, todayVotesResult] = await Promise.all([
+      supabase
+        .from("items")
+        .select("list_id, total_votes, title")
+        .in("list_id", listIds)
+        .eq("completed", false)
+        .order("total_votes", { ascending: false }),
+      supabase
+        .from("votes")
+        .select("list_id")
+        .eq("user_id", userIdRef.current)
+        .in("list_id", listIds)
+        .eq("voted_date", today),
+    ]);
+
+    const newTotalVotesMap: Record<string, number> = {};
+    const newLeaderMap: Record<string, string | null> = {};
+    for (const item of itemsResult.data ?? []) {
+      newTotalVotesMap[item.list_id] = (newTotalVotesMap[item.list_id] ?? 0) + item.total_votes;
+      if (!(item.list_id in newLeaderMap) && item.total_votes > 0) {
+        newLeaderMap[item.list_id] = item.title;
+      }
+    }
+
+    setTotalVotesMap(newTotalVotesMap);
+    setLeaderMap(newLeaderMap);
+    setVotedTodayIds((todayVotesResult.data ?? []).map((r) => r.list_id));
+  }
+
+  // Fetch fresh data on mount — catches votes made while navigating away
+  useEffect(() => {
+    refreshVoteData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Stable Realtime subscription — created once on mount, never recreated
+  useEffect(() => {
+    const channel = supabase
+      .channel("home-realtime")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "items" }, () => {
+        refreshVoteData();
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "votes" }, () => {
+        refreshVoteData();
+      })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "votes" }, () => {
+        refreshVoteData();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty: subscription must be stable, refs keep values fresh
+
+  // Fallback: refresh when returning to the tab
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") refreshVoteData();
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Stable: uses refs
 
   useEffect(() => {
     try {
