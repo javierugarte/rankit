@@ -16,6 +16,19 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  async function handleDemo() {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push("/home");
+      router.refresh();
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -186,6 +199,24 @@ export default function LoginPage() {
             : "Crear cuenta"}
         </button>
       </form>
+
+      {/* Demo */}
+      <div className="flex items-center gap-3 my-5">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-muted text-xs">o</span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
+      <button
+        onClick={handleDemo}
+        disabled={loading}
+        className="w-full border border-border rounded-xl py-3 text-sm font-medium text-muted hover:text-text hover:border-gold/40 transition-colors disabled:opacity-50 active:scale-[0.98] active:transition-none"
+      >
+        {loading ? "Preparando demo…" : "✨ Probar demo sin cuenta"}
+      </button>
+      <p className="text-center text-xs text-muted mt-2">
+        Datos de ejemplo · Se borran en 24h
+      </p>
     </div>
   );
 }

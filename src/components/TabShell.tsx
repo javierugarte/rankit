@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import HomeClient from "./HomeClient";
 import ProfileClient from "./ProfileClient";
 import ListDetailClient from "./ListDetailClient";
@@ -40,10 +41,11 @@ interface Props {
   homeProps: HomeProps;
   profileProps: ProfileProps;
   listDetails: ListDetail[];
+  isAnonymous: boolean;
   children: React.ReactNode;
 }
 
-export default function TabShell({ homeProps, profileProps, listDetails, children }: Props) {
+export default function TabShell({ homeProps, profileProps, listDetails, isAnonymous, children }: Props) {
   const pathname = usePathname();
   const isHome = pathname === "/home" || pathname === "/";
   const isProfile = pathname === "/profile";
@@ -55,6 +57,12 @@ export default function TabShell({ homeProps, profileProps, listDetails, childre
 
   return (
     <div className="flex flex-col min-h-full bg-bg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      {isAnonymous && (
+        <div className="text-center py-2 px-4 text-xs" style={{ backgroundColor: "rgba(200,169,110,0.1)", borderBottom: "1px solid rgba(200,169,110,0.2)", color: "#c8a96e" }}>
+          Modo demo · Datos de ejemplo · Se borran en 24h ·{" "}
+          <Link href="/login" className="underline font-medium">Crear cuenta gratis</Link>
+        </div>
+      )}
       <main className="flex-1">
         {/* Tabs — always mounted, CSS toggled for instant switching */}
         <div style={{ display: isHome ? "block" : "none" }}>
