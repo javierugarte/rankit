@@ -21,6 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { ArrowUpDown, Check, GripVertical } from "lucide-react";
 import ListCard from "./ListCard";
 import CreateListButton from "./CreateListButton";
+import { createClient } from "@/lib/supabase/client";
 import type { List } from "@/lib/supabase/types";
 
 const STORAGE_KEY = "rankit_list_order";
@@ -99,11 +100,26 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap, votedToda
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
+  // Realtime: refresh when votes or items change in any of the user's lists
+  useEffect(() => {
+    if (lists.length === 0) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel("home-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "votes" }, () => {
+        router.refresh();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "items" }, () => {
+        router.refresh();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [lists.length, router]);
+
+  // Fallback: refresh when returning to the tab
   useEffect(() => {
     function handleVisibilityChange() {
-      if (document.visibilityState === "visible") {
-        router.refresh();
-      }
+      if (document.visibilityState === "visible") router.refresh();
     }
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
