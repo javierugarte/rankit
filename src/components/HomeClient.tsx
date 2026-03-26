@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
   closestCenter,
@@ -102,21 +102,27 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
-  // Live vote data managed client-side so Realtime can update it directly
+  // Live vote data managed client-side
   const [totalVotesMap, setTotalVotesMap] = useState(initialTotalVotesMap);
   const [leaderMap, setLeaderMap] = useState(initialLeaderMap);
   const [votedTodayIds, setVotedTodayIds] = useState(initialVotedTodayIds);
 
   const votedTodaySet = new Set(votedTodayIds);
 
-  // Fetch fresh vote data directly from Supabase (client-side)
-  const refreshVoteData = useCallback(async () => {
-    const listIds = lists.map((l) => l.id);
+  // Single stable Supabase client instance for this component
+  const supabase = useRef(createClient()).current;
+
+  // Refs to always have fresh values inside the stable realtime callback
+  const listsRef = useRef(lists);
+  const userIdRef = useRef(userId);
+  useEffect(() => { listsRef.current = lists; }, [lists]);
+  useEffect(() => { userIdRef.current = userId; }, [userId]);
+
+  async function refreshVoteData() {
+    const listIds = listsRef.current.map((l) => l.id);
     if (listIds.length === 0) return;
 
-    const supabase = createClient();
     const today = localToday();
-
     const [itemsResult, todayVotesResult] = await Promise.all([
       supabase
         .from("items")
@@ -127,7 +133,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
       supabase
         .from("votes")
         .select("list_id")
-        .eq("user_id", userId)
+        .eq("user_id", userIdRef.current)
         .in("list_id", listIds)
         .eq("voted_date", today),
     ]);
@@ -144,23 +150,26 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
     setTotalVotesMap(newTotalVotesMap);
     setLeaderMap(newLeaderMap);
     setVotedTodayIds((todayVotesResult.data ?? []).map((r) => r.list_id));
-  }, [lists, userId]);
+  }
 
-  // Realtime: re-fetch when items or votes change
+  // Stable Realtime subscription — created once on mount, never recreated
   useEffect(() => {
-    if (lists.length === 0) return;
-    const supabase = createClient();
     const channel = supabase
       .channel("home-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "items" }, () => {
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "items" }, () => {
         refreshVoteData();
       })
-      .on("postgres_changes", { event: "*", schema: "public", table: "votes" }, () => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "votes" }, () => {
+        refreshVoteData();
+      })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "votes" }, () => {
         refreshVoteData();
       })
       .subscribe();
+
     return () => { supabase.removeChannel(channel); };
-  }, [lists.length, refreshVoteData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty: subscription must be stable, refs keep values fresh
 
   // Fallback: refresh when returning to the tab
   useEffect(() => {
@@ -169,7 +178,8 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
     }
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [refreshVoteData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Stable: uses refs
 
   useEffect(() => {
     try {
