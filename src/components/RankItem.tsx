@@ -102,11 +102,11 @@ export default function RankItem({
         {isFirst && (
           <button
             onClick={onMarkDone}
-            className="text-xs px-2 py-1 rounded-lg transition-colors text-muted hover:text-text"
+            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-muted hover:text-text active:scale-90 active:transition-none"
             style={{ border: "1px solid #2a2a38" }}
             title="Marcar como visto"
           >
-            ✓
+            <span className="text-xs">✓</span>
           </button>
         )}
 

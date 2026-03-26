@@ -150,7 +150,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap, votedToda
         {orderedLists.length > 0 && (
           <button
             onClick={toggleSortMode}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90 active:transition-none ${
               sortMode
                 ? "text-bg"
                 : "bg-surface border border-border text-muted hover:text-text"
