@@ -6,6 +6,7 @@ import { X, Trash2, Search, Loader2, CheckCircle } from "lucide-react";
 import type { Item } from "@/lib/supabase/types";
 import { getService, type ExternalResult } from "@/lib/services";
 import Image from "next/image";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 interface Props {
   listId: string;
@@ -14,7 +15,7 @@ interface Props {
   onClose: () => void;
   onSaved: (item: Item) => void;
   editItem?: Item;
-  onDelete?: () => void;
+  onDelete?: () => Promise<void> | void;
   onMarkDone?: () => void;
 }
 
@@ -222,37 +223,6 @@ export default function AddItemModal({
           </div>
         </div>
 
-        {confirmDelete && (
-          <div
-            className="mb-4 p-4 rounded-xl border"
-            style={{
-              backgroundColor: "rgba(239, 68, 68, 0.08)",
-              borderColor: "rgba(239, 68, 68, 0.3)",
-            }}
-          >
-            <p className="text-sm text-text mb-3">
-              Eliminar este item? Esta accion no se puede deshacer.
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(false)}
-                className="flex-1 py-2 rounded-lg border border-border text-muted text-sm hover:text-text transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={onDelete}
-                className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
-                style={{ backgroundColor: "#ef4444" }}
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title field — with autocomplete if service available */}
           <div className="relative">
@@ -414,6 +384,16 @@ export default function AddItemModal({
           </div>
         </form>
       </div>
+
+      {confirmDelete && editItem && onDelete && (
+        <ConfirmDeleteModal
+          emoji="🗑️"
+          title="Eliminar item"
+          itemName={editItem.title}
+          onConfirm={onDelete}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
     </div>
   );
 }
