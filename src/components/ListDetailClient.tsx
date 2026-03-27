@@ -594,13 +594,16 @@ export default function ListDetailClient({
                   Esta función está disponible para usuarios con cuenta.
                 </p>
               </div>
-              <a
-                href="/login?tab=signup"
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  router.push("/login?tab=signup");
+                }}
                 className="block w-full py-3 rounded-2xl text-center text-sm font-semibold transition-opacity active:opacity-70"
                 style={{ backgroundColor: "#c8a96e", color: "#1a1a1a" }}
               >
                 Crear cuenta gratis
-              </a>
+              </button>
             </div>
           </div>
         </div>
