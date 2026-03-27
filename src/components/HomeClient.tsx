@@ -171,6 +171,10 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
       .on("postgres_changes", { event: "DELETE", schema: "public", table: "votes" }, () => {
         refreshVoteData();
       })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "lists" }, (payload) => {
+        const updated = payload.new as List;
+        setOrderedLists((prev) => prev.map((l) => l.id === updated.id ? { ...l, name: updated.name, emoji: updated.emoji } : l));
+      })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };

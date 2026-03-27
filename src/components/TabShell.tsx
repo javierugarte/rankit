@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import HomeClient from "./HomeClient";
 import ProfileClient from "./ProfileClient";
@@ -54,19 +53,12 @@ export default function TabShell({ homeProps, profileProps, listDetails, childre
   const currentListId = listIdMatch?.[1] ?? null;
   const isKnownList = currentListId !== null && listDetails.some((d) => d.list.id === currentListId);
 
-  const [listOverrides, setListOverrides] = useState<Record<string, List>>({});
-  const handleListUpdated = useCallback((updated: List) => {
-    setListOverrides((prev) => ({ ...prev, [updated.id]: updated }));
-  }, []);
-
-  const listsWithOverrides = homeProps.lists.map((l) => listOverrides[l.id] ?? l);
-
   return (
     <div className="flex flex-col min-h-full bg-bg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       <main className="flex-1">
         {/* Tabs — always mounted, CSS toggled for instant switching */}
         <div style={{ display: isHome ? "block" : "none" }}>
-          <HomeClient {...homeProps} lists={listsWithOverrides} />
+          <HomeClient {...homeProps} />
         </div>
         <div style={{ display: isProfile ? "block" : "none" }}>
           <ProfileClient {...profileProps} />
@@ -81,7 +73,6 @@ export default function TabShell({ homeProps, profileProps, listDetails, childre
             <ListDetailClient
               {...detail}
               userId={homeProps.userId}
-              onListUpdated={handleListUpdated}
             />
           </div>
         ))}
