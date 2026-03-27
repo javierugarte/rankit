@@ -579,7 +579,10 @@ export default function ListDetailClient({
           title="Eliminar lista"
           itemName={listName}
           onConfirm={handleDelete}
-          onCancel={() => setShowDeleteConfirm(false)}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setShowEditListModal(true);
+          }}
         />
       )}
     </div>
