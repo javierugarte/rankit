@@ -1,6 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import HomeClient from "./HomeClient";
 import ProfileClient from "./ProfileClient";
 import ListDetailClient from "./ListDetailClient";
@@ -40,11 +42,19 @@ interface Props {
   homeProps: HomeProps;
   profileProps: ProfileProps;
   listDetails: ListDetail[];
+  isAnonymous: boolean;
   children: React.ReactNode;
 }
 
-export default function TabShell({ homeProps, profileProps, listDetails, children }: Props) {
+export default function TabShell({ homeProps, profileProps, listDetails, isAnonymous, children }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleCreateAccount() {
+    await supabase.auth.signOut();
+    router.push("/login?tab=signup");
+  }
   const isHome = pathname === "/home" || pathname === "/";
   const isProfile = pathname === "/profile";
   const isTabRoute = isHome || isProfile;
@@ -55,6 +65,12 @@ export default function TabShell({ homeProps, profileProps, listDetails, childre
 
   return (
     <div className="flex flex-col min-h-full bg-bg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+      {isAnonymous && (
+        <div className="text-center py-2 px-4 text-xs" style={{ backgroundColor: "rgba(200,169,110,0.1)", borderBottom: "1px solid rgba(200,169,110,0.2)", color: "#c8a96e" }}>
+          Modo demo · Se borrará en 24h ·{" "}
+          <button onClick={handleCreateAccount} className="underline font-medium">Crear cuenta ahora</button>
+        </div>
+      )}
       <main className="flex-1">
         {/* Tabs — always mounted, CSS toggled for instant switching */}
         <div style={{ display: isHome ? "block" : "none" }}>
