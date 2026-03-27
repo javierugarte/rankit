@@ -25,6 +25,7 @@ interface Props {
   isOwner?: boolean;
   initialMembers: MemberWithProfile[];
   ownerUsername?: string | null;
+  onListUpdated?: (updated: List) => void;
 }
 
 export default function ListDetailClient({
@@ -35,6 +36,7 @@ export default function ListDetailClient({
   isOwner,
   ownerUsername,
   initialMembers,
+  onListUpdated,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -523,6 +525,7 @@ export default function ListDetailClient({
           onUpdated={(updated) => {
             setListName(updated.name);
             setListEmoji(updated.emoji);
+            onListUpdated?.(updated);
             setShowEditListModal(false);
           }}
           onDelete={() => {
