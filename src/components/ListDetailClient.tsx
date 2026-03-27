@@ -23,6 +23,7 @@ interface Props {
   userId: string;
   latestVote: { item_id: string; voted_date: string } | null;
   isOwner?: boolean;
+  isAnonymous?: boolean;
   initialMembers: MemberWithProfile[];
   ownerUsername?: string | null;
 }
@@ -33,6 +34,7 @@ export default function ListDetailClient({
   userId,
   latestVote,
   isOwner,
+  isAnonymous,
   ownerUsername,
   initialMembers,
 }: Props) {
@@ -564,7 +566,46 @@ export default function ListDetailClient({
       )}
 
       {/* Share modal */}
-      {showShareModal && (
+      {showShareModal && isAnonymous && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+          onClick={() => setShowShareModal(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-surface-2 rounded-t-3xl border-t border-border"
+            style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
+              <div className="flex flex-col items-center text-center gap-3 mb-6">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ backgroundColor: "rgba(200, 169, 110, 0.12)", border: "1px solid rgba(200, 169, 110, 0.2)" }}
+                >
+                  👥
+                </div>
+                <h2 className="text-lg font-semibold text-text">Comparte con quien quieras</h2>
+                <p className="text-sm text-muted">
+                  Invita a tu pareja o amigos para votar juntos y democratizar las decisiones. ¿Qué peli ver esta noche? ¿A dónde viajar? Que gane la más votada.
+                </p>
+                <p className="text-xs text-muted/70 mt-1">
+                  Esta función está disponible para usuarios con cuenta.
+                </p>
+              </div>
+              <a
+                href="/login?tab=signup"
+                className="block w-full py-3 rounded-2xl text-center text-sm font-semibold transition-opacity active:opacity-70"
+                style={{ backgroundColor: "#c8a96e", color: "#1a1a1a" }}
+              >
+                Crear cuenta gratis
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+      {showShareModal && !isAnonymous && (
         <ShareModal
           listId={list.id}
           members={members}
