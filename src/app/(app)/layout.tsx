@@ -153,6 +153,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <TabShell
+      isAnonymous={user.is_anonymous ?? false}
       homeProps={{
         lists: allLists,
         sharingMap,
