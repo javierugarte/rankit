@@ -322,7 +322,7 @@ export default function AddItemModal({
                       ? service.placeholder
                       : "Breaking Bad, Tokio, Ramen Nakamura..."
                   }
-                  className="w-full bg-surface border border-border rounded-xl py-3 text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
+                  className="w-full bg-surface border border-border rounded-xl py-3 text-base text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
                   style={{ paddingLeft: service ? "2.5rem" : "1rem", paddingRight: "1rem" }}
                 />
               </div>

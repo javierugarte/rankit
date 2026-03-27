@@ -162,7 +162,7 @@ export default function EditProfileModal({
                 setError("");
               }}
               placeholder="tunombredeusuario"
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-gold/50"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-text placeholder:text-muted focus:outline-none focus:border-gold/50"
               autoCorrect="off"
               autoCapitalize="none"
             />

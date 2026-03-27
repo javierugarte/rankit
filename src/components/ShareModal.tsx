@@ -178,7 +178,7 @@ export default function ShareModal({
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="email@ejemplo.com"
-              className="flex-1 bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-text placeholder:text-muted focus:outline-none focus:border-gold/50"
+              className="flex-1 bg-surface border border-border rounded-xl px-4 py-2.5 text-base text-text placeholder:text-muted focus:outline-none focus:border-gold/50"
             />
             <button
               onClick={handleSearch}
