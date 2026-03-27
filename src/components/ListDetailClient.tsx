@@ -11,6 +11,7 @@ import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
 import CreateListModal from "./CreateListModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 function localToday() {
   const d = new Date();
@@ -48,7 +49,6 @@ export default function ListDetailClient({
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [voting, setVoting] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
   const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
@@ -259,7 +259,6 @@ export default function ListDetailClient({
   }
 
   async function handleDelete() {
-    setDeleting(true);
     await supabase.from("lists").delete().eq("id", list.id);
     router.replace("/home");
   }
@@ -556,8 +555,8 @@ export default function ListDetailClient({
             handleMarkDone(editingItem.id);
             setEditingItem(null);
           }}
-          onDelete={() => {
-            handleDeleteItem(editingItem.id);
+          onDelete={async () => {
+            await handleDeleteItem(editingItem.id);
             setEditingItem(null);
           }}
         />
@@ -575,52 +574,13 @@ export default function ListDetailClient({
 
       {/* Delete confirmation */}
       {showDeleteConfirm && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
-          onClick={(e) =>
-            e.target === e.currentTarget && setShowDeleteConfirm(false)
-          }
-        >
-          <div
-            className="w-full max-w-lg bg-surface-2 rounded-t-3xl p-6 border-t border-border"
-            style={{
-              paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
-            }}
-          >
-            <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
-
-            <div className="text-center mb-6">
-              <p className="text-3xl mb-3">{listEmoji}</p>
-              <h2 className="text-lg font-semibold text-text mb-1">
-                Eliminar lista
-              </h2>
-              <p className="text-muted text-sm">
-                ¿Seguro que quieres eliminar{" "}
-                <span className="text-text font-medium">{listName}</span>? Esta
-                acción no se puede deshacer.
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
-                className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50"
-                style={{ backgroundColor: "#ef4444", color: "white" }}
-              >
-                {deleting ? "Eliminando..." : "Eliminar"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDeleteModal
+          emoji={listEmoji}
+          title="Eliminar lista"
+          itemName={listName}
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       )}
     </div>
   );
