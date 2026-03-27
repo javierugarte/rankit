@@ -135,6 +135,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     }
   }
 
+  const isAnonymous = user.is_anonymous ?? false;
+
   // Build list detail props for each list
   const listDetails = allLists.map((list) => {
     const isOwner = list.owner_id === user.id;
@@ -143,6 +145,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       initialItems: itemsByList[list.id] ?? [],
       latestVote: latestVoteByList[list.id] ?? null,
       isOwner,
+      isAnonymous,
       initialMembers: isOwner ? (membersByList[list.id] ?? []) : [],
       ownerUsername: isOwner ? null : (ownerUsernameMap[list.id] ?? null),
     };

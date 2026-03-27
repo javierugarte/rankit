@@ -34,6 +34,7 @@ interface ListDetail {
   initialItems: Item[];
   latestVote: { item_id: string; voted_date: string } | null;
   isOwner: boolean;
+  isAnonymous: boolean;
   initialMembers: MemberWithProfile[];
   ownerUsername: string | null;
 }
