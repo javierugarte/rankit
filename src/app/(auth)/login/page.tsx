@@ -48,6 +48,7 @@ export default function LoginPage() {
       } else {
         router.push("/home");
         router.refresh();
+        return;
       }
     } else {
       const { data, error } = await supabase.auth.signUp({
@@ -67,6 +68,7 @@ export default function LoginPage() {
 
           router.push("/home");
           router.refresh();
+          return;
         } else {
           setMessage(
             "Revisa tu email para confirmar tu cuenta y luego inicia sesión."
