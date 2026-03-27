@@ -525,7 +525,6 @@ export default function ListDetailClient({
             setShowEditListModal(false);
           }}
           onDelete={() => {
-            setShowEditListModal(false);
             setShowDeleteConfirm(true);
           }}
         />
