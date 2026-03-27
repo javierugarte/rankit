@@ -120,6 +120,7 @@ export default function AddItemModal({
     setSelectedResult(null);
     setExternalId(null);
     setExternalData(null);
+    setTitle("");
     setCategory("");
   }
 
