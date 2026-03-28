@@ -175,6 +175,10 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
         const updated = payload.new as List;
         setOrderedLists((prev) => prev.map((l) => l.id === updated.id ? { ...l, name: updated.name, emoji: updated.emoji } : l));
       })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "lists" }, (payload) => {
+        const listId = (payload.old as { id: string }).id;
+        setOrderedLists((prev) => prev.filter((l) => l.id !== listId));
+      })
       .on("postgres_changes", { event: "DELETE", schema: "public", table: "list_members", filter: `user_id=eq.${userId}` }, (payload) => {
         const listId = (payload.old as { list_id: string }).list_id;
         setOrderedLists((prev) => prev.filter((l) => l.id !== listId));
