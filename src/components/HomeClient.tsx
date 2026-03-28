@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   DndContext,
   closestCenter,
@@ -20,6 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { ArrowUpDown, Check, GripVertical } from "lucide-react";
 import ListCard from "./ListCard";
 import CreateListButton from "./CreateListButton";
+import PullToRefresh from "./PullToRefresh";
 import { createClient } from "@/lib/supabase/client";
 import type { List } from "@/lib/supabase/types";
 
@@ -99,6 +101,7 @@ interface Props {
 }
 
 export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTotalVotesMap, votedTodayIds: initialVotedTodayIds, leaderMap: initialLeaderMap, userId }: Props) {
+  const router = useRouter();
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
@@ -227,7 +230,13 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
     setSortMode((prev) => !prev);
   }
 
+  async function handleRefresh() {
+    await refreshVoteData();
+    router.refresh();
+  }
+
   return (
+    <PullToRefresh onRefresh={handleRefresh} className="h-full">
     <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -313,5 +322,6 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
 
       <CreateListButton userId={userId} />
     </div>
+    </PullToRefresh>
   );
 }

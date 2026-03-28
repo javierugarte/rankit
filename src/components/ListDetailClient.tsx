@@ -12,6 +12,7 @@ import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
 import CreateListModal from "./CreateListModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import PullToRefresh from "./PullToRefresh";
 
 function localToday() {
   const d = new Date();
@@ -273,7 +274,24 @@ export default function ListDetailClient({
     });
   }
 
+  async function handleRefresh() {
+    const today = localToday();
+    const [itemsResult, voteResult] = await Promise.all([
+      supabase.from("items").select("*").eq("list_id", list.id),
+      supabase
+        .from("votes")
+        .select("item_id, voted_date")
+        .eq("user_id", userId)
+        .eq("list_id", list.id)
+        .eq("voted_date", today)
+        .maybeSingle(),
+    ]);
+    if (itemsResult.data) setItems(itemsResult.data as Item[]);
+    setVotedItemId(voteResult.data?.item_id ?? null);
+  }
+
   return (
+    <PullToRefresh onRefresh={handleRefresh} className="h-full">
     <div className="max-w-lg mx-auto px-4 pt-10 pb-4">
       {/* Header */}
       <div className="mb-6">
@@ -629,5 +647,6 @@ export default function ListDetailClient({
         />
       )}
     </div>
+    </PullToRefresh>
   );
 }
