@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.rawg.io",
       },
+      {
+        protocol: "https",
+        hostname: "vtkadxzditmkkfcnleoh.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
 };

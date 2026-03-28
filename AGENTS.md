@@ -19,6 +19,7 @@ src/
 │   │   └── list/[id]/       → List detail (Server Component)
 │   └── page.tsx             → Redirects to /home
 ├── components/
+│   ├── ConfirmDeleteModal.tsx → Shared bottom sheet for destructive confirmations (manages own loading state)
 │   ├── ListDetailClient.tsx → List detail view (Client Component, Realtime)
 │   ├── ShareModal.tsx       → Modal to share/manage collaborators
 │   ├── AddItemModal.tsx     → Modal to add items
@@ -42,10 +43,14 @@ src/
 - **Middleware** (`middleware.ts`) handles route protection: redirects to `/login` if unauthenticated.
 - **Realtime** active on `items` and `list_members` via `supabase_realtime` publication.
 - Detail Server Components (`list/[id]/page.tsx`) pass initial data as props to the Client Component.
+- **Modal z-index layering**: base bottom sheets use `z-[60]`; confirmation modals that stack on top use `z-[70]`. Never close a parent modal before showing a child confirmation — keep both mounted so the child renders naturally on top.
+- **Auth loading state**: after a successful `router.push()` in auth flows, use `return` immediately to avoid calling `setLoading(false)` before navigation completes (re-enables buttons visually).
 
 ## Authentication
 
 Supabase Auth with email/password. On user creation, a trigger automatically creates a row in `profiles`. Middleware refreshes the session on every request.
+
+Anonymous (demo) users are detected via `user.is_anonymous`. To send an anonymous user to signup, always call `supabase.auth.signOut()` first — navigating directly to `/login` while an anonymous session is active silently blocks registration.
 
 # Database: architecture
 
