@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -60,6 +60,7 @@ function SortableListCard({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -75,6 +76,7 @@ function SortableListCard({
   return (
     <div ref={setNodeRef} style={style} className="flex items-center gap-2">
       <button
+        ref={setActivatorNodeRef}
         {...attributes}
         {...listeners}
         className="text-muted hover:text-text p-2 touch-none cursor-grab active:cursor-grabbing"
@@ -202,10 +204,8 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
   }, [lists]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 150, tolerance: 5 },
-    })
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
 
   function handleDragEnd(event: DragEndEvent) {
