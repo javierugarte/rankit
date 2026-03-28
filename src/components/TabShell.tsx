@@ -17,6 +17,7 @@ interface HomeProps {
   votedTodayIds: string[];
   leaderMap: Record<string, string | null>;
   userId: string;
+  initialOrder: string[];
 }
 
 interface ProfileProps {

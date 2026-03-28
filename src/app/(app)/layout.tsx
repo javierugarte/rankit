@@ -161,6 +161,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         votedTodayIds: [...votedTodaySet],
         leaderMap,
         userId: user.id,
+        initialOrder: (user.user_metadata?.list_order as string[] | undefined) ?? [],
       }}
       profileProps={{
         profile: profileResult.data as Profile | null,
