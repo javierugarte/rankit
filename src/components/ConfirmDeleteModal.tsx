@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 interface Props {
   emoji: string;
   title: string;
   itemName: string;
+  message?: ReactNode;
+  confirmLabel?: string;
   onConfirm: () => Promise<void> | void;
   onCancel: () => void;
 }
@@ -14,6 +17,8 @@ export default function ConfirmDeleteModal({
   emoji,
   title,
   itemName,
+  message,
+  confirmLabel,
   onConfirm,
   onCancel,
 }: Props) {
@@ -42,9 +47,13 @@ export default function ConfirmDeleteModal({
           <p className="text-3xl mb-3">{emoji}</p>
           <h2 className="text-lg font-semibold text-text mb-1">{title}</h2>
           <p className="text-muted text-sm">
-            ¿Seguro que quieres eliminar{" "}
-            <span className="text-text font-medium">{itemName}</span>? Esta
-            acción no se puede deshacer.
+            {message ?? (
+              <>
+                ¿Seguro que quieres eliminar{" "}
+                <span className="text-text font-medium">{itemName}</span>? Esta
+                acción no se puede deshacer.
+              </>
+            )}
           </p>
         </div>
 
@@ -62,7 +71,11 @@ export default function ConfirmDeleteModal({
             className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50"
             style={{ backgroundColor: "#ef4444", color: "white" }}
           >
-            {deleting ? "Eliminando..." : "Eliminar"}
+            {deleting
+            ? confirmLabel
+              ? `${confirmLabel}...`
+              : "Eliminando..."
+            : (confirmLabel ?? "Eliminar")}
           </button>
         </div>
       </div>

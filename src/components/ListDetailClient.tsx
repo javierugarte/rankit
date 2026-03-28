@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, UserPlus, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
@@ -51,6 +51,7 @@ export default function ListDetailClient({
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [voting, setVoting] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
   const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
@@ -265,6 +266,15 @@ export default function ListDetailClient({
     router.replace("/home");
   }
 
+  async function handleLeave() {
+    await supabase
+      .from("list_members")
+      .delete()
+      .eq("list_id", list.id)
+      .eq("user_id", userId);
+    router.replace("/home");
+  }
+
   function onItemSaved(savedItem: Item) {
     setItems((prev) => {
       const exists = prev.some((i) => i.id === savedItem.id);
@@ -305,6 +315,15 @@ export default function ListDetailClient({
                   <UserPlus size={18} />
                 </button>
               </>
+            )}
+            {!isOwner && (
+              <button
+                onClick={() => setShowLeaveConfirm(true)}
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
+                aria-label="Salir de la lista"
+              >
+                <LogOut size={18} />
+              </button>
             )}
             <button
               onClick={() => setShowAddModal(true)}
@@ -626,6 +645,25 @@ export default function ListDetailClient({
             setShowDeleteConfirm(false);
             setShowEditListModal(true);
           }}
+        />
+      )}
+
+      {/* Leave list confirmation */}
+      {showLeaveConfirm && (
+        <ConfirmDeleteModal
+          emoji="🚪"
+          title="Salir de la lista"
+          itemName={listName}
+          message={
+            <>
+              ¿Seguro que quieres salir de{" "}
+              <span className="text-text font-medium">{listName}</span>?
+              Perderás el acceso a esta lista.
+            </>
+          }
+          confirmLabel="Salir"
+          onConfirm={handleLeave}
+          onCancel={() => setShowLeaveConfirm(false)}
         />
       )}
     </div>
