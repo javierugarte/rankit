@@ -348,3 +348,4 @@ create trigger on_auth_user_created
 alter publication supabase_realtime add table public.items;
 alter publication supabase_realtime add table public.votes;
 alter publication supabase_realtime add table public.lists;
+alter publication supabase_realtime add table public.list_members;
