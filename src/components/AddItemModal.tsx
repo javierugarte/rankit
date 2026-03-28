@@ -191,7 +191,7 @@ export default function AddItemModal({
 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-text">
-            {editItem ? "Editar item" : "Anadir item"}
+            {editItem ? "Editar ítem" : "Añadir ítem"}
           </h2>
           <div className="flex items-center gap-2">
             {editItem && onMarkDone && (
@@ -227,7 +227,7 @@ export default function AddItemModal({
           {/* Title field — with autocomplete if service available */}
           <div className="relative">
             <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
-              {service ? "Buscar" : "Titulo"}
+              {service ? "Buscar" : "Título"}
             </label>
 
             {/* Selected result preview */}
@@ -376,10 +376,10 @@ export default function AddItemModal({
               {loading
                 ? editItem
                   ? "Guardando..."
-                  : "Anadiendo..."
+                  : "Añadiendo..."
                 : editItem
                 ? "Guardar"
-                : "Anadir"}
+                : "Añadir"}
             </button>
           </div>
         </form>

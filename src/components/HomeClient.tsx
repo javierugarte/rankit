@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -60,6 +60,7 @@ function SortableListCard({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -75,6 +76,7 @@ function SortableListCard({
   return (
     <div ref={setNodeRef} style={style} className="flex items-center gap-2">
       <button
+        ref={setActivatorNodeRef}
         {...attributes}
         {...listeners}
         className="text-muted hover:text-text p-2 touch-none cursor-grab active:cursor-grabbing"
@@ -96,9 +98,10 @@ interface Props {
   votedTodayIds: string[];
   leaderMap: Record<string, string | null>;
   userId: string;
+  initialOrder: string[];
 }
 
-export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTotalVotesMap, votedTodayIds: initialVotedTodayIds, leaderMap: initialLeaderMap, userId }: Props) {
+export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTotalVotesMap, votedTodayIds: initialVotedTodayIds, leaderMap: initialLeaderMap, userId, initialOrder }: Props) {
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
@@ -200,20 +203,23 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
   }, []); // Stable: uses refs
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      const order: string[] = saved ? JSON.parse(saved) : [];
-      setOrderedLists(applyOrder(lists, order));
-    } catch {
-      setOrderedLists(lists);
+    if (initialOrder.length > 0) {
+      setOrderedLists(applyOrder(lists, initialOrder));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialOrder));
+    } else {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        const order: string[] = saved ? JSON.parse(saved) : [];
+        setOrderedLists(applyOrder(lists, order));
+      } catch {
+        setOrderedLists(lists);
+      }
     }
-  }, [lists]);
+  }, [lists, initialOrder]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 150, tolerance: 5 },
-    })
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   );
 
   function handleDragEnd(event: DragEndEvent) {
@@ -223,10 +229,9 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
       const oldIndex = prev.findIndex((l) => l.id === active.id);
       const newIndex = prev.findIndex((l) => l.id === over.id);
       const next = arrayMove(prev, oldIndex, newIndex);
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(next.map((l) => l.id))
-      );
+      const order = next.map((l) => l.id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+      supabase.auth.updateUser({ data: { list_order: order } });
       return next;
     });
   }

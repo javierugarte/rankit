@@ -28,7 +28,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     totalVotesForStatsResult,
     sharedListsResult,
   ] = await Promise.all([
-    supabase.from("lists").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }),
+    supabase.from("lists").select("*").eq("owner_id", user.id).order("created_at", { ascending: true }),
     supabase.from("list_members").select("list_id").eq("user_id", user.id),
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("lists").select("*", { count: "exact", head: true }).eq("owner_id", user.id),
@@ -47,7 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       .select("*, profiles!lists_owner_id_fkey(username)")
       .in("id", memberIds)
       .neq("owner_id", user.id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: true });
     for (const row of data ?? []) {
       ownerUsernameMap[row.id] =
         (row.profiles as { username: string } | null)?.username ?? "alguien";
@@ -161,6 +161,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         votedTodayIds: [...votedTodaySet],
         leaderMap,
         userId: user.id,
+        initialOrder: (user.user_metadata?.list_order as string[] | undefined) ?? [],
       }}
       profileProps={{
         profile: profileResult.data as Profile | null,
