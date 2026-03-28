@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, UserPlus, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
@@ -12,6 +12,7 @@ import OgImage from "./OgImage";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
 import CreateListModal from "./CreateListModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 function localToday() {
   const d = new Date();
@@ -24,6 +25,7 @@ interface Props {
   userId: string;
   latestVote: { item_id: string; voted_date: string } | null;
   isOwner?: boolean;
+  isAnonymous?: boolean;
   initialMembers: MemberWithProfile[];
   ownerUsername?: string | null;
 }
@@ -34,6 +36,7 @@ export default function ListDetailClient({
   userId,
   latestVote,
   isOwner,
+  isAnonymous,
   ownerUsername,
   initialMembers,
 }: Props) {
@@ -49,7 +52,7 @@ export default function ListDetailClient({
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [voting, setVoting] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
   const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
@@ -137,6 +140,7 @@ export default function ListDetailClient({
   async function handleVote(itemId: string) {
     if (voting) return;
 
+    navigator.vibrate?.(10);
     setVoting(true);
 
     const d = new Date();
@@ -259,8 +263,16 @@ export default function ListDetailClient({
   }
 
   async function handleDelete() {
-    setDeleting(true);
     await supabase.from("lists").delete().eq("id", list.id);
+    router.replace("/home");
+  }
+
+  async function handleLeave() {
+    await supabase
+      .from("list_members")
+      .delete()
+      .eq("list_id", list.id)
+      .eq("user_id", userId);
     router.replace("/home");
   }
 
@@ -280,7 +292,7 @@ export default function ListDetailClient({
         <div className="flex items-center justify-between mb-5">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-muted hover:text-text transition-colors"
+            className="flex items-center gap-1.5 text-muted hover:text-text transition-colors active:scale-95 active:transition-none"
           >
             <ArrowLeft size={18} />
             <span className="text-sm font-medium">Inicio</span>
@@ -291,23 +303,32 @@ export default function ListDetailClient({
               <>
                 <button
                   onClick={() => setShowEditListModal(true)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
                   aria-label="Editar lista"
                 >
                   <Pencil size={16} />
                 </button>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
                   aria-label="Compartir lista"
                 >
                   <UserPlus size={18} />
                 </button>
               </>
             )}
+            {!isOwner && (
+              <button
+                onClick={() => setShowLeaveConfirm(true)}
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
+                aria-label="Salir de la lista"
+              >
+                <LogOut size={18} />
+              </button>
+            )}
             <button
               onClick={() => setShowAddModal(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95 active:transition-none"
               style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
             >
               <Plus size={20} color="#c8a96e" />
@@ -346,7 +367,7 @@ export default function ListDetailClient({
       <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-6">
         <button
           onClick={() => setTab("pending")}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.97] active:transition-none ${
             tab === "pending"
               ? "bg-gold text-bg"
               : "text-muted hover:text-text"
@@ -367,7 +388,7 @@ export default function ListDetailClient({
         </button>
         <button
           onClick={() => setTab("done")}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all active:scale-[0.97] active:transition-none ${
             tab === "done" ? "bg-gold text-bg" : "text-muted hover:text-text"
           }`}
         >
@@ -456,7 +477,7 @@ export default function ListDetailClient({
                   className="bg-surface border border-border rounded-2xl p-4 flex items-center gap-3 opacity-60"
                 >
                   <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
+                    className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity active:scale-90 active:transition-none"
                     style={{ backgroundColor: "rgba(200, 169, 110, 0.2)" }}
                     onClick={() => handleUnmarkDone(item.id)}
                     title="Volver a pendientes"
@@ -529,7 +550,6 @@ export default function ListDetailClient({
             setShowEditListModal(false);
           }}
           onDelete={() => {
-            setShowEditListModal(false);
             setShowDeleteConfirm(true);
           }}
         />
@@ -559,15 +579,57 @@ export default function ListDetailClient({
             handleMarkDone(editingItem.id);
             setEditingItem(null);
           }}
-          onDelete={() => {
-            handleDeleteItem(editingItem.id);
+          onDelete={async () => {
+            await handleDeleteItem(editingItem.id);
             setEditingItem(null);
           }}
         />
       )}
 
       {/* Share modal */}
-      {showShareModal && (
+      {showShareModal && isAnonymous && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+          onClick={() => setShowShareModal(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-surface-2 rounded-t-3xl border-t border-border"
+            style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
+              <div className="flex flex-col items-center text-center gap-3 mb-6">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ backgroundColor: "rgba(200, 169, 110, 0.12)", border: "1px solid rgba(200, 169, 110, 0.2)" }}
+                >
+                  👥
+                </div>
+                <h2 className="text-lg font-semibold text-text">Comparte con quien quieras</h2>
+                <p className="text-sm text-muted">
+                  Invita a tu pareja o amigos para votar juntos y democratizar las decisiones. ¿Qué peli ver esta noche? ¿A dónde viajar? Que gane la más votada.
+                </p>
+                <p className="text-xs text-muted/70 mt-1">
+                  Esta función está disponible para usuarios con cuenta.
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  router.push("/login?tab=signup");
+                }}
+                className="block w-full py-3 rounded-2xl text-center text-sm font-semibold transition-opacity active:opacity-70"
+                style={{ backgroundColor: "#c8a96e", color: "#1a1a1a" }}
+              >
+                Crear cuenta gratis
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showShareModal && !isAnonymous && (
         <ShareModal
           listId={list.id}
           members={members}
@@ -578,52 +640,35 @@ export default function ListDetailClient({
 
       {/* Delete confirmation */}
       {showDeleteConfirm && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
-          onClick={(e) =>
-            e.target === e.currentTarget && setShowDeleteConfirm(false)
+        <ConfirmDeleteModal
+          emoji={listEmoji}
+          title="Eliminar lista"
+          itemName={listName}
+          onConfirm={handleDelete}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setShowEditListModal(true);
+          }}
+        />
+      )}
+
+      {/* Leave list confirmation */}
+      {showLeaveConfirm && (
+        <ConfirmDeleteModal
+          emoji="🚪"
+          title="Salir de la lista"
+          itemName={listName}
+          message={
+            <>
+              ¿Seguro que quieres salir de{" "}
+              <span className="text-text font-medium">{listName}</span>?
+              Perderás el acceso a esta lista.
+            </>
           }
-        >
-          <div
-            className="w-full max-w-lg bg-surface-2 rounded-t-3xl p-6 border-t border-border"
-            style={{
-              paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
-            }}
-          >
-            <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
-
-            <div className="text-center mb-6">
-              <p className="text-3xl mb-3">{listEmoji}</p>
-              <h2 className="text-lg font-semibold text-text mb-1">
-                Eliminar lista
-              </h2>
-              <p className="text-muted text-sm">
-                ¿Seguro que quieres eliminar{" "}
-                <span className="text-text font-medium">{listName}</span>? Esta
-                acción no se puede deshacer.
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
-                className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50"
-                style={{ backgroundColor: "#ef4444", color: "white" }}
-              >
-                {deleting ? "Eliminando..." : "Eliminar"}
-              </button>
-            </div>
-          </div>
-        </div>
+          confirmLabel="Salir"
+          onConfirm={handleLeave}
+          onCancel={() => setShowLeaveConfirm(false)}
+        />
       )}
     </div>
   );

@@ -5,119 +5,131 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- END:nextjs-agent-rules -->
 
 
-# Estructura del proyecto
+# Project structure
 
-Next.js App Router con Supabase como backend. App móvil-first con diseño oscuro y acento dorado (`#c8a96e`).
+Next.js App Router with Supabase as backend. Mobile-first app with dark design and golden accent (`#c8a96e`).
 
 ```
 src/
 ├── app/
-│   ├── (auth)/login/        → Página de login (Supabase Auth)
-│   ├── (app)/               → Rutas protegidas (layout con BottomNav)
-│   │   ├── home/            → Lista de listas del usuario
-│   │   ├── profile/         → Perfil y estadísticas
-│   │   └── list/[id]/       → Detalle de una lista (Server Component)
-│   └── page.tsx             → Redirige a /home
+│   ├── (auth)/login/        → Login page (Supabase Auth)
+│   ├── (app)/               → Protected routes (layout with BottomNav)
+│   │   ├── home/            → User's list of lists
+│   │   ├── profile/         → Profile and stats
+│   │   └── list/[id]/       → List detail (Server Component)
+│   └── page.tsx             → Redirects to /home
 ├── components/
-│   ├── ListDetailClient.tsx → Vista de detalle de lista (Client Component, Realtime)
-│   ├── ShareModal.tsx       → Modal para compartir/gestionar colaboradores
-│   ├── AddItemModal.tsx     → Modal para añadir items
-│   ├── CreateListModal.tsx  → Modal para crear listas
-│   ├── RankItem.tsx         → Item de la lista con votos
-│   ├── ListCard.tsx         → Tarjeta de lista en home
-│   ├── BottomNav.tsx        → Navegación inferior (Home / Perfil)
-│   └── LogoutButton.tsx     → Botón de cerrar sesión
+│   ├── ConfirmDeleteModal.tsx → Shared bottom sheet for destructive confirmations (manages own loading state)
+│   ├── ListDetailClient.tsx → List detail view (Client Component, Realtime)
+│   ├── ShareModal.tsx       → Modal to share/manage collaborators
+│   ├── AddItemModal.tsx     → Modal to add items
+│   ├── CreateListModal.tsx  → Modal to create lists
+│   ├── RankItem.tsx         → List item with votes
+│   ├── ListCard.tsx         → List card in home
+│   ├── BottomNav.tsx        → Bottom navigation (Home / Profile)
+│   └── LogoutButton.tsx     → Logout button
 ├── lib/supabase/
-│   ├── client.ts            → Cliente browser (componentes client)
-│   ├── server.ts            → Cliente servidor (Server Components y middleware)
-│   └── types.ts             → Tipos del schema de Supabase (actualizar al añadir tablas/funciones)
+│   ├── client.ts            → Browser client (client components)
+│   ├── server.ts            → Server client (Server Components and middleware)
+│   └── types.ts             → Supabase schema types (update when adding tables/functions)
 └── lib/services/
-    └── index.ts             → Registry de servicios externos (TMDB, etc.)
+    └── index.ts             → External services registry (TMDB, etc.)
 ```
 
-## Patrones clave
+## Key patterns
 
-- **Server Components** fetchan datos directamente con `createClient()` de `@/lib/supabase/server`.
-- **Client Components** usan `createClient()` de `@/lib/supabase/client` para mutaciones y Realtime.
-- **Middleware** (`middleware.ts`) gestiona la protección de rutas: redirige a `/login` si no autenticado.
-- **Realtime** activo en `items` y `list_members` vía `supabase_realtime` publication.
-- Los Server Components de detalle (`list/[id]/page.tsx`) pasan datos iniciales como props al Client Component.
+- **Server Components** fetch data directly with `createClient()` from `@/lib/supabase/server`.
+- **Client Components** use `createClient()` from `@/lib/supabase/client` for mutations and Realtime.
+- **Middleware** (`middleware.ts`) handles route protection: redirects to `/login` if unauthenticated.
+- **Realtime** active on `items` and `list_members` via `supabase_realtime` publication.
+- Detail Server Components (`list/[id]/page.tsx`) pass initial data as props to the Client Component.
+- **Modal z-index layering**: base bottom sheets use `z-[60]`; confirmation modals that stack on top use `z-[70]`. Never close a parent modal before showing a child confirmation — keep both mounted so the child renders naturally on top.
+- **Auth loading state**: after a successful `router.push()` in auth flows, use `return` immediately to avoid calling `setLoading(false)` before navigation completes (re-enables buttons visually).
 
-## Autenticación
+## Authentication
 
-Supabase Auth con email/password. Al crear usuario, un trigger crea automáticamente una fila en `profiles`. El middleware refresca la sesión en cada request.
+Supabase Auth with email/password. On user creation, a trigger automatically creates a row in `profiles`. Middleware refreshes the session on every request.
 
-# Base de datos: arquitectura
+Anonymous (demo) users are detected via `user.is_anonymous`. To send an anonymous user to signup, always call `supabase.auth.signOut()` first — navigating directly to `/login` while an anonymous session is active silently blocks registration.
 
-Supabase con las siguientes tablas (ver `supabase/schema.sql` para el schema completo):
+# Database: architecture
 
-- `profiles` — usuarios (1:1 con `auth.users`, se crea automáticamente via trigger)
-- `lists` — listas de items, cada una tiene un `owner_id`
-- `list_members` — relación N:M entre listas y usuarios colaboradores
-- `items` — elementos de una lista, con votos y estado completado
-- `votes` — un voto por usuario por lista por día (`unique (user_id, list_id, voted_date)`)
+Supabase with the following tables (see `supabase/schema.sql` for the full schema):
 
-Todas las tablas tienen RLS habilitado. Funciones RPC disponibles: `get_profile_by_email`, `get_list_owner_id`.
+- `profiles` — users (1:1 with `auth.users`, created automatically via trigger)
+- `lists` — item lists, each with an `owner_id`
+- `list_members` — N:M relationship between lists and collaborator users
+- `items` — list elements, with votes and completed state
+- `votes` — one vote per user per list per day (`unique (user_id, list_id, voted_date)`)
 
-# Base de datos: migraciones
+All tables have RLS enabled. Available RPC functions: `get_profile_by_email`, `get_list_owner_id`.
 
-- Para cambios en la base de datos, crear un archivo nuevo en `supabase/migrations/` con el SQL incremental.
-- Nunca re-ejecutar `supabase/schema.sql` completo en producción — es solo el estado inicial.
-- Actualizar también `supabase/schema.sql` para que refleje el estado final tras la migración.
+# Database: migrations
 
-# Servicios externos (autocompletado)
+- For database changes, create a new file in `supabase/migrations/` with incremental SQL.
+- Never re-run the full `supabase/schema.sql` in production — it's only the initial state.
+- Also update `supabase/schema.sql` to reflect the final state after the migration.
 
-Las listas pueden asociarse a un servicio externo mediante el campo `list_type` en la tabla `lists`. Cuando un item se añade a una lista con servicio, `AddItemModal` muestra un buscador con autocompletado que rellena `title`, `category`, `external_id` y `external_data` (JSONB).
+# External services (autocomplete)
 
-La API key de cada servicio vive en `.env.local` como variable de entorno server-side (nunca expuesta al cliente). Las búsquedas se proxyan a través de `/api/search/[service]`.
+Lists can be associated with an external service via the `list_type` field in the `lists` table. When an item is added to a list with a service, `AddItemModal` shows an autocomplete search that fills in `title`, `category`, `external_id` and `external_data` (JSONB).
 
-## Servicios activos
+Each service's API key lives in `.env.local` as a server-side environment variable (never exposed to the client). Searches are proxied through `/api/search/[service]`.
 
-| `list_type` | Servicio | API | API key env var |
+## Active services
+
+| `list_type` | Service | API | API key env var |
 |---|---|---|---|
-| `movies` | Películas | TMDB | `TMDB_API_KEY` |
-| `tv` | Series | TMDB | `TMDB_API_KEY` |
-| `books` | Libros | Google Books | — (sin key) |
-| `games` | Videojuegos | RAWG | `RAWG_API_KEY` |
+| `movies` | Movies | TMDB | `TMDB_API_KEY` |
+| `tv` | TV Shows | TMDB | `TMDB_API_KEY` |
+| `books` | Books | Google Books | — (no key) |
+| `games` | Video games | RAWG | `RAWG_API_KEY` |
+| `albums` | Music albums | MusicBrainz + Cover Art Archive | — (no key) |
 
-Cuando `posterBase` en `ServiceConfig` está vacío (`""`), el `poster_path` almacenado en `external_data` es una URL absoluta. Si no está vacío, el src de la imagen es `posterBase + poster_path`.
+When `posterBase` in `ServiceConfig` is empty (`""`), the `poster_path` stored in `external_data` is an absolute URL. If not empty, the image src is `posterBase + poster_path`.
 
-## Cómo añadir un nuevo servicio
+## How to add a new service
 
-1. **Añadir el tipo** en `src/lib/services/index.ts`:
-   - Extender `ServiceId` con el nuevo valor (ej. `"wine"`)
-   - Añadir entrada en `SERVICES` con `id`, `label`, `searchEndpoint`, `placeholder` y `posterBase`
-   - Añadir opción en `LIST_TYPE_OPTIONS` para que aparezca en `CreateListModal`
+1. **Add the type** in `src/lib/services/index.ts`:
+   - Extend `ServiceId` with the new value (e.g. `"wine"`)
+   - Add an entry to `SERVICES` with `id`, `label`, `searchEndpoint`, `placeholder` and `posterBase`
+   - Add an option to `LIST_TYPE_OPTIONS` so it appears in `CreateListModal`
 
-2. **Implementar el handler** en `src/app/api/search/[service]/route.ts`:
-   - Añadir `if (service === "wine") return searchWine(q);`
-   - Implementar la función que llama a la API externa y devuelve un array de `ExternalResult`
-   - `ExternalResult` tiene: `external_id`, `title`, `year`, `type`, `poster_path`, `overview`
+2. **Implement the handler** in `src/app/api/search/[service]/route.ts`:
+   - If the service does not need `TMDB_API_KEY`, add the dispatch **before** the `if (!apiKey)` block so it doesn't fail with an unrelated config error.
+   - Add `if (service === "wine") return searchWine(q);`
+   - Implement the function that calls the external API and returns an array of `ExternalResult`
+   - `ExternalResult` has: `external_id`, `title`, `year`, `type`, `poster_path`, `overview`
 
-3. **Añadir la API key** en `.env.local` y documentar en esta sección.
+3. **Add the image domain** in `next.config.ts` → `images.remotePatterns`:
+   - **Required** whenever the service returns image URLs from a new domain.
+   - Without this, Next.js silently blocks images and they won't load.
+   - Example: `{ protocol: "https", hostname: "coverartarchive.org" }`
 
-No hace falta tocar `AddItemModal`, `ListDetailClient` ni la base de datos: el sistema es plug-and-play una vez que el servicio devuelve `ExternalResult[]`.
+4. **Add the API key** in `.env.local` and document it in this section (if applicable).
 
-# Base de datos: RLS sin recursión
+No need to touch `AddItemModal`, `ListDetailClient` or the database: the system is plug-and-play once the service returns `ExternalResult[]`.
 
-Las políticas RLS nunca deben crear dependencias circulares entre tablas. Si una política de la tabla A referencia la tabla B, la tabla B no puede referenciar A en su propia política.
+# Database: RLS without recursion
 
-Para romper ciclos, usar funciones `SECURITY DEFINER` que consultan la tabla sin pasar por RLS. Ver `supabase/migrations/fix_rls_recursion.sql` como ejemplo.
+RLS policies must never create circular dependencies between tables. If a policy on table A references table B, table B cannot reference A in its own policy.
 
-# Antes de hacer commit
+To break cycles, use `SECURITY DEFINER` functions that query the table bypassing RLS. See `supabase/migrations/fix_rls_recursion.sql` as an example.
 
-Siempre ejecutar `npm run build` antes de hacer commit. Si el build falla, corregir los errores antes de continuar. No hacer commit de código que no compila.
+# Before committing
 
-# Skills disponibles
+Always run `npm run build` before committing. If the build fails, fix the errors before continuing. Do not commit code that doesn't compile.
 
-Usa el skill tool para invocarlos por nombre.
+# Available skills
 
-| Skill | Cuándo usarlo |
+Use the skill tool to invoke them by name.
+
+| Skill | When to use |
 |---|---|
-| `commit-commands:commit` | Crear un commit sin abrir PR |
-| `commit-commands:commit-push-pr` | Terminar una tarea: commit + push + PR en un paso |
-| `commit-commands:clean_gone` | Limpiar ramas locales ya mergeadas y borradas en remoto |
-| `simplify` | Pulir el código recién escrito: eliminar redundancias, mejorar calidad |
-| `claude-md-management:revise-claude-md` | Guardar aprendizajes de la sesión en AGENTS.md |
-| `claude-md-management:claude-md-improver` | Auditar y mejorar todas las instrucciones del repo |
-| `update-config` | Configurar permisos, hooks o variables de entorno en Claude Code |
+| `commit-commands:commit` | Create a commit without opening a PR |
+| `commit-commands:commit-push-pr` | Finish a task: commit + push + PR in one step |
+| `commit-commands:clean_gone` | Clean up local branches already merged and deleted on remote |
+| `simplify` | Polish newly written code: remove redundancies, improve quality |
+| `claude-md-management:revise-claude-md` | Save session learnings to AGENTS.md |
+| `claude-md-management:claude-md-improver` | Audit and improve all repo instructions |
+| `update-config` | Configure permissions, hooks or environment variables in Claude Code |

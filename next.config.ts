@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "coverartarchive.org",
       },
+      {
+        protocol: "https",
+        hostname: "vtkadxzditmkkfcnleoh.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
 };
