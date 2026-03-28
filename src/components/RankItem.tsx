@@ -98,17 +98,18 @@ export default function RankItem({
 
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Mark done (only for #1) */}
-        {isFirst && (
-          <button
-            onClick={onMarkDone}
-            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-muted hover:text-text active:scale-90 active:transition-none"
-            style={{ border: "1px solid #2a2a38" }}
-            title="Marcar como visto"
-          >
-            <span className="text-xs">✓</span>
-          </button>
-        )}
+        {/* Mark done */}
+        <button
+          onClick={onMarkDone}
+          className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors active:scale-90 active:transition-none"
+          style={{
+            border: `1px solid ${isFirst ? "rgba(200, 169, 110, 0.3)" : "#2a2a38"}`,
+            color: isFirst ? "#c8a96e" : "#8888a0",
+          }}
+          title="Marcar como visto"
+        >
+          <span className="text-xs">✓</span>
+        </button>
 
         {/* Vote button */}
         <button

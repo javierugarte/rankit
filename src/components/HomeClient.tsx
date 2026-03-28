@@ -249,15 +249,17 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
         {orderedLists.length > 0 && (
           <button
             onClick={toggleSortMode}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90 active:transition-none ${
+            className={`flex items-center gap-1.5 px-3 h-9 rounded-full transition-colors active:scale-95 active:transition-none ${
               sortMode
                 ? "text-bg"
                 : "bg-surface border border-border text-muted hover:text-text"
             }`}
             style={sortMode ? { backgroundColor: "#c8a96e" } : {}}
-            aria-label={sortMode ? "Confirmar orden" : "Reordenar listas"}
           >
-            {sortMode ? <Check size={18} /> : <ArrowUpDown size={16} />}
+            {sortMode ? <Check size={15} /> : <ArrowUpDown size={14} />}
+            <span className="text-xs font-medium">
+              {sortMode ? "Listo" : "Ordenar"}
+            </span>
           </button>
         )}
       </div>
