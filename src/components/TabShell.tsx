@@ -24,6 +24,7 @@ interface ProfileProps {
   profile: Profile | null;
   userId: string;
   email: string;
+  isAnonymous: boolean;
   totalLists: number;
   totalVotes: number;
   totalCompleted: number;
