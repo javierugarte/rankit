@@ -167,7 +167,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         profile: profileResult.data as Profile | null,
         userId: user.id,
         email: user.email ?? "",
-        createdAt: profileResult.data?.created_at ?? null,
         totalLists: totalListsResult.count ?? 0,
         totalVotes: totalVotesForStatsResult.count ?? 0,
         totalCompleted: (totalCompletedResult as { count: number | null }).count ?? 0,

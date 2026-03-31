@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { LayoutList, Star, CheckCheck, Users } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 import EditProfileModal from "./EditProfileModal";
 import type { Profile } from "@/lib/supabase/types";
@@ -11,7 +10,6 @@ interface Props {
   profile: Profile | null;
   userId: string;
   email: string;
-  createdAt?: string | null;
   totalLists: number;
   totalVotes: number;
   totalCompleted: number;
@@ -22,7 +20,6 @@ export default function ProfileClient({
   profile,
   userId,
   email,
-  createdAt,
   totalLists,
   totalVotes,
   totalCompleted,
@@ -36,15 +33,11 @@ export default function ProfileClient({
 
   const initials = username.slice(0, 2).toUpperCase();
 
-  const memberSince = createdAt
-    ? new Date(createdAt).toLocaleDateString("es-ES", { month: "long", year: "numeric" })
-    : null;
-
   const stats = [
-    { value: totalLists, label: "Listas creadas", Icon: LayoutList },
-    { value: totalVotes, label: "Votos emitidos", Icon: Star },
-    { value: totalCompleted, label: "Ítems vistos", Icon: CheckCheck },
-    { value: sharedLists, label: "Listas compartidas", Icon: Users },
+    { value: totalLists, label: "Listas creadas" },
+    { value: totalVotes, label: "Votos emitidos" },
+    { value: totalCompleted, label: "Ítems vistos" },
+    { value: sharedLists, label: "Listas compartidas" },
   ];
 
   return (
@@ -83,24 +76,16 @@ export default function ProfileClient({
         >
           Editar perfil
         </button>
-        {memberSince && (
-          <p className="text-xs mt-3" style={{ color: "rgba(160,160,180,0.6)" }}>
-            Miembro desde {memberSince}
-          </p>
-        )}
-        <p className="text-xs mt-0.5" style={{ color: "rgba(160,160,180,0.5)" }}>
-          {email}
-        </p>
+        <p className="text-muted text-sm mt-1">{email}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-8">
-        {stats.map(({ value, label, Icon }) => (
+        {stats.map(({ value, label }) => (
           <div
             key={label}
             className="bg-surface border border-border rounded-xl p-4 text-center"
           >
-            <Icon size={20} className="mx-auto mb-2" style={{ color: "#c8a96e" }} />
             <p
               className="text-3xl font-bold"
               style={{ color: "#c8a96e", fontFamily: "Georgia, serif" }}
