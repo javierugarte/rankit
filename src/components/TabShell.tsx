@@ -24,6 +24,7 @@ interface ProfileProps {
   profile: Profile | null;
   userId: string;
   email: string;
+  createdAt?: string | null;
   totalLists: number;
   totalVotes: number;
   totalCompleted: number;
