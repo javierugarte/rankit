@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const [mode, setMode] = useState<"login" | "signup">(
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">(
     searchParams.get("tab") === "signup" ? "signup" : "login"
   );
   const [email, setEmail] = useState("");
@@ -30,6 +30,25 @@ export default function LoginPage() {
       router.push("/home");
       router.refresh();
     }
+  }
+
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setMessage("Revisa tu email para recuperar tu contraseña.");
+    }
+
+    setLoading(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -96,37 +115,50 @@ export default function LoginPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex rounded-xl bg-surface p-1 mb-6 border border-border">
-        <button
-          onClick={() => {
-            setMode("login");
-            setError(null);
-          }}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === "login"
-              ? "bg-gold text-bg"
-              : "text-muted hover:text-text"
-          }`}
-        >
-          Iniciar sesión
-        </button>
-        <button
-          onClick={() => {
-            setMode("signup");
-            setError(null);
-          }}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-            mode === "signup"
-              ? "bg-gold text-bg"
-              : "text-muted hover:text-text"
-          }`}
-        >
-          Crear cuenta
-        </button>
-      </div>
+      {mode !== "forgot" && (
+        <div className="flex rounded-xl bg-surface p-1 mb-6 border border-border">
+          <button
+            onClick={() => {
+              setMode("login");
+              setError(null);
+            }}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === "login"
+                ? "bg-gold text-bg"
+                : "text-muted hover:text-text"
+            }`}
+          >
+            Iniciar sesión
+          </button>
+          <button
+            onClick={() => {
+              setMode("signup");
+              setError(null);
+            }}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === "signup"
+                ? "bg-gold text-bg"
+                : "text-muted hover:text-text"
+            }`}
+          >
+            Crear cuenta
+          </button>
+        </div>
+      )}
+
+      {mode === "forgot" && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-text text-center">
+            Recuperar contraseña
+          </h2>
+          <p className="text-sm text-muted text-center mt-1">
+            Te enviaremos un enlace para restablecer tu contraseña.
+          </p>
+        </div>
+      )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={mode === "forgot" ? handleForgot : handleSubmit} className="space-y-4">
         {mode === "signup" && (
           <div>
             <label className="block text-xs text-muted mb-1.5 uppercase tracking-wider">
@@ -158,20 +190,35 @@ export default function LoginPage() {
           />
         </div>
 
-        <div>
-          <label className="block text-xs text-muted mb-1.5 uppercase tracking-wider">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            placeholder="••••••••"
-            className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
-          />
-        </div>
+        {mode !== "forgot" && (
+          <div>
+            <label className="block text-xs text-muted mb-1.5 uppercase tracking-wider">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="••••••••"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
+            />
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("forgot");
+                  setError(null);
+                  setMessage(null);
+                }}
+                className="mt-2 text-xs text-muted hover:text-gold transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            )}
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
@@ -201,27 +248,47 @@ export default function LoginPage() {
             ? "Cargando..."
             : mode === "login"
             ? "Entrar"
-            : "Crear cuenta"}
+            : mode === "signup"
+            ? "Crear cuenta"
+            : "Enviar enlace"}
         </button>
+
+        {mode === "forgot" && (
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              setError(null);
+              setMessage(null);
+            }}
+            className="w-full text-sm text-muted hover:text-text transition-colors py-1"
+          >
+            Volver al inicio de sesión
+          </button>
+        )}
       </form>
 
       {/* Demo */}
-      <div className="flex items-center gap-3 my-5">
-        <div className="flex-1 h-px bg-border" />
-        <span className="text-muted text-xs">o</span>
-        <div className="flex-1 h-px bg-border" />
-      </div>
+      {mode !== "forgot" && (
+        <>
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-muted text-xs">o</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
 
-      <button
-        onClick={handleDemo}
-        disabled={loading}
-        className="w-full border border-border rounded-xl py-3 text-sm font-medium text-muted hover:text-text hover:border-gold/40 transition-colors disabled:opacity-50 active:scale-[0.98] active:transition-none"
-      >
-        {loading ? "Preparando demo…" : "✨ Probar demo sin cuenta"}
-      </button>
-      <p className="text-center text-xs text-muted mt-2">
-        Datos de ejemplo · Se borran en 24h
-      </p>
+          <button
+            onClick={handleDemo}
+            disabled={loading}
+            className="w-full border border-border rounded-xl py-3 text-sm font-medium text-muted hover:text-text hover:border-gold/40 transition-colors disabled:opacity-50 active:scale-[0.98] active:transition-none"
+          >
+            {loading ? "Preparando demo…" : "✨ Probar demo sin cuenta"}
+          </button>
+          <p className="text-center text-xs text-muted mt-2">
+            Datos de ejemplo · Se borran en 24h
+          </p>
+        </>
+      )}
     </div>
   );
 }

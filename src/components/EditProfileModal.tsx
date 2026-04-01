@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { Loader2, Camera } from "lucide-react";
+import { Loader2, Camera, KeyRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   currentAvatarUrl: string | null;
   onClose: () => void;
   onSaved: (username: string, avatarUrl: string | null) => void;
+  onChangePassword?: () => void;
 }
 
 export default function EditProfileModal({
@@ -19,6 +20,7 @@ export default function EditProfileModal({
   currentAvatarUrl,
   onClose,
   onSaved,
+  onChangePassword,
 }: Props) {
   const [username, setUsername] = useState(currentUsername);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -169,6 +171,17 @@ export default function EditProfileModal({
           </div>
 
           {error && <p className="text-red-400 text-xs mb-4">{error}</p>}
+
+          {/* Change password */}
+          {onChangePassword && (
+            <button
+              onClick={onChangePassword}
+              className="w-full flex items-center gap-3 py-3 px-4 rounded-xl border border-border text-muted text-sm hover:text-text hover:border-border/80 transition-colors mb-4 active:scale-[0.98] active:transition-none"
+            >
+              <KeyRound size={16} />
+              Cambiar contraseña
+            </button>
+          )}
 
           {/* Actions */}
           <div className="flex gap-3">

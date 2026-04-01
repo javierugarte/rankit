@@ -4,12 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import LogoutButton from "./LogoutButton";
 import EditProfileModal from "./EditProfileModal";
+import ChangePasswordModal from "./ChangePasswordModal";
 import type { Profile } from "@/lib/supabase/types";
 
 interface Props {
   profile: Profile | null;
   userId: string;
   email: string;
+  isAnonymous: boolean;
   totalLists: number;
   totalVotes: number;
   totalCompleted: number;
@@ -20,6 +22,7 @@ export default function ProfileClient({
   profile,
   userId,
   email,
+  isAnonymous,
   totalLists,
   totalVotes,
   totalCompleted,
@@ -30,6 +33,7 @@ export default function ProfileClient({
     profile?.avatar_url ?? null
   );
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   const initials = username.slice(0, 2).toUpperCase();
 
@@ -115,6 +119,18 @@ export default function ProfileClient({
             );
             setShowEditModal(false);
           }}
+          onChangePassword={
+            isAnonymous
+              ? undefined
+              : () => setShowChangePasswordModal(true)
+          }
+        />
+      )}
+
+      {showChangePasswordModal && (
+        <ChangePasswordModal
+          email={email}
+          onClose={() => setShowChangePasswordModal(false)}
         />
       )}
     </div>

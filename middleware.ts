@@ -29,7 +29,20 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/login");
+  const isAuthRoute =
+    request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/reset-password");
+
+  // Supabase sends auth errors (e.g. expired recovery link) to the site root.
+  // Forward them to /reset-password so the page can display a useful message.
+  if (
+    request.nextUrl.pathname === "/" &&
+    request.nextUrl.searchParams.get("error")
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/reset-password";
+    return NextResponse.redirect(url);
+  }
 
   if (!user && !isAuthRoute) {
     const url = request.nextUrl.clone();
