@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Pencil } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 import EditProfileModal from "./EditProfileModal";
 import ChangePasswordModal from "./ChangePasswordModal";
@@ -50,20 +49,13 @@ export default function ProfileClient({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-semibold text-text">Perfil</h2>
-        <button
-          onClick={() => setShowEditModal(true)}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-90 active:transition-none"
-          aria-label="Editar perfil"
-        >
-          <Pencil size={16} />
-        </button>
       </div>
 
       {/* Avatar + Name */}
       <div className="flex flex-col items-center mb-10">
         <button
           onClick={() => setShowEditModal(true)}
-          className="relative w-20 h-20 rounded-full overflow-hidden mb-4 transition-transform active:scale-95 active:transition-none"
+          className="relative w-20 h-20 rounded-full overflow-hidden mb-4 ring-2 ring-[#c8a96e] shadow-[0_0_14px_rgba(200,169,110,0.35)] transition-transform active:scale-95 active:transition-none"
           aria-label="Editar foto de perfil"
         >
           <div
@@ -82,6 +74,12 @@ export default function ProfileClient({
           )}
         </button>
         <h3 className="text-xl font-semibold text-text">{username}</h3>
+        <button
+          onClick={() => setShowEditModal(true)}
+          className="mt-2 px-3 py-1 rounded-full text-xs font-medium border border-[#c8a96e]/40 text-[#c8a96e] hover:bg-[#c8a96e]/10 transition-colors active:scale-95 active:transition-none"
+        >
+          Editar perfil
+        </button>
         <p className="text-muted text-sm mt-1">{email}</p>
       </div>
 
