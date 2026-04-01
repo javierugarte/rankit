@@ -1,22 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   useEffect(() => {
-    // Supabase redirects here with a hash fragment containing the session tokens.
-    // The SDK picks up the session from the URL automatically on the client.
+    const errorCode = searchParams.get("error_code");
+    if (errorCode) {
+      if (errorCode === "otp_expired") {
+        setLinkError("El enlace ha expirado. Solicita uno nuevo.");
+      } else {
+        setLinkError("El enlace no es válido. Solicita uno nuevo.");
+      }
+      return;
+    }
+
+    // Supabase PKCE flow redirects here with ?code=... The SDK exchanges it
+    // automatically and fires PASSWORD_RECOVERY once the session is ready.
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setReady(true);
@@ -24,7 +36,7 @@ export default function ResetPasswordPage() {
     });
 
     return () => listener.subscription.unsubscribe();
-  }, [supabase]);
+  }, [supabase, searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,6 +61,28 @@ export default function ResetPasswordPage() {
       await supabase.auth.signOut();
       router.push("/login");
     }
+  }
+
+  if (linkError) {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <h1
+          className="text-5xl font-bold mb-10"
+          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+        >
+          RankIt
+        </h1>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm mb-6">
+          {linkError}
+        </div>
+        <button
+          onClick={() => router.push("/login")}
+          className="w-full bg-gold text-bg font-semibold py-3 rounded-xl transition-opacity hover:opacity-90"
+        >
+          Solicitar nuevo enlace
+        </button>
+      </div>
+    );
   }
 
   if (!ready) {
@@ -123,5 +157,13 @@ export default function ResetPasswordPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
