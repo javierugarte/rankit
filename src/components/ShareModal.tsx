@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface MemberWithProfile {
   user_id: string;
   username: string;
+  avatar_url?: string | null;
 }
 
 interface Props {

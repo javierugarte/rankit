@@ -40,17 +40,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const memberIds = (memberListIdsResult.data ?? []).map((m) => m.list_id);
   let memberLists: List[] = [];
   const ownerUsernameMap: Record<string, string> = {};
+  const ownerProfileMap: Record<string, { id: string; username: string; avatar_url: string | null }> = {};
 
   if (memberIds.length > 0) {
     const { data } = await supabase
       .from("lists")
-      .select("*, profiles!lists_owner_id_fkey(username)")
+      .select("*, profiles!lists_owner_id_fkey(id, username, avatar_url)")
       .in("id", memberIds)
       .neq("owner_id", user.id)
       .order("created_at", { ascending: true });
     for (const row of data ?? []) {
-      ownerUsernameMap[row.id] =
-        (row.profiles as { username: string } | null)?.username ?? "alguien";
+      const ownerProfile = row.profiles as { id: string; username: string; avatar_url: string | null } | null;
+      ownerUsernameMap[row.id] = ownerProfile?.username ?? "alguien";
+      if (ownerProfile) ownerProfileMap[row.id] = ownerProfile;
     }
     memberLists = (data ?? []).map(({ profiles: _p, ...rest }) => rest as List);
   }
@@ -62,12 +64,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // ── Fetch list-dependent data in parallel ──────────────────────────────────
   // Full items (all fields, all states) — used for both home stats and list detail
   const today = new Date().toISOString().split("T")[0];
-  const [allItemsResult, membersResult, todayVotesResult, latestVotesResult, totalCompletedResult] = await Promise.all([
+  const [allItemsResult, membersResult, todayVotesResult, latestVotesResult, totalCompletedResult, allVotesResult] = await Promise.all([
     listIds.length > 0
       ? supabase.from("items").select("*").in("list_id", listIds).order("total_votes", { ascending: false })
       : Promise.resolve({ data: [] as Item[] }),
     listIds.length > 0
-      ? supabase.from("list_members").select("list_id, user_id, profiles(username)").in("list_id", listIds)
+      ? supabase.from("list_members").select("list_id, user_id, profiles(username, avatar_url)").in("list_id", listIds)
       : Promise.resolve({ data: [] }),
     listIds.length > 0
       ? supabase.from("votes").select("list_id").eq("user_id", user.id).in("list_id", listIds).eq("voted_date", today)
@@ -78,6 +80,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     ownedListIds.length > 0
       ? supabase.from("items").select("*", { count: "exact", head: true }).eq("completed", true).in("list_id", ownedListIds)
       : Promise.resolve({ count: 0 }),
+    listIds.length > 0
+      ? supabase.from("votes").select("item_id, user_id").in("list_id", listIds)
+      : Promise.resolve({ data: [] as { item_id: string; user_id: string }[] }),
   ]);
 
   // ── Build home data ─────────────────────────────────────────────────────────
@@ -104,11 +109,40 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const membersByList: Record<string, MemberWithProfile[]> = {};
 
   for (const row of membersResult.data ?? []) {
-    const username = (row.profiles as { username: string } | null)?.username ?? "alguien";
+    const profile = row.profiles as { username: string; avatar_url: string | null } | null;
+    const username = profile?.username ?? "alguien";
     if (!membersByList[row.list_id]) membersByList[row.list_id] = [];
-    membersByList[row.list_id].push({ user_id: row.user_id, username });
+    membersByList[row.list_id].push({ user_id: row.user_id, username, avatar_url: profile?.avatar_url ?? null });
     if (row.user_id !== user.id) {
       otherMembersPerList[row.list_id] = [...(otherMembersPerList[row.list_id] ?? []), username];
+    }
+  }
+
+  // Build votesByItem: item_id → user_id → count
+  const votesByItem: Record<string, Record<string, number>> = {};
+  for (const vote of (allVotesResult.data ?? []) as { item_id: string; user_id: string }[]) {
+    if (!votesByItem[vote.item_id]) votesByItem[vote.item_id] = {};
+    votesByItem[vote.item_id][vote.user_id] = (votesByItem[vote.item_id][vote.user_id] ?? 0) + 1;
+  }
+
+  // Build allParticipantsByList: list_id → all participants (owner + members)
+  const currentUserProfile: MemberWithProfile = {
+    user_id: user.id,
+    username: profileResult.data?.username ?? "yo",
+    avatar_url: profileResult.data?.avatar_url ?? null,
+  };
+  const allParticipantsByList: Record<string, MemberWithProfile[]> = {};
+  for (const list of allLists) {
+    if (list.owner_id === user.id) {
+      // Current user is the owner
+      allParticipantsByList[list.id] = [currentUserProfile, ...(membersByList[list.id] ?? [])];
+    } else {
+      // Current user is a member; add owner from ownerProfileMap
+      const ownerProfile = ownerProfileMap[list.id];
+      const ownerEntry: MemberWithProfile = ownerProfile
+        ? { user_id: ownerProfile.id, username: ownerProfile.username, avatar_url: ownerProfile.avatar_url }
+        : { user_id: list.owner_id, username: ownerUsernameMap[list.id] ?? "alguien", avatar_url: null };
+      allParticipantsByList[list.id] = [ownerEntry, ...(membersByList[list.id] ?? [])];
     }
   }
 
@@ -140,14 +174,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Build list detail props for each list
   const listDetails = allLists.map((list) => {
     const isOwner = list.owner_id === user.id;
+    const items = itemsByList[list.id] ?? [];
+    const initialVotesByItem: Record<string, Record<string, number>> = {};
+    for (const item of items) {
+      initialVotesByItem[item.id] = votesByItem[item.id] ?? {};
+    }
     return {
       list,
-      initialItems: itemsByList[list.id] ?? [],
+      initialItems: items,
       latestVote: latestVoteByList[list.id] ?? null,
       isOwner,
       isAnonymous,
       initialMembers: isOwner ? (membersByList[list.id] ?? []) : [],
       ownerUsername: isOwner ? null : (ownerUsernameMap[list.id] ?? null),
+      allParticipants: allParticipantsByList[list.id] ?? [currentUserProfile],
+      initialVotesByItem,
     };
   });
 
