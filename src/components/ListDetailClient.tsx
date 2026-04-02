@@ -27,6 +27,8 @@ interface Props {
   isAnonymous?: boolean;
   initialMembers: MemberWithProfile[];
   ownerUsername?: string | null;
+  allParticipants: MemberWithProfile[];
+  initialVotesByItem: Record<string, Record<string, number>>;
 }
 
 export default function ListDetailClient({
@@ -38,6 +40,8 @@ export default function ListDetailClient({
   isAnonymous,
   ownerUsername,
   initialMembers,
+  allParticipants,
+  initialVotesByItem,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -55,6 +59,7 @@ export default function ListDetailClient({
   const [voting, setVoting] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
   const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
+  const [votesByItem, setVotesByItem] = useState<Record<string, Record<string, number>>>(initialVotesByItem);
 
   useEffect(() => {
     if (!votedItemId) return;
@@ -161,11 +166,25 @@ export default function ListDetailClient({
         return i;
       })
     );
+    setVotesByItem((prev) => {
+      const next = { ...prev };
+      if (prevVotedItemId) {
+        const prevCount = next[prevVotedItemId]?.[userId] ?? 0;
+        next[prevVotedItemId] = { ...(next[prevVotedItemId] ?? {}), [userId]: Math.max(0, prevCount - 1) };
+      }
+      if (!isRevoke) {
+        const newCount = next[itemId]?.[userId] ?? 0;
+        next[itemId] = { ...(next[itemId] ?? {}), [userId]: newCount + 1 };
+      }
+      return next;
+    });
     setVotedItemId(isRevoke ? null : itemId);
 
     // Revert helper
+    const prevVotesByItem = votesByItem;
     const revert = (restoreVotedId: string | null) => {
       setItems(prevItems);
+      setVotesByItem(prevVotesByItem);
       setVotedItemId(restoreVotedId);
       setVoting(false);
     };
@@ -454,6 +473,9 @@ export default function ListDetailClient({
                   onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
                   listType={list.list_type}
+                  participants={allParticipants}
+                  votesByUser={votesByItem[item.id] ?? {}}
+                  currentUserId={userId}
                 />
               ))}
             </div>

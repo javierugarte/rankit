@@ -1,6 +1,8 @@
 import Image from "next/image";
 import type { Item } from "@/lib/supabase/types";
 import { TMDB_POSTER_BASE, getService } from "@/lib/services";
+import VoteBreakdown from "./VoteBreakdown";
+import type { MemberWithProfile } from "./ShareModal";
 
 function parseDescription(value: string): { isUrl: true; href: string; label: string } | { isUrl: false } {
   try {
@@ -22,6 +24,9 @@ interface Props {
   onEdit: () => void;
   isFirst: boolean;
   listType?: string | null;
+  participants?: MemberWithProfile[];
+  votesByUser?: Record<string, number>;
+  currentUserId?: string;
 }
 
 export default function RankItem({
@@ -34,11 +39,15 @@ export default function RankItem({
   onEdit,
   isFirst,
   listType,
+  participants,
+  votesByUser,
+  currentUserId,
 }: Props) {
   const isLandscape = getService(listType)?.posterAspect === "landscape";
+  const showBreakdown = participants && participants.length > 0 && votesByUser !== undefined && currentUserId;
   return (
     <div
-      className="rounded-2xl p-4 flex items-center gap-4 transition-all"
+      className="rounded-2xl p-4 transition-all"
       style={{
         backgroundColor: isFirst ? "rgba(200, 169, 110, 0.08)" : "#111117",
         border: isFirst
@@ -46,100 +55,110 @@ export default function RankItem({
           : "1px solid #2a2a38",
       }}
     >
-      {/* Rank number */}
-      <div className="shrink-0 w-8 text-center">
-        {isFirst ? (
-          <span className="text-xl">👑</span>
-        ) : (
-          <span
-            className="text-sm font-bold"
-            style={{ color: rank <= 3 ? "#c8a96e" : "#8888a0" }}
-          >
-            #{rank}
-          </span>
-        )}
-      </div>
-
-      {/* Poster */}
-      {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
-        const path = (item.external_data as Record<string, unknown>).poster_path as string;
-        const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
-        return (
-          <div
-            className="rounded overflow-hidden shrink-0 relative"
-            style={{ width: isLandscape ? 56 : 36, height: isLandscape ? 32 : 54 }}
-          >
-            <Image src={src} alt={item.title} fill className="object-cover" />
-          </div>
-        );
-      })()}
-
-      {/* Content */}
-      <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
-        <p className="text-text font-medium text-sm truncate">{item.title}</p>
-        {item.category && (() => {
-          const parsed = parseDescription(item.category);
-          return parsed.isUrl ? (
-            <a
-              href={parsed.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-xs mt-0.5 truncate inline-flex hover:underline"
-              style={{ color: "#c8a96e" }}
-            >
-              {parsed.label}
-            </a>
+      <div className="flex items-center gap-4">
+        {/* Rank number */}
+        <div className="shrink-0 w-8 text-center">
+          {isFirst ? (
+            <span className="text-xl">👑</span>
           ) : (
-            <p className="text-muted text-xs mt-0.5 truncate">{item.category}</p>
+            <span
+              className="text-sm font-bold"
+              style={{ color: rank <= 3 ? "#c8a96e" : "#8888a0" }}
+            >
+              #{rank}
+            </span>
+          )}
+        </div>
+
+        {/* Poster */}
+        {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
+          const path = (item.external_data as Record<string, unknown>).poster_path as string;
+          const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
+          return (
+            <div
+              className="rounded overflow-hidden shrink-0 relative"
+              style={{ width: isLandscape ? 56 : 36, height: isLandscape ? 32 : 54 }}
+            >
+              <Image src={src} alt={item.title} fill className="object-cover" />
+            </div>
           );
         })()}
-      </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 shrink-0">
-        {/* Mark done (only for #1) */}
-        {isFirst && (
+        {/* Content */}
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
+          <p className="text-text font-medium text-sm truncate">{item.title}</p>
+          {item.category && (() => {
+            const parsed = parseDescription(item.category);
+            return parsed.isUrl ? (
+              <a
+                href={parsed.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs mt-0.5 truncate inline-flex hover:underline"
+                style={{ color: "#c8a96e" }}
+              >
+                {parsed.label}
+              </a>
+            ) : (
+              <p className="text-muted text-xs mt-0.5 truncate">{item.category}</p>
+            );
+          })()}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Mark done (only for #1) */}
+          {isFirst && (
+            <button
+              onClick={onMarkDone}
+              className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-muted hover:text-text active:scale-90 active:transition-none"
+              style={{ border: "1px solid #2a2a38" }}
+              title="Marcar como visto"
+            >
+              <span className="text-xs">✓</span>
+            </button>
+          )}
+
+          {/* Vote button */}
           <button
-            onClick={onMarkDone}
-            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-muted hover:text-text active:scale-90 active:transition-none"
-            style={{ border: "1px solid #2a2a38" }}
-            title="Marcar como visto"
+            onClick={onVote}
+            disabled={!canVote}
+            className="w-10 rounded-xl flex flex-col items-center justify-center gap-0.5 py-2 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: isVoted
+                ? "#c8a96e"
+                : canVote
+                ? "rgba(200, 169, 110, 0.15)"
+                : "rgba(200, 169, 110, 0.05)",
+              border: isVoted
+                ? "none"
+                : "1px solid rgba(200, 169, 110, 0.3)",
+            }}
           >
-            <span className="text-xs">✓</span>
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7L7 1z"
+                fill={isVoted ? "#0a0a0f" : "#c8a96e"}
+              />
+            </svg>
+            <span
+              className="text-[11px] font-semibold leading-none"
+              style={{ color: isVoted ? "#0a0a0f" : "#c8a96e" }}
+            >
+              {item.total_votes}
+            </span>
           </button>
-        )}
-
-        {/* Vote button */}
-        <button
-          onClick={onVote}
-          disabled={!canVote}
-          className="w-10 rounded-xl flex flex-col items-center justify-center gap-0.5 py-2 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: isVoted
-              ? "#c8a96e"
-              : canVote
-              ? "rgba(200, 169, 110, 0.15)"
-              : "rgba(200, 169, 110, 0.05)",
-            border: isVoted
-              ? "none"
-              : "1px solid rgba(200, 169, 110, 0.3)",
-          }}
-        >
-          <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-            <path
-              d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7L7 1z"
-              fill={isVoted ? "#0a0a0f" : "#c8a96e"}
-            />
-          </svg>
-          <span
-            className="text-[11px] font-semibold leading-none"
-            style={{ color: isVoted ? "#0a0a0f" : "#c8a96e" }}
-          >
-            {item.total_votes}
-          </span>
-        </button>
+        </div>
       </div>
+
+      {showBreakdown && (
+        <VoteBreakdown
+          participants={participants}
+          votesByUser={votesByUser}
+          currentUserId={currentUserId}
+        />
+      )}
     </div>
   );
 }

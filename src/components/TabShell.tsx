@@ -39,6 +39,8 @@ interface ListDetail {
   isAnonymous: boolean;
   initialMembers: MemberWithProfile[];
   ownerUsername: string | null;
+  allParticipants: MemberWithProfile[];
+  initialVotesByItem: Record<string, Record<string, number>>;
 }
 
 interface Props {
