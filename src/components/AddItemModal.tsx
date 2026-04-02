@@ -7,6 +7,8 @@ import type { Item } from "@/lib/supabase/types";
 import { getService, type ExternalResult } from "@/lib/services";
 import Image from "next/image";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import VoteBreakdown from "./VoteBreakdown";
+import type { MemberWithProfile } from "./ShareModal";
 
 interface Props {
   listId: string;
@@ -17,6 +19,9 @@ interface Props {
   editItem?: Item;
   onDelete?: () => Promise<void> | void;
   onMarkDone?: () => void;
+  participants?: MemberWithProfile[];
+  votesByUser?: Record<string, number>;
+  currentUserId?: string;
 }
 
 export default function AddItemModal({
@@ -28,6 +33,9 @@ export default function AddItemModal({
   editItem,
   onDelete,
   onMarkDone,
+  participants,
+  votesByUser,
+  currentUserId,
 }: Props) {
   const [title, setTitle] = useState(editItem?.title ?? "");
   const [category, setCategory] = useState(editItem?.category ?? "");
@@ -223,6 +231,16 @@ export default function AddItemModal({
           </div>
         </div>
 
+        {editItem && participants && participants.length > 0 && votesByUser && currentUserId && (
+          <div className="mb-6">
+            <VoteBreakdown
+              participants={participants}
+              votesByUser={votesByUser}
+              currentUserId={currentUserId}
+            />
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title field — with autocomplete if service available */}
           <div className="relative">
@@ -285,7 +303,6 @@ export default function AddItemModal({
                     if (selectedResult) setSelectedResult(null);
                   }}
                   required
-                  autoFocus
                   placeholder={
                     service
                       ? service.placeholder

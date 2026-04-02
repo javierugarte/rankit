@@ -473,9 +473,6 @@ export default function ListDetailClient({
                   onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
                   listType={list.list_type}
-                  participants={allParticipants}
-                  votesByUser={votesByItem[item.id] ?? {}}
-                  currentUserId={userId}
                 />
               ))}
             </div>
@@ -601,6 +598,9 @@ export default function ListDetailClient({
             await handleDeleteItem(editingItem.id);
             setEditingItem(null);
           }}
+          participants={allParticipants}
+          votesByUser={votesByItem[editingItem.id] ?? {}}
+          currentUserId={userId}
         />
       )}
 
