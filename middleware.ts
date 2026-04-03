@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveLocale } from "./i18n/request";
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -54,6 +55,19 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/home";
     return NextResponse.redirect(url);
+  }
+
+  // Set locale cookie on first visit if not already set
+  if (!request.cookies.get("NEXT_LOCALE")) {
+    const locale = resolveLocale(
+      undefined,
+      request.headers.get("accept-language") ?? ""
+    );
+    supabaseResponse.cookies.set("NEXT_LOCALE", locale, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
   }
 
   return supabaseResponse;

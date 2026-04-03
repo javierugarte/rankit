@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
@@ -60,6 +61,12 @@ export default function ListDetailClient({
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
   const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
   const [votesByItem, setVotesByItem] = useState<Record<string, Record<string, number>>>(initialVotesByItem);
+  const t = useTranslations("listDetail");
+  const ts = useTranslations("sharing");
+  const tLeave = useTranslations("leaveList");
+  const tDelete = useTranslations("deleteList");
+  const tShareAnon = useTranslations("shareAnon");
+  const tDemo = useTranslations("demo");
 
   useEffect(() => {
     if (!votedItemId) return;
@@ -313,7 +320,7 @@ export default function ListDetailClient({
             className="flex items-center gap-1.5 text-muted hover:text-text transition-colors active:scale-95 active:transition-none"
           >
             <ArrowLeft size={18} />
-            <span className="text-sm font-medium">Inicio</span>
+            <span className="text-sm font-medium">{t("back")}</span>
           </button>
 
           <div className="flex items-center gap-1">
@@ -322,14 +329,14 @@ export default function ListDetailClient({
                 <button
                   onClick={() => setShowEditListModal(true)}
                   className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
-                  aria-label="Editar lista"
+                  aria-label={t("editList")}
                 >
                   <Pencil size={16} />
                 </button>
                 <button
                   onClick={() => setShowShareModal(true)}
                   className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
-                  aria-label="Compartir lista"
+                  aria-label={t("shareList")}
                 >
                   <UserPlus size={18} />
                 </button>
@@ -339,7 +346,7 @@ export default function ListDetailClient({
               <button
                 onClick={() => setShowLeaveConfirm(true)}
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
-                aria-label="Salir de la lista"
+                aria-label={tLeave("title")}
               >
                 <LogOut size={18} />
               </button>
@@ -370,12 +377,12 @@ export default function ListDetailClient({
             <p className="text-muted text-sm mt-0.5">
               {(() => {
                 let label: string | null = null;
-                if (!isOwner && ownerUsername) label = `De ${ownerUsername}`;
-                else if (isOwner && members.length === 1) label = `Con ${members[0].username}`;
-                else if (isOwner && members.length > 1) label = `Con ${members.length} personas`;
+                if (!isOwner && ownerUsername) label = ts("from", { name: ownerUsername });
+                else if (isOwner && members.length === 1) label = ts("with", { name: members[0].username });
+                else if (isOwner && members.length > 1) label = ts("withN", { count: members.length });
                 return label ? `${label} · ` : null;
               })()}
-              {pendingItems.length} pendiente{pendingItems.length !== 1 ? "s" : ""}
+              {pendingItems.length} {pendingItems.length !== 1 ? t("pendingsSuffix") : t("pendingSuffix")}
             </p>
           </div>
         </div>
@@ -391,7 +398,7 @@ export default function ListDetailClient({
               : "text-muted hover:text-text"
           }`}
         >
-          Pendientes
+          {t("pending")}
           {pendingItems.length > 0 && (
             <span
               className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
@@ -410,7 +417,7 @@ export default function ListDetailClient({
             tab === "done" ? "bg-gold text-bg" : "text-muted hover:text-text"
           }`}
         >
-          Vistos
+          {t("done")}
           {doneItems.length > 0 && (
             <span
               className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
@@ -442,8 +449,8 @@ export default function ListDetailClient({
           }}
         >
           {votedItemId
-            ? `✓ Ya votaste hoy · Regresa en ${timeUntilMidnight}`
-            : "⚡ Tienes 1 voto disponible hoy"}
+            ? t("votedBanner", { time: timeUntilMidnight })
+            : t("voteAvailable")}
         </div>
       )}
 
@@ -454,9 +461,9 @@ export default function ListDetailClient({
             <div className="text-center py-16">
               <p className="text-3xl mb-3">{list.emoji}</p>
               <p className="text-muted">
-                No hay items pendientes.
+                {t("pendingEmpty")}
                 <br />
-                Pulsa el + para añadir.
+                {t("pendingEmptyHint")}
               </p>
             </div>
           ) : (
@@ -485,7 +492,7 @@ export default function ListDetailClient({
           {doneItems.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-3xl mb-3">📭</p>
-              <p className="text-muted">Aún no hay nada marcado como visto.</p>
+              <p className="text-muted">{t("doneEmpty")}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -498,7 +505,7 @@ export default function ListDetailClient({
                     className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity active:scale-90 active:transition-none"
                     style={{ backgroundColor: "rgba(200, 169, 110, 0.2)" }}
                     onClick={() => handleUnmarkDone(item.id)}
-                    title="Volver a pendientes"
+                    title={t("markPending")}
                   >
                     <span className="text-xs">✓</span>
                   </div>
@@ -543,7 +550,7 @@ export default function ListDetailClient({
                     })()}
                   </div>
                   <span className="text-muted text-xs">
-                    {item.total_votes} voto{item.total_votes !== 1 ? "s" : ""}
+                    {item.total_votes === 1 ? t("vote") : t("votes", { count: item.total_votes })}
                   </span>
                 </div>
               ))}
@@ -625,12 +632,12 @@ export default function ListDetailClient({
                 >
                   👥
                 </div>
-                <h2 className="text-lg font-semibold text-text">Comparte con quien quieras</h2>
+                <h2 className="text-lg font-semibold text-text">{tShareAnon("title")}</h2>
                 <p className="text-sm text-muted">
-                  Invita a tu pareja o amigos para votar juntos y democratizar las decisiones. ¿Qué peli ver esta noche? ¿A dónde viajar? Que gane la más votada.
+                  {tShareAnon("description")}
                 </p>
                 <p className="text-xs text-muted/70 mt-1">
-                  Esta función está disponible para usuarios con cuenta.
+                  {tShareAnon("accountRequired")}
                 </p>
               </div>
               <button
@@ -641,7 +648,7 @@ export default function ListDetailClient({
                 className="block w-full py-3 rounded-2xl text-center text-sm font-semibold transition-opacity active:opacity-70"
                 style={{ backgroundColor: "#c8a96e", color: "#1a1a1a" }}
               >
-                Crear cuenta gratis
+                {tShareAnon("createAccount")}
               </button>
             </div>
           </div>
@@ -660,7 +667,7 @@ export default function ListDetailClient({
       {showDeleteConfirm && (
         <ConfirmDeleteModal
           emoji={listEmoji}
-          title="Eliminar lista"
+          title={tDelete("title")}
           itemName={listName}
           onConfirm={handleDelete}
           onCancel={() => {
@@ -674,16 +681,14 @@ export default function ListDetailClient({
       {showLeaveConfirm && (
         <ConfirmDeleteModal
           emoji="🚪"
-          title="Salir de la lista"
+          title={tLeave("title")}
           itemName={listName}
           message={
             <>
-              ¿Seguro que quieres salir de{" "}
-              <span className="text-text font-medium">{listName}</span>?
-              Perderás el acceso a esta lista.
+              {tLeave.rich("message", { name: listName, bold: (chunks) => <span key="bold" className="text-text font-medium">{chunks}</span> })}
             </>
           }
-          confirmLabel="Salir"
+          confirmLabel={tLeave("confirm")}
           onConfirm={handleLeave}
           onCancel={() => setShowLeaveConfirm(false)}
         />

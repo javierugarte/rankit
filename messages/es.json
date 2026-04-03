@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "profile": "Perfil"
+  },
+  "home": {
+    "myLists": "Tus listas",
+    "empty": "Aún no tienes listas.",
+    "emptyHint": "Pulsa el <plus>+</plus> para crear la primera.",
+    "dragHint": "Arrastra para cambiar el orden",
+    "reorder": "Reordenar listas",
+    "confirmOrder": "Confirmar orden",
+    "dragHandle": "Arrastrar para reordenar"
+  },
+  "sharing": {
+    "private": "Privado",
+    "with": "Con {name}",
+    "withN": "Con {count} personas",
+    "from": "De {name}",
+    "someone": "alguien"
+  },
+  "listCard": {
+    "vote": "1 voto",
+    "votes": "{count} votos",
+    "votedToday": "✓ Votaste hoy"
+  },
+  "listDetail": {
+    "back": "Inicio",
+    "pending": "Pendientes",
+    "done": "Vistos",
+    "pendingSuffix": "pendiente",
+    "pendingsSuffix": "pendientes",
+    "pendingEmpty": "No hay items pendientes.",
+    "pendingEmptyHint": "Pulsa el + para añadir.",
+    "doneEmpty": "Aún no hay nada marcado como visto.",
+    "voteAvailable": "⚡ Tienes 1 voto disponible hoy",
+    "votedBanner": "✓ Ya votaste hoy · Regresa en {time}",
+    "editList": "Editar lista",
+    "shareList": "Compartir lista",
+    "leaveList": "Salir de la lista",
+    "markDone": "Marcar como visto",
+    "markPending": "Volver a pendientes",
+    "vote": "1 voto",
+    "votes": "{count} votos"
+  },
+  "leaveList": {
+    "title": "Salir de la lista",
+    "message": "¿Seguro que quieres salir de <bold>{name}</bold>? Perderás el acceso a esta lista.",
+    "confirm": "Salir"
+  },
+  "deleteList": {
+    "title": "Eliminar lista"
+  },
+  "addItem": {
+    "addTitle": "Añadir ítem",
+    "editTitle": "Editar ítem",
+    "search": "Buscar",
+    "titleLabel": "Título",
+    "descLabel": "Descripción",
+    "descOptional": "(opcional)",
+    "descPlaceholder": "Drama, Japón, https://amazon.com/...",
+    "defaultPlaceholder": "Breaking Bad, Tokio, Ramen Nakamura...",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "add": "Añadir",
+    "adding": "Añadiendo...",
+    "markDone": "Marcar como visto",
+    "delete": "Eliminar item"
+  },
+  "createList": {
+    "createTitle": "Nueva lista",
+    "editTitle": "Editar lista",
+    "iconLabel": "Icono",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Series pendientes, Viajes, Restaurantes...",
+    "typeLabel": "Tipo de contenido",
+    "typeOptional": "(opcional)",
+    "customEmoji": "Otro...",
+    "emojiPlaceholder": "Abre el teclado emoji 😀",
+    "emojiError": "Escribe un único emoji válido",
+    "autocompleteHint": "Autocompletado con {api} al añadir items.",
+    "cancel": "Cancelar",
+    "create": "Crear lista",
+    "creating": "Creando...",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "delete": "Eliminar lista"
+  },
+  "serviceLabels": {
+    "none": "Sin tipo",
+    "movies": "Películas",
+    "tv": "Series",
+    "books": "Libros",
+    "games": "Videojuegos",
+    "albums": "Álbumes"
+  },
+  "share": {
+    "title": "Compartir lista",
+    "collaborators": "Colaboradores",
+    "addCollaborator": "Añadir colaborador",
+    "emailPlaceholder": "email@ejemplo.com",
+    "search": "Buscar",
+    "add": "Añadir",
+    "removeAriaLabel": "Eliminar colaborador",
+    "errorNotFound": "No se encontró ningún usuario con ese email",
+    "errorAlreadyMember": "Este usuario ya es colaborador",
+    "errorAdd": "Error al añadir colaborador",
+    "successAdded": "{name} añadido como colaborador"
+  },
+  "shareAnon": {
+    "title": "Comparte con quien quieras",
+    "description": "Invita a tu pareja o amigos para votar juntos y democratizar las decisiones. ¿Qué peli ver esta noche? ¿A dónde viajar? Que gane la más votada.",
+    "accountRequired": "Esta función está disponible para usuarios con cuenta.",
+    "createAccount": "Crear cuenta gratis"
+  },
+  "confirm": {
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "deleting": "Eliminando...",
+    "defaultMessage": "¿Seguro que quieres eliminar {name}? Esta acción no se puede deshacer."
+  },
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar perfil",
+    "listsCreated": "Listas creadas",
+    "votesEmitted": "Votos emitidos",
+    "itemsWatched": "Ítems vistos",
+    "sharedLists": "Listas compartidas"
+  },
+  "editProfile": {
+    "title": "Editar perfil",
+    "usernameLabel": "Nombre de usuario",
+    "usernamePlaceholder": "tunombredeusuario",
+    "changePhoto": "Cambiar foto de perfil",
+    "changePassword": "Cambiar contraseña",
+    "language": "Idioma",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "errorTooShort": "El nombre de usuario debe tener al menos 3 caracteres",
+    "errorNoSpaces": "El nombre de usuario no puede contener espacios",
+    "errorUpload": "Error al subir la imagen",
+    "errorSave": "Error al guardar los cambios",
+    "errorTaken": "Ese nombre de usuario ya está en uso",
+    "errorFileTooLarge": "La imagen no puede superar 5 MB"
+  },
+  "logout": {
+    "button": "Cerrar sesión",
+    "title": "Cerrar sesión",
+    "message": "¿Seguro que quieres cerrar sesión?",
+    "cancel": "Cancelar",
+    "confirm": "Cerrar sesión",
+    "closing": "Cerrando..."
+  },
+  "changePassword": {
+    "title": "Cambiar contraseña",
+    "currentLabel": "Contraseña actual",
+    "newLabel": "Nueva contraseña",
+    "confirmLabel": "Confirmar nueva contraseña",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "successTitle": "¡Contraseña actualizada!",
+    "successMessage": "Tu contraseña ha sido cambiada correctamente.",
+    "close": "Cerrar",
+    "errorTooShort": "La nueva contraseña debe tener al menos 8 caracteres",
+    "errorMismatch": "Las contraseñas no coinciden",
+    "errorWrong": "La contraseña actual es incorrecta",
+    "errorGeneric": "Error al cambiar la contraseña"
+  },
+  "auth": {
+    "tagline": "Listas colaborativas. Un voto al día.",
+    "loginTab": "Iniciar sesión",
+    "signupTab": "Crear cuenta",
+    "usernameLabel": "Nombre de usuario",
+    "usernamePlaceholder": "tu_nombre",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tuemail@ejemplo.com",
+    "passwordLabel": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginButton": "Entrar",
+    "signupButton": "Crear cuenta",
+    "loading": "Cargando...",
+    "forgotTitle": "Recuperar contraseña",
+    "forgotSubtitle": "Te enviaremos un enlace para restablecer tu contraseña.",
+    "sendLink": "Enviar enlace",
+    "backToLogin": "Volver al inicio de sesión",
+    "demoButton": "✨ Probar demo sin cuenta",
+    "demoLoading": "Preparando demo…",
+    "demoHint": "Datos de ejemplo · Se borran en 24h",
+    "emailSent": "Revisa tu email para recuperar tu contraseña."
+  },
+  "demo": {
+    "banner": "Modo demo · Se borrará en 24h ·",
+    "createAccount": "Crear cuenta ahora"
+  },
+  "resetPassword": {
+    "verifying": "Verificando enlace…",
+    "subtitle": "Nueva contraseña",
+    "newLabel": "Nueva contraseña",
+    "confirmLabel": "Confirmar contraseña",
+    "submit": "Restablecer contraseña",
+    "submitting": "Guardando...",
+    "errorMismatch": "Las contraseñas no coinciden.",
+    "errorTooShort": "La contraseña debe tener al menos 8 caracteres.",
+    "errorExpired": "El enlace ha expirado. Solicita uno nuevo.",
+    "errorInvalid": "El enlace no es válido. Solicita uno nuevo.",
+    "requestNew": "Solicitar nuevo enlace"
+  },
+  "voteBreakdown": {
+    "vote": "voto",
+    "votes": "votos",
+    "you": "Tú"
+  }
+}

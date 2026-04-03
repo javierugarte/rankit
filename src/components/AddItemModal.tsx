@@ -9,6 +9,7 @@ import Image from "next/image";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import VoteBreakdown from "./VoteBreakdown";
 import type { MemberWithProfile } from "./ShareModal";
+import { useTranslations } from "next-intl";
 
 interface Props {
   listId: string;
@@ -42,6 +43,7 @@ export default function AddItemModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const t = useTranslations("addItem");
 
   // Autocomplete state
   const service = getService(listType);
@@ -199,7 +201,7 @@ export default function AddItemModal({
 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-text">
-            {editItem ? "Editar ítem" : "Añadir ítem"}
+            {editItem ? t("editTitle") : t("addTitle")}
           </h2>
           <div className="flex items-center gap-2">
             {editItem && onMarkDone && (
@@ -207,7 +209,7 @@ export default function AddItemModal({
                 type="button"
                 onClick={onMarkDone}
                 className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-green-400 hover:bg-green-400/10 transition-colors"
-                title="Marcar como visto"
+                title={t("markDone")}
               >
                 <CheckCircle size={14} />
               </button>
@@ -217,7 +219,7 @@ export default function AddItemModal({
                 type="button"
                 onClick={() => setConfirmDelete(true)}
                 className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors"
-                title="Eliminar item"
+                title={t("delete")}
               >
                 <Trash2 size={14} />
               </button>
@@ -245,7 +247,7 @@ export default function AddItemModal({
           {/* Title field — with autocomplete if service available */}
           <div className="relative">
             <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
-              {service ? "Buscar" : "Título"}
+              {service ? t("search") : t("titleLabel")}
             </label>
 
             {/* Selected result preview */}
@@ -306,7 +308,7 @@ export default function AddItemModal({
                   placeholder={
                     service
                       ? service.placeholder
-                      : "Breaking Bad, Tokio, Ramen Nakamura..."
+                      : t("defaultPlaceholder")
                   }
                   className="w-full bg-surface border border-border rounded-xl py-3 text-base text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
                   style={{ paddingLeft: service ? "2.5rem" : "1rem", paddingRight: "1rem" }}
@@ -362,14 +364,14 @@ export default function AddItemModal({
 
           <div>
             <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
-              Descripción{" "}
-              <span className="normal-case text-muted/60">(opcional)</span>
+              {t("descLabel")}{" "}
+              <span className="normal-case text-muted/60">{t("descOptional")}</span>
             </label>
             <input
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="Drama, Japón, https://amazon.com/..."
+              placeholder={t("descPlaceholder")}
               className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder-muted focus:outline-none focus:border-gold transition-colors"
             />
           </div>
@@ -382,7 +384,7 @@ export default function AddItemModal({
               onClick={onClose}
               className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors"
             >
-              Cancelar
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -392,11 +394,11 @@ export default function AddItemModal({
             >
               {loading
                 ? editItem
-                  ? "Guardando..."
-                  : "Añadiendo..."
+                  ? t("saving")
+                  : t("adding")
                 : editItem
-                ? "Guardar"
-                : "Añadir"}
+                ? t("save")
+                : t("add")}
             </button>
           </div>
         </form>
@@ -405,7 +407,7 @@ export default function AddItemModal({
       {confirmDelete && editItem && onDelete && (
         <ConfirmDeleteModal
           emoji="🗑️"
-          title="Eliminar item"
+          title={t("delete")}
           itemName={editItem.title}
           onConfirm={onDelete}
           onCancel={() => setConfirmDelete(false)}

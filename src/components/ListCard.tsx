@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import type { List } from "@/lib/supabase/types";
+import { useTranslations } from "next-intl";
 
 interface Props {
   list: List;
@@ -16,12 +19,12 @@ export default function ListCard({
   votedToday,
   leader,
 }: Props) {
-  const votesLabel =
-    totalVotes === 1 ? "1 voto" : `${totalVotes} votos`;
+  const t = useTranslations("listCard");
+  const votesLabel = totalVotes === 1 ? t("vote") : t("votes", { count: totalVotes });
 
   const bottomLine = [
     leader ? `🥇 ${leader}` : null,
-    votedToday ? "✓ Votaste hoy" : null,
+    votedToday ? t("votedToday") : null,
   ]
     .filter(Boolean)
     .join(" · ");

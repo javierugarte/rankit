@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function LogoutButton() {
   const router = useRouter();
   const supabase = createClient();
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("logout");
 
   async function handleLogout() {
     setLoading(true);
@@ -25,7 +27,7 @@ export default function LogoutButton() {
         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-border text-muted hover:text-red-400 hover:border-red-400/30 transition-colors"
       >
         <LogOut size={18} />
-        <span className="text-sm font-medium">Cerrar sesión</span>
+        <span className="text-sm font-medium">{t("button")}</span>
       </button>
 
       {showConfirm && (
@@ -45,11 +47,9 @@ export default function LogoutButton() {
             <div className="text-center mb-6">
               <p className="text-3xl mb-3">👋</p>
               <h2 className="text-lg font-semibold text-text mb-1">
-                Cerrar sesión
+                {t("title")}
               </h2>
-              <p className="text-muted text-sm">
-                ¿Seguro que quieres cerrar sesión?
-              </p>
+              <p className="text-muted text-sm">{t("message")}</p>
             </div>
 
             <div className="flex gap-3">
@@ -58,7 +58,7 @@ export default function LogoutButton() {
                 disabled={loading}
                 className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50"
               >
-                Cancelar
+                {t("cancel")}
               </button>
               <button
                 onClick={handleLogout}
@@ -66,7 +66,7 @@ export default function LogoutButton() {
                 className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50"
                 style={{ backgroundColor: "#ef4444", color: "white" }}
               >
-                {loading ? "Cerrando..." : "Cerrar sesión"}
+                {loading ? t("closing") : t("confirm")}
               </button>
             </div>
           </div>

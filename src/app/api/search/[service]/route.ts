@@ -35,21 +35,24 @@ export async function GET(
     return NextResponse.json([]);
   }
 
+  const locale = req.cookies.get("NEXT_LOCALE")?.value === "en" ? "en" : "es";
+
   const apiKey = process.env.TMDB_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "TMDB_API_KEY not configured" }, { status: 500 });
   }
 
-  if (service === "movies") return searchMovies(q.trim(), apiKey);
-  if (service === "tv") return searchTV(q.trim(), apiKey);
-  if (service === "books") return searchBooks(q.trim());
+  if (service === "movies") return searchMovies(q.trim(), apiKey, locale);
+  if (service === "tv") return searchTV(q.trim(), apiKey, locale);
+  if (service === "books") return searchBooks(q.trim(), locale);
   if (service === "games") return searchGames(q.trim(), process.env.RAWG_API_KEY ?? "");
 
   return NextResponse.json({ error: "Unknown service" }, { status: 400 });
 }
 
-async function searchMovies(query: string, apiKey: string): Promise<NextResponse> {
-  const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${apiKey}&language=es-ES&page=1`;
+async function searchMovies(query: string, apiKey: string, locale: string): Promise<NextResponse> {
+  const lang = locale === "en" ? "en-US" : "es-ES";
+  const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${apiKey}&language=${lang}&page=1`;
 
   let res: Response;
   try {
@@ -76,8 +79,8 @@ async function searchMovies(query: string, apiKey: string): Promise<NextResponse
   return NextResponse.json(results);
 }
 
-async function searchBooks(query: string): Promise<NextResponse> {
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=7&langRestrict=es`;
+async function searchBooks(query: string, locale: string): Promise<NextResponse> {
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=7&langRestrict=${locale}`;
 
   let res: Response;
   try {
@@ -144,8 +147,9 @@ async function searchGames(query: string, apiKey: string): Promise<NextResponse>
   return NextResponse.json(results);
 }
 
-async function searchTV(query: string, apiKey: string): Promise<NextResponse> {
-  const url = `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}&api_key=${apiKey}&language=es-ES&page=1`;
+async function searchTV(query: string, apiKey: string, locale: string): Promise<NextResponse> {
+  const lang = locale === "en" ? "en-US" : "es-ES";
+  const url = `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}&api_key=${apiKey}&language=${lang}&page=1`;
 
   let res: Response;
   try {
