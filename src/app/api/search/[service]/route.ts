@@ -35,7 +35,8 @@ export async function GET(
     return NextResponse.json([]);
   }
 
-  const locale = req.cookies.get("NEXT_LOCALE")?.value === "en" ? "en" : "es";
+  const cookieLocale = req.cookies.get("NEXT_LOCALE")?.value;
+  const locale = cookieLocale === "en" ? "en" : cookieLocale === "fr" ? "fr" : "es";
 
   const apiKey = process.env.TMDB_API_KEY;
   if (!apiKey) {
@@ -51,7 +52,7 @@ export async function GET(
 }
 
 async function searchMovies(query: string, apiKey: string, locale: string): Promise<NextResponse> {
-  const lang = locale === "en" ? "en-US" : "es-ES";
+  const lang = locale === "en" ? "en-US" : locale === "fr" ? "fr-FR" : "es-ES";
   const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${apiKey}&language=${lang}&page=1`;
 
   let res: Response;
@@ -80,7 +81,8 @@ async function searchMovies(query: string, apiKey: string, locale: string): Prom
 }
 
 async function searchBooks(query: string, locale: string): Promise<NextResponse> {
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=7&langRestrict=${locale}`;
+  const langRestrict = locale === "fr" ? "fr" : locale === "en" ? "en" : "es";
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=7&langRestrict=${langRestrict}`;
 
   let res: Response;
   try {
@@ -148,7 +150,7 @@ async function searchGames(query: string, apiKey: string): Promise<NextResponse>
 }
 
 async function searchTV(query: string, apiKey: string, locale: string): Promise<NextResponse> {
-  const lang = locale === "en" ? "en-US" : "es-ES";
+  const lang = locale === "en" ? "en-US" : locale === "fr" ? "fr-FR" : "es-ES";
   const url = `https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}&api_key=${apiKey}&language=${lang}&page=1`;
 
   let res: Response;
