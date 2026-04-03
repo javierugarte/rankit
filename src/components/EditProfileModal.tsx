@@ -218,6 +218,17 @@ export default function EditProfileModal({
               >
                 🇫🇷 Français
               </button>
+              <button
+                onClick={() => handleLocaleChange("it")}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
+                style={{
+                  backgroundColor: currentLocale === "it" ? "rgba(200,169,110,0.2)" : "transparent",
+                  border: currentLocale === "it" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
+                  color: currentLocale === "it" ? "#c8a96e" : "#8888a0",
+                }}
+              >
+                🇮🇹 Italiano
+              </button>
             </div>
           </div>
 
