@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   emoji: string;
@@ -23,6 +24,7 @@ export default function ConfirmDeleteModal({
   onCancel,
 }: Props) {
   const [deleting, setDeleting] = useState(false);
+  const t = useTranslations("confirm");
 
   async function handleConfirm() {
     setDeleting(true);
@@ -47,13 +49,7 @@ export default function ConfirmDeleteModal({
           <p className="text-3xl mb-3">{emoji}</p>
           <h2 className="text-lg font-semibold text-text mb-1">{title}</h2>
           <p className="text-muted text-sm">
-            {message ?? (
-              <>
-                ¿Seguro que quieres eliminar{" "}
-                <span className="text-text font-medium">{itemName}</span>? Esta
-                acción no se puede deshacer.
-              </>
-            )}
+            {message ?? t("defaultMessage", { name: itemName })}
           </p>
         </div>
 
@@ -63,7 +59,7 @@ export default function ConfirmDeleteModal({
             disabled={deleting}
             className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50"
           >
-            Cancelar
+            {t("cancel")}
           </button>
           <button
             onClick={handleConfirm}
@@ -72,10 +68,10 @@ export default function ConfirmDeleteModal({
             style={{ backgroundColor: "#ef4444", color: "white" }}
           >
             {deleting
-            ? confirmLabel
-              ? `${confirmLabel}...`
-              : "Eliminando..."
-            : (confirmLabel ?? "Eliminar")}
+              ? confirmLabel
+                ? `${confirmLabel}...`
+                : t("deleting")
+              : (confirmLabel ?? t("delete"))}
           </button>
         </div>
       </div>

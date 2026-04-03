@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, User, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   const isHome = pathname === "/home" || pathname === "/";
   const isProfile = pathname === "/profile";
@@ -26,7 +28,7 @@ export default function BottomNav() {
           }`}
         >
           <Home size={22} strokeWidth={isHome ? 2.5 : 1.8} />
-          <span className="text-[10px] font-medium">Inicio</span>
+          <span className="text-[10px] font-medium">{t("home")}</span>
         </Link>
 
         {/* Create list — central gold button */}
@@ -53,7 +55,7 @@ export default function BottomNav() {
           }`}
         >
           <User size={22} strokeWidth={isProfile ? 2.5 : 1.8} />
-          <span className="text-[10px] font-medium">Perfil</span>
+          <span className="text-[10px] font-medium">{t("profile")}</span>
         </Link>
       </div>
     </nav>

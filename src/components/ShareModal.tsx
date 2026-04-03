@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, UserPlus, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 export interface MemberWithProfile {
   user_id: string;
@@ -35,6 +36,7 @@ export default function ShareModal({
   } | null>(null);
 
   const supabase = createClient();
+  const t = useTranslations("share");
 
   async function handleSearch() {
     const trimmed = email.trim();
@@ -52,14 +54,14 @@ export default function ShareModal({
     setSearching(false);
 
     if (rpcError || !data || data.length === 0) {
-      setError("No se encontró ningún usuario con ese email");
+      setError(t("errorNotFound"));
       return;
     }
 
     const user = data[0] as { id: string; username: string };
 
     if (members.some((m) => m.user_id === user.id)) {
-      setError("Este usuario ya es colaborador");
+      setError(t("errorAlreadyMember"));
       return;
     }
 
@@ -78,7 +80,7 @@ export default function ShareModal({
     setAdding(false);
 
     if (insertError) {
-      setError("Error al añadir colaborador");
+      setError(t("errorAdd"));
       return;
     }
 
@@ -88,7 +90,7 @@ export default function ShareModal({
     ]);
     setFoundUser(null);
     setEmail("");
-    setSuccess(`${foundUser.username} añadido como colaborador`);
+    setSuccess(t("successAdded", { name: foundUser.username }));
   }
 
   async function handleRemove(userId: string) {
@@ -118,14 +120,14 @@ export default function ShareModal({
           <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
 
           <h2 className="text-lg font-semibold text-text mb-5">
-            Compartir lista
+            {t("title")}
           </h2>
 
           {/* Current collaborators */}
           {members.length > 0 && (
             <div className="mb-5">
               <p className="text-xs text-muted uppercase tracking-wide mb-2">
-                Colaboradores
+                {t("collaborators")}
               </p>
               <div className="space-y-2">
                 {members.map((m) => (
@@ -149,7 +151,7 @@ export default function ShareModal({
                       onClick={() => handleRemove(m.user_id)}
                       disabled={removingId === m.user_id}
                       className="w-7 h-7 rounded-full flex items-center justify-center text-muted hover:text-red-400 hover:bg-red-400/10 transition-colors disabled:opacity-50"
-                      aria-label="Eliminar colaborador"
+                      aria-label={t("removeAriaLabel")}
                     >
                       {removingId === m.user_id ? (
                         <Loader2 size={12} className="animate-spin" />
@@ -165,7 +167,7 @@ export default function ShareModal({
 
           {/* Add collaborator */}
           <p className="text-xs text-muted uppercase tracking-wide mb-2">
-            Añadir colaborador
+            {t("addCollaborator")}
           </p>
           <div className="flex gap-2">
             <input
@@ -178,7 +180,7 @@ export default function ShareModal({
                 setFoundUser(null);
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder="email@ejemplo.com"
+              placeholder={t("emailPlaceholder")}
               className="flex-1 bg-surface border border-border rounded-xl px-4 py-2.5 text-base text-text placeholder:text-muted focus:outline-none focus:border-gold/50"
             />
             <button
@@ -193,7 +195,7 @@ export default function ShareModal({
               {searching ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                "Buscar"
+                t("search")
               )}
             </button>
           </div>
@@ -240,7 +242,7 @@ export default function ShareModal({
                 ) : (
                   <>
                     <UserPlus size={12} />
-                    <span>Añadir</span>
+                    <span>{t("add")}</span>
                   </>
                 )}
               </button>

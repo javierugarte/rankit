@@ -6,6 +6,7 @@ import LogoutButton from "./LogoutButton";
 import EditProfileModal from "./EditProfileModal";
 import ChangePasswordModal from "./ChangePasswordModal";
 import type { Profile } from "@/lib/supabase/types";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Props {
   profile: Profile | null;
@@ -34,21 +35,23 @@ export default function ProfileClient({
   );
   const [showEditModal, setShowEditModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const t = useTranslations("profile");
+  const locale = useLocale();
 
   const initials = username.slice(0, 2).toUpperCase();
 
   const stats = [
-    { value: totalLists, label: "Listas creadas" },
-    { value: totalVotes, label: "Votos emitidos" },
-    { value: totalCompleted, label: "Ítems vistos" },
-    { value: sharedLists, label: "Listas compartidas" },
+    { value: totalLists, label: t("listsCreated") },
+    { value: totalVotes, label: t("votesEmitted") },
+    { value: totalCompleted, label: t("itemsWatched") },
+    { value: sharedLists, label: t("sharedLists") },
   ];
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-12 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl font-semibold text-text">Perfil</h2>
+        <h2 className="text-xl font-semibold text-text">{t("title")}</h2>
       </div>
 
       {/* Avatar + Name */}
@@ -78,7 +81,7 @@ export default function ProfileClient({
           onClick={() => setShowEditModal(true)}
           className="mt-2 px-3 py-1 rounded-full text-xs font-medium border border-[#c8a96e]/40 text-[#c8a96e] hover:bg-[#c8a96e]/10 transition-colors active:scale-95 active:transition-none"
         >
-          Editar perfil
+          {t("editProfile")}
         </button>
         <p className="text-muted text-sm mt-1">{email}</p>
       </div>
@@ -111,6 +114,7 @@ export default function ProfileClient({
           userId={userId}
           currentUsername={username}
           currentAvatarUrl={avatarUrl}
+          currentLocale={locale}
           onClose={() => setShowEditModal(false)}
           onSaved={(newUsername, newAvatarUrl) => {
             setUsername(newUsername);

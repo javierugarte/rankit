@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 import TabShell from "@/components/TabShell";
 import type { List, Item, Profile } from "@/lib/supabase/types";
 import type { MemberWithProfile } from "@/components/ShareModal";
+import { getTranslations } from "next-intl/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
+  const ts = await getTranslations("sharing");
 
   const {
     data: { user },
@@ -51,7 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       .order("created_at", { ascending: true });
     for (const row of data ?? []) {
       const ownerProfile = row.profiles as { id: string; username: string; avatar_url: string | null } | null;
-      ownerUsernameMap[row.id] = ownerProfile?.username ?? "alguien";
+      ownerUsernameMap[row.id] = ownerProfile?.username ?? ts("someone");
       if (ownerProfile) ownerProfileMap[row.id] = ownerProfile;
     }
     memberLists = (data ?? []).map(({ profiles: _p, ...rest }) => rest as List);
@@ -150,12 +152,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const sharingMap: Record<string, string> = {};
   for (const list of allLists) {
     if (memberListIdSet.has(list.id) && list.owner_id !== user.id) {
-      sharingMap[list.id] = `De ${ownerUsernameMap[list.id] ?? "alguien"}`;
+      sharingMap[list.id] = ts("from", { name: ownerUsernameMap[list.id] ?? ts("someone") });
     } else {
       const others = otherMembersPerList[list.id] ?? [];
-      if (others.length === 0) sharingMap[list.id] = "Privado";
-      else if (others.length === 1) sharingMap[list.id] = `Con ${others[0]}`;
-      else sharingMap[list.id] = `Con ${others.length} personas`;
+      if (others.length === 0) sharingMap[list.id] = ts("private");
+      else if (others.length === 1) sharingMap[list.id] = ts("with", { name: others[0] });
+      else sharingMap[list.id] = ts("withN", { count: others.length });
     }
   }
 

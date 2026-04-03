@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { MemberWithProfile } from "./ShareModal";
+import { useTranslations } from "next-intl";
 
 const COLORS = [
   "#e05c5c",
@@ -31,6 +32,7 @@ interface Props {
 
 export default function VoteBreakdown({ participants, votesByUser, currentUserId }: Props) {
   const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null);
+  const t = useTranslations("voteBreakdown");
 
   const totalVotes = participants.reduce((sum, p) => sum + (votesByUser[p.user_id] ?? 0), 0);
 
@@ -96,13 +98,13 @@ export default function VoteBreakdown({ participants, votesByUser, currentUserId
               {/* Name + votes */}
               <div className="flex flex-col items-center gap-0.5">
                 <span className="text-[10px] text-muted leading-none">
-                  {isYou ? "Tú" : p.username}
+                  {isYou ? t("you") : p.username}
                 </span>
                 <span
                   className="text-xs font-semibold leading-none"
                   style={{ color }}
                 >
-                  {votes} {votes === 1 ? "voto" : "votos"}
+                  {votes} {votes === 1 ? t("vote") : t("votes")}
                 </span>
               </div>
             </button>

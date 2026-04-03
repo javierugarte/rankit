@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import HomeClient from "./HomeClient";
 import ProfileClient from "./ProfileClient";
@@ -55,6 +56,7 @@ export default function TabShell({ homeProps, profileProps, listDetails, isAnony
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const t = useTranslations("demo");
 
   async function handleCreateAccount() {
     await supabase.auth.signOut();
@@ -72,8 +74,8 @@ export default function TabShell({ homeProps, profileProps, listDetails, isAnony
     <div className="flex flex-col min-h-full bg-bg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       {isAnonymous && (
         <div className="text-center py-2 px-4 text-xs" style={{ backgroundColor: "rgba(200,169,110,0.1)", borderBottom: "1px solid rgba(200,169,110,0.2)", color: "#c8a96e" }}>
-          Modo demo · Se borrará en 24h ·{" "}
-          <button onClick={handleCreateAccount} className="underline font-medium">Crear cuenta ahora</button>
+          {t("banner")}{" "}
+          <button onClick={handleCreateAccount} className="underline font-medium">{t("createAccount")}</button>
         </div>
       )}
       <main className="flex-1">

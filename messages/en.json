@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "home": "Home",
+    "profile": "Profile"
+  },
+  "home": {
+    "myLists": "Your lists",
+    "empty": "You don't have any lists yet.",
+    "emptyHint": "Tap <plus>+</plus> to create your first one.",
+    "dragHint": "Drag to reorder",
+    "reorder": "Reorder lists",
+    "confirmOrder": "Confirm order",
+    "dragHandle": "Drag to reorder"
+  },
+  "sharing": {
+    "private": "Private",
+    "with": "With {name}",
+    "withN": "With {count} people",
+    "from": "By {name}",
+    "someone": "someone"
+  },
+  "listCard": {
+    "vote": "1 vote",
+    "votes": "{count} votes",
+    "votedToday": "✓ Voted today"
+  },
+  "listDetail": {
+    "back": "Home",
+    "pending": "Pending",
+    "done": "Watched",
+    "pendingSuffix": "pending",
+    "pendingsSuffix": "pending",
+    "pendingEmpty": "No pending items.",
+    "pendingEmptyHint": "Tap + to add one.",
+    "doneEmpty": "Nothing marked as watched yet.",
+    "voteAvailable": "⚡ You have 1 vote available today",
+    "votedBanner": "✓ Already voted today · Come back in {time}",
+    "editList": "Edit list",
+    "shareList": "Share list",
+    "leaveList": "Leave list",
+    "markDone": "Mark as watched",
+    "markPending": "Mark as pending",
+    "vote": "1 vote",
+    "votes": "{count} votes"
+  },
+  "leaveList": {
+    "title": "Leave list",
+    "message": "Are you sure you want to leave <bold>{name}</bold>? You will lose access to this list.",
+    "confirm": "Leave"
+  },
+  "deleteList": {
+    "title": "Delete list"
+  },
+  "addItem": {
+    "addTitle": "Add item",
+    "editTitle": "Edit item",
+    "search": "Search",
+    "titleLabel": "Title",
+    "descLabel": "Description",
+    "descOptional": "(optional)",
+    "descPlaceholder": "Drama, Japan, https://amazon.com/...",
+    "defaultPlaceholder": "Breaking Bad, Tokyo, Ramen Nakamura...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "add": "Add",
+    "adding": "Adding...",
+    "markDone": "Mark as watched",
+    "delete": "Delete item"
+  },
+  "createList": {
+    "createTitle": "New list",
+    "editTitle": "Edit list",
+    "iconLabel": "Icon",
+    "nameLabel": "Name",
+    "namePlaceholder": "Movies to watch, Trips, Restaurants...",
+    "typeLabel": "Content type",
+    "typeOptional": "(optional)",
+    "customEmoji": "Other...",
+    "emojiPlaceholder": "Open the emoji keyboard 😀",
+    "emojiError": "Please enter a single valid emoji",
+    "autocompleteHint": "Autocomplete powered by {api} when adding items.",
+    "cancel": "Cancel",
+    "create": "Create list",
+    "creating": "Creating...",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete list"
+  },
+  "serviceLabels": {
+    "none": "No type",
+    "movies": "Movies",
+    "tv": "TV Shows",
+    "books": "Books",
+    "games": "Video games",
+    "albums": "Albums"
+  },
+  "share": {
+    "title": "Share list",
+    "collaborators": "Collaborators",
+    "addCollaborator": "Add collaborator",
+    "emailPlaceholder": "friend@example.com",
+    "search": "Search",
+    "add": "Add",
+    "removeAriaLabel": "Remove collaborator",
+    "errorNotFound": "No user found with that email",
+    "errorAlreadyMember": "This user is already a collaborator",
+    "errorAdd": "Error adding collaborator",
+    "successAdded": "{name} added as collaborator"
+  },
+  "shareAnon": {
+    "title": "Share with anyone",
+    "description": "Invite your partner or friends to vote together and make decisions democratically. What movie to watch tonight? Where to travel? Let the most voted win.",
+    "accountRequired": "This feature is available for registered users.",
+    "createAccount": "Create a free account"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "defaultMessage": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit profile",
+    "listsCreated": "Lists created",
+    "votesEmitted": "Votes cast",
+    "itemsWatched": "Items watched",
+    "sharedLists": "Shared lists"
+  },
+  "editProfile": {
+    "title": "Edit profile",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "yourusername",
+    "changePhoto": "Change profile photo",
+    "changePassword": "Change password",
+    "language": "Language",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "errorTooShort": "Username must be at least 3 characters",
+    "errorNoSpaces": "Username cannot contain spaces",
+    "errorUpload": "Error uploading image",
+    "errorSave": "Error saving changes",
+    "errorTaken": "That username is already taken",
+    "errorFileTooLarge": "Image cannot exceed 5 MB"
+  },
+  "logout": {
+    "button": "Log out",
+    "title": "Log out",
+    "message": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "confirm": "Log out",
+    "closing": "Logging out..."
+  },
+  "changePassword": {
+    "title": "Change password",
+    "currentLabel": "Current password",
+    "newLabel": "New password",
+    "confirmLabel": "Confirm new password",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "successTitle": "Password updated!",
+    "successMessage": "Your password has been changed successfully.",
+    "close": "Close",
+    "errorTooShort": "New password must be at least 8 characters",
+    "errorMismatch": "Passwords do not match",
+    "errorWrong": "Current password is incorrect",
+    "errorGeneric": "Error changing password"
+  },
+  "auth": {
+    "tagline": "Collaborative lists. One vote a day.",
+    "loginTab": "Log in",
+    "signupTab": "Sign up",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "your_name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "youremail@example.com",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot your password?",
+    "loginButton": "Log in",
+    "signupButton": "Sign up",
+    "loading": "Loading...",
+    "forgotTitle": "Reset password",
+    "forgotSubtitle": "We'll send you a link to reset your password.",
+    "sendLink": "Send link",
+    "backToLogin": "Back to login",
+    "demoButton": "✨ Try demo without an account",
+    "demoLoading": "Preparing demo…",
+    "demoHint": "Sample data · Deleted after 24h",
+    "emailSent": "Check your email to reset your password."
+  },
+  "demo": {
+    "banner": "Demo mode · Will be deleted in 24h ·",
+    "createAccount": "Create account now"
+  },
+  "resetPassword": {
+    "verifying": "Verifying link…",
+    "subtitle": "New password",
+    "newLabel": "New password",
+    "confirmLabel": "Confirm password",
+    "submit": "Reset password",
+    "submitting": "Saving...",
+    "errorMismatch": "Passwords do not match.",
+    "errorTooShort": "Password must be at least 8 characters.",
+    "errorExpired": "The link has expired. Please request a new one.",
+    "errorInvalid": "The link is not valid. Please request a new one.",
+    "requestNew": "Request new link"
+  },
+  "voteBreakdown": {
+    "vote": "vote",
+    "votes": "votes",
+    "you": "You"
+  }
+}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 interface Props {
   email: string;
@@ -17,14 +18,15 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const supabase = createClient();
+  const t = useTranslations("changePassword");
 
   async function handleSave() {
     if (newPassword.length < 8) {
-      setError("La nueva contraseña debe tener al menos 8 caracteres");
+      setError(t("errorTooShort"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError(t("errorMismatch"));
       return;
     }
 
@@ -38,7 +40,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
     });
 
     if (signInError) {
-      setError("La contraseña actual es incorrecta");
+      setError(t("errorWrong"));
       setSaving(false);
       return;
     }
@@ -50,7 +52,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
     setSaving(false);
 
     if (updateError) {
-      setError("Error al cambiar la contraseña");
+      setError(t("errorGeneric"));
       return;
     }
 
@@ -70,19 +72,19 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
         <div className="p-6">
           <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
           <h2 className="text-lg font-semibold text-text mb-6">
-            Cambiar contraseña
+            {t("title")}
           </h2>
 
           {success ? (
             <div className="text-center py-4">
-              <p className="text-text font-medium mb-1">¡Contraseña actualizada!</p>
-              <p className="text-muted text-sm mb-6">Tu contraseña ha sido cambiada correctamente.</p>
+              <p className="text-text font-medium mb-1">{t("successTitle")}</p>
+              <p className="text-muted text-sm mb-6">{t("successMessage")}</p>
               <button
                 onClick={onClose}
                 className="w-full py-3 rounded-xl text-sm font-semibold"
                 style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
               >
-                Cerrar
+                {t("close")}
               </button>
             </div>
           ) : (
@@ -90,7 +92,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
               <div className="space-y-4 mb-5">
                 <div>
                   <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
-                    Contraseña actual
+                    {t("currentLabel")}
                   </label>
                   <input
                     type="password"
@@ -103,7 +105,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
                 </div>
                 <div>
                   <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
-                    Nueva contraseña
+                    {t("newLabel")}
                   </label>
                   <input
                     type="password"
@@ -116,7 +118,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
                 </div>
                 <div>
                   <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
-                    Confirmar nueva contraseña
+                    {t("confirmLabel")}
                   </label>
                   <input
                     type="password"
@@ -137,7 +139,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
                   disabled={saving}
                   className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50 active:scale-[0.97] active:transition-none"
                 >
-                  Cancelar
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={handleSave}
@@ -145,7 +147,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
                   className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.97] active:transition-none"
                   style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
                 >
-                  {saving ? <Loader2 size={16} className="animate-spin" /> : "Guardar"}
+                  {saving ? <Loader2 size={16} className="animate-spin" /> : t("save")}
                 </button>
               </div>
             </>

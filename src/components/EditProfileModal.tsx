@@ -4,11 +4,13 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { Loader2, Camera, KeyRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
 interface Props {
   userId: string;
   currentUsername: string;
   currentAvatarUrl: string | null;
+  currentLocale: string;
   onClose: () => void;
   onSaved: (username: string, avatarUrl: string | null) => void;
   onChangePassword?: () => void;
@@ -18,6 +20,7 @@ export default function EditProfileModal({
   userId,
   currentUsername,
   currentAvatarUrl,
+  currentLocale,
   onClose,
   onSaved,
   onChangePassword,
@@ -29,6 +32,7 @@ export default function EditProfileModal({
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
+  const t = useTranslations("editProfile");
 
   const displayAvatar = avatarPreview ?? currentAvatarUrl;
   const initials = (username || currentUsername).slice(0, 2).toUpperCase();
@@ -37,7 +41,7 @@ export default function EditProfileModal({
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      setError("La imagen no puede superar 5 MB");
+      setError(t("errorFileTooLarge"));
       return;
     }
     setAvatarFile(file);
@@ -45,14 +49,19 @@ export default function EditProfileModal({
     setError("");
   }
 
+  function handleLocaleChange(locale: string) {
+    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    window.location.reload();
+  }
+
   async function handleSave() {
     const trimmed = username.trim();
     if (trimmed.length < 3) {
-      setError("El nombre de usuario debe tener al menos 3 caracteres");
+      setError(t("errorTooShort"));
       return;
     }
     if (/\s/.test(trimmed)) {
-      setError("El nombre de usuario no puede contener espacios");
+      setError(t("errorNoSpaces"));
       return;
     }
 
@@ -70,7 +79,7 @@ export default function EditProfileModal({
         });
 
       if (uploadError) {
-        setError("Error al subir la imagen");
+        setError(t("errorUpload"));
         setSaving(false);
         return;
       }
@@ -89,9 +98,9 @@ export default function EditProfileModal({
 
     if (updateError) {
       if (updateError.code === "23505") {
-        setError("Ese nombre de usuario ya está en uso");
+        setError(t("errorTaken"));
       } else {
-        setError("Error al guardar los cambios");
+        setError(t("errorSave"));
       }
       return;
     }
@@ -111,14 +120,14 @@ export default function EditProfileModal({
       >
         <div className="p-6">
           <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
-          <h2 className="text-lg font-semibold text-text mb-6">Editar perfil</h2>
+          <h2 className="text-lg font-semibold text-text mb-6">{t("title")}</h2>
 
           {/* Avatar picker */}
           <div className="flex justify-center mb-6">
             <button
               onClick={() => fileInputRef.current?.click()}
               className="relative w-20 h-20 rounded-full overflow-hidden transition-transform active:scale-95 active:transition-none"
-              aria-label="Cambiar foto de perfil"
+              aria-label={t("changePhoto")}
             >
               <div
                 className="absolute inset-0 flex items-center justify-center text-2xl font-bold"
@@ -154,7 +163,7 @@ export default function EditProfileModal({
           {/* Username */}
           <div className="mb-5">
             <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
-              Nombre de usuario
+              {t("usernameLabel")}
             </label>
             <input
               type="text"
@@ -163,11 +172,42 @@ export default function EditProfileModal({
                 setUsername(e.target.value);
                 setError("");
               }}
-              placeholder="tunombredeusuario"
+              placeholder={t("usernamePlaceholder")}
               className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-base text-text placeholder:text-muted focus:outline-none focus:border-gold/50"
               autoCorrect="off"
               autoCapitalize="none"
             />
+          </div>
+
+          {/* Language switcher */}
+          <div className="mb-5">
+            <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
+              {t("language")}
+            </label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleLocaleChange("es")}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
+                style={{
+                  backgroundColor: currentLocale === "es" ? "rgba(200,169,110,0.2)" : "transparent",
+                  border: currentLocale === "es" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
+                  color: currentLocale === "es" ? "#c8a96e" : "#8888a0",
+                }}
+              >
+                🇪🇸 Español
+              </button>
+              <button
+                onClick={() => handleLocaleChange("en")}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
+                style={{
+                  backgroundColor: currentLocale === "en" ? "rgba(200,169,110,0.2)" : "transparent",
+                  border: currentLocale === "en" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
+                  color: currentLocale === "en" ? "#c8a96e" : "#8888a0",
+                }}
+              >
+                🇬🇧 English
+              </button>
+            </div>
           </div>
 
           {error && <p className="text-red-400 text-xs mb-4">{error}</p>}
@@ -179,7 +219,7 @@ export default function EditProfileModal({
               className="w-full flex items-center gap-3 py-3 px-4 rounded-xl border border-border text-muted text-sm hover:text-text hover:border-border/80 transition-colors mb-4 active:scale-[0.98] active:transition-none"
             >
               <KeyRound size={16} />
-              Cambiar contraseña
+              {t("changePassword")}
             </button>
           )}
 
@@ -190,7 +230,7 @@ export default function EditProfileModal({
               disabled={saving}
               className="flex-1 py-3 rounded-xl border border-border text-muted text-sm font-medium hover:text-text transition-colors disabled:opacity-50 active:scale-[0.97] active:transition-none"
             >
-              Cancelar
+              {t("cancel")}
             </button>
             <button
               onClick={handleSave}
@@ -201,7 +241,7 @@ export default function EditProfileModal({
               {saving ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                "Guardar"
+                t("save")
               )}
             </button>
           </div>

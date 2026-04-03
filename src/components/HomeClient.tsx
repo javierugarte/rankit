@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ArrowUpDown, Check, GripVertical } from "lucide-react";
+import { useTranslations } from "next-intl";
 import ListCard from "./ListCard";
 import CreateListButton from "./CreateListButton";
 import { createClient } from "@/lib/supabase/client";
@@ -80,7 +81,7 @@ function SortableListCard({
         {...attributes}
         {...listeners}
         className="text-muted hover:text-text p-2 touch-none cursor-grab active:cursor-grabbing"
-        aria-label="Arrastrar para reordenar"
+        aria-label="drag"
       >
         <GripVertical size={18} />
       </button>
@@ -102,6 +103,8 @@ interface Props {
 }
 
 export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTotalVotesMap, votedTodayIds: initialVotedTodayIds, leaderMap: initialLeaderMap, userId, initialOrder }: Props) {
+  const t = useTranslations("home");
+  const ts = useTranslations("sharing");
   const [sortMode, setSortMode] = useState(false);
   const [orderedLists, setOrderedLists] = useState<List[]>(lists);
 
@@ -251,7 +254,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
           >
             RankIt
           </h1>
-          <p className="text-muted text-sm mt-1">Tus listas</p>
+          <p className="text-muted text-sm mt-1">{t("myLists")}</p>
         </div>
 
         {orderedLists.length > 0 && (
@@ -263,7 +266,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
                 : "bg-surface border border-border text-muted hover:text-text"
             }`}
             style={sortMode ? { backgroundColor: "#c8a96e" } : {}}
-            aria-label={sortMode ? "Confirmar orden" : "Reordenar listas"}
+            aria-label={sortMode ? t("confirmOrder") : t("reorder")}
           >
             {sortMode ? <Check size={18} /> : <ArrowUpDown size={16} />}
           </button>
@@ -274,16 +277,15 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
       {orderedLists.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-4xl mb-4">🎬</p>
-          <p className="text-muted text-base">Aún no tienes listas.</p>
+          <p className="text-muted text-base">{t("empty")}</p>
           <p className="text-muted text-sm mt-1">
-            Pulsa el <span className="text-gold font-bold">+</span> para crear
-            la primera.
+            {t.rich("emptyHint", { plus: (chunks) => <span key="plus" className="text-gold font-bold">{chunks}</span> })}
           </p>
         </div>
       ) : sortMode ? (
         <>
           <p className="text-muted text-xs text-center mb-4">
-            Arrastra para cambiar el orden
+            {t("dragHint")}
           </p>
           <DndContext
             sensors={sensors}
@@ -299,7 +301,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
                   <SortableListCard
                     key={list.id}
                     list={list}
-                    sharingLabel={sharingMap[list.id] ?? "Privado"}
+                    sharingLabel={sharingMap[list.id] ?? ts("private")}
                     totalVotes={totalVotesMap[list.id] ?? 0}
                     votedToday={votedTodaySet.has(list.id)}
                     leader={leaderMap[list.id] ?? null}
@@ -315,7 +317,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
             <ListCard
               key={list.id}
               list={list}
-              sharingLabel={sharingMap[list.id] ?? "Privado"}
+              sharingLabel={sharingMap[list.id] ?? ts("private")}
               totalVotes={totalVotesMap[list.id] ?? 0}
               votedToday={votedTodaySet.has(list.id)}
               leader={leaderMap[list.id] ?? null}
