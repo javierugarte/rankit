@@ -1,0 +1,216 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "profile": "Profil"
+  },
+  "home": {
+    "myLists": "Vos listes",
+    "empty": "Vous n'avez pas encore de listes.",
+    "emptyHint": "Appuyez sur <plus>+</plus> pour en créer une.",
+    "dragHint": "Glisser pour réorganiser",
+    "reorder": "Réorganiser les listes",
+    "confirmOrder": "Confirmer l'ordre",
+    "dragHandle": "Glisser pour réorganiser"
+  },
+  "sharing": {
+    "private": "Privé",
+    "with": "Avec {name}",
+    "withN": "Avec {count} personnes",
+    "from": "Par {name}",
+    "someone": "quelqu'un"
+  },
+  "listCard": {
+    "vote": "1 vote",
+    "votes": "{count} votes",
+    "votedToday": "✓ Voté aujourd'hui"
+  },
+  "listDetail": {
+    "back": "Accueil",
+    "pending": "En attente",
+    "done": "Vus",
+    "pendingSuffix": "en attente",
+    "pendingsSuffix": "en attente",
+    "pendingEmpty": "Aucun élément en attente.",
+    "pendingEmptyHint": "Appuyez sur + pour en ajouter un.",
+    "doneEmpty": "Rien n'est encore marqué comme vu.",
+    "voteAvailable": "⚡ Vous avez 1 vote disponible aujourd'hui",
+    "votedBanner": "✓ Déjà voté aujourd'hui · Revenez dans {time}",
+    "editList": "Modifier la liste",
+    "shareList": "Partager la liste",
+    "leaveList": "Quitter la liste",
+    "markDone": "Marquer comme vu",
+    "markPending": "Remettre en attente",
+    "vote": "1 vote",
+    "votes": "{count} votes"
+  },
+  "leaveList": {
+    "title": "Quitter la liste",
+    "message": "Voulez-vous vraiment quitter <bold>{name}</bold> ? Vous perdrez l'accès à cette liste.",
+    "confirm": "Quitter"
+  },
+  "deleteList": {
+    "title": "Supprimer la liste"
+  },
+  "addItem": {
+    "addTitle": "Ajouter un élément",
+    "editTitle": "Modifier l'élément",
+    "search": "Rechercher",
+    "titleLabel": "Titre",
+    "descLabel": "Description",
+    "descOptional": "(facultatif)",
+    "descPlaceholder": "Drame, Japon, https://amazon.com/...",
+    "defaultPlaceholder": "Breaking Bad, Tokyo, Ramen Nakamura...",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "add": "Ajouter",
+    "adding": "Ajout...",
+    "markDone": "Marquer comme vu",
+    "delete": "Supprimer l'élément"
+  },
+  "createList": {
+    "createTitle": "Nouvelle liste",
+    "editTitle": "Modifier la liste",
+    "iconLabel": "Icône",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Films à voir, Voyages, Restaurants...",
+    "typeLabel": "Type de contenu",
+    "typeOptional": "(facultatif)",
+    "customEmoji": "Autre...",
+    "emojiPlaceholder": "Ouvrez le clavier emoji 😀",
+    "emojiError": "Veuillez saisir un seul emoji valide",
+    "autocompleteHint": "Autocomplétion par {api} lors de l'ajout d'éléments.",
+    "cancel": "Annuler",
+    "create": "Créer la liste",
+    "creating": "Création...",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "delete": "Supprimer la liste"
+  },
+  "serviceLabels": {
+    "none": "Sans type",
+    "movies": "Films",
+    "tv": "Séries",
+    "books": "Livres",
+    "games": "Jeux vidéo",
+    "albums": "Albums"
+  },
+  "share": {
+    "title": "Partager la liste",
+    "collaborators": "Collaborateurs",
+    "addCollaborator": "Ajouter un collaborateur",
+    "emailPlaceholder": "ami@exemple.com",
+    "search": "Rechercher",
+    "add": "Ajouter",
+    "removeAriaLabel": "Supprimer le collaborateur",
+    "errorNotFound": "Aucun utilisateur trouvé avec cet e-mail",
+    "errorAlreadyMember": "Cet utilisateur est déjà collaborateur",
+    "errorAdd": "Erreur lors de l'ajout du collaborateur",
+    "successAdded": "{name} ajouté comme collaborateur"
+  },
+  "shareAnon": {
+    "title": "Partagez avec n'importe qui",
+    "description": "Invitez votre partenaire ou vos amis à voter ensemble et à prendre des décisions démocratiquement. Quel film voir ce soir ? Où voyager ? Que le plus voté gagne.",
+    "accountRequired": "Cette fonctionnalité est disponible pour les utilisateurs inscrits.",
+    "createAccount": "Créer un compte gratuit"
+  },
+  "confirm": {
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "defaultMessage": "Voulez-vous vraiment supprimer {name} ? Cette action est irréversible."
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Modifier le profil",
+    "listsCreated": "Listes créées",
+    "votesEmitted": "Votes émis",
+    "itemsWatched": "Éléments vus",
+    "sharedLists": "Listes partagées"
+  },
+  "editProfile": {
+    "title": "Modifier le profil",
+    "usernameLabel": "Nom d'utilisateur",
+    "usernamePlaceholder": "votrenom",
+    "changePhoto": "Changer la photo de profil",
+    "changePassword": "Changer le mot de passe",
+    "language": "Langue",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "errorTooShort": "Le nom d'utilisateur doit comporter au moins 3 caractères",
+    "errorNoSpaces": "Le nom d'utilisateur ne peut pas contenir d'espaces",
+    "errorUpload": "Erreur lors du téléchargement de l'image",
+    "errorSave": "Erreur lors de l'enregistrement des modifications",
+    "errorTaken": "Ce nom d'utilisateur est déjà pris",
+    "errorFileTooLarge": "L'image ne peut pas dépasser 5 Mo"
+  },
+  "logout": {
+    "button": "Se déconnecter",
+    "title": "Se déconnecter",
+    "message": "Voulez-vous vraiment vous déconnecter ?",
+    "cancel": "Annuler",
+    "confirm": "Se déconnecter",
+    "closing": "Déconnexion..."
+  },
+  "changePassword": {
+    "title": "Changer le mot de passe",
+    "currentLabel": "Mot de passe actuel",
+    "newLabel": "Nouveau mot de passe",
+    "confirmLabel": "Confirmer le nouveau mot de passe",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "successTitle": "Mot de passe mis à jour !",
+    "successMessage": "Votre mot de passe a été modifié avec succès.",
+    "close": "Fermer",
+    "errorTooShort": "Le nouveau mot de passe doit comporter au moins 8 caractères",
+    "errorMismatch": "Les mots de passe ne correspondent pas",
+    "errorWrong": "Le mot de passe actuel est incorrect",
+    "errorGeneric": "Erreur lors du changement de mot de passe"
+  },
+  "auth": {
+    "tagline": "Listes collaboratives. Un vote par jour.",
+    "loginTab": "Connexion",
+    "signupTab": "Inscription",
+    "usernameLabel": "Nom d'utilisateur",
+    "usernamePlaceholder": "votre_nom",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "votreemail@exemple.com",
+    "passwordLabel": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "loginButton": "Se connecter",
+    "signupButton": "S'inscrire",
+    "loading": "Chargement...",
+    "forgotTitle": "Réinitialiser le mot de passe",
+    "forgotSubtitle": "Nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "sendLink": "Envoyer le lien",
+    "backToLogin": "Retour à la connexion",
+    "demoButton": "✨ Essayer sans compte",
+    "demoLoading": "Préparation de la démo…",
+    "demoHint": "Données d'exemple · Supprimées après 24h",
+    "emailSent": "Vérifiez votre e-mail pour réinitialiser votre mot de passe."
+  },
+  "demo": {
+    "banner": "Mode démo · Sera supprimé dans 24h ·",
+    "createAccount": "Créer un compte maintenant"
+  },
+  "resetPassword": {
+    "verifying": "Vérification du lien…",
+    "subtitle": "Nouveau mot de passe",
+    "newLabel": "Nouveau mot de passe",
+    "confirmLabel": "Confirmer le mot de passe",
+    "submit": "Réinitialiser le mot de passe",
+    "submitting": "Enregistrement...",
+    "errorMismatch": "Les mots de passe ne correspondent pas.",
+    "errorTooShort": "Le mot de passe doit comporter au moins 8 caractères.",
+    "errorExpired": "Le lien a expiré. Veuillez en demander un nouveau.",
+    "errorInvalid": "Le lien n'est pas valide. Veuillez en demander un nouveau.",
+    "requestNew": "Demander un nouveau lien"
+  },
+  "voteBreakdown": {
+    "vote": "vote",
+    "votes": "votes",
+    "you": "Vous"
+  }
+}

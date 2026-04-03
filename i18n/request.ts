@@ -1,18 +1,20 @@
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
 
-export type Locale = "es" | "en";
-export const locales: Locale[] = ["es", "en"];
+export type Locale = "es" | "en" | "fr";
+export const locales: Locale[] = ["es", "en", "fr"];
 export const defaultLocale: Locale = "es";
 
 export function resolveLocale(
   cookieValue: string | undefined,
   acceptLanguage: string
 ): Locale {
-  if (cookieValue === "en" || cookieValue === "es") return cookieValue;
-  // Detect from Accept-Language: prefer English if it comes before Spanish
+  if (cookieValue === "en" || cookieValue === "es" || cookieValue === "fr") return cookieValue;
+  // Detect from Accept-Language header
   const lang = acceptLanguage.split(",")[0]?.split("-")[0]?.trim() ?? "";
-  return lang === "en" ? "en" : "es";
+  if (lang === "en") return "en";
+  if (lang === "fr") return "fr";
+  return "es";
 }
 
 export default getRequestConfig(async () => {

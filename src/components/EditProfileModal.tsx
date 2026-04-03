@@ -207,6 +207,17 @@ export default function EditProfileModal({
               >
                 🇬🇧 English
               </button>
+              <button
+                onClick={() => handleLocaleChange("fr")}
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
+                style={{
+                  backgroundColor: currentLocale === "fr" ? "rgba(200,169,110,0.2)" : "transparent",
+                  border: currentLocale === "fr" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
+                  color: currentLocale === "fr" ? "#c8a96e" : "#8888a0",
+                }}
+              >
+                🇫🇷 Français
+              </button>
             </div>
           </div>
 
