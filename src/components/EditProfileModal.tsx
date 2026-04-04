@@ -12,6 +12,7 @@ const LANGUAGES = [
   { code: "es", flag: "🇪🇸", label: "Español" },
   { code: "fr", flag: "🇫🇷", label: "Français" },
   { code: "it", flag: "🇮🇹", label: "Italiano" },
+  { code: "pt-BR", flag: "🇧🇷", label: "Português (Brasil)" },
 ] as const;
 
 interface Props {
