@@ -117,6 +117,23 @@ API keys are server-side only (never sent to the client). Searches are proxied t
 
 ---
 
+## Internationalisation
+
+The app ships with four languages: **Español** (default), **English**, **Français** and **Italiano**. Users switch language from Edit Profile; the change is applied on save.
+
+Locale is stored in the `NEXT_LOCALE` cookie and auto-detected from the browser's `Accept-Language` header on first visit.
+
+### Adding a new language
+
+1. **Create `messages/<code>.json`** — copy `messages/en.json` and translate every value (keep keys unchanged).
+2. **Update `i18n/request.ts`** — add the code to the `Locale` type, the `locales` array, and a detection branch in `resolveLocale()`.
+3. **Update the search API** (`src/app/api/search/[service]/route.ts`) — extend locale resolution and add the TMDB language tag / Google Books `langRestrict` for the new language.
+4. **Add an entry to `LANGUAGES`** in `src/components/EditProfileModal.tsx` — `{ code, flag, label }`.
+
+No other files need to change.
+
+---
+
 ## Getting started
 
 ### Prerequisites

@@ -110,6 +110,43 @@ When `posterBase` in `ServiceConfig` is empty (`""`), the `poster_path` stored i
 
 No need to touch `AddItemModal`, `ListDetailClient` or the database: the system is plug-and-play once the service returns `ExternalResult[]`.
 
+# Internationalisation (i18n)
+
+The app uses **next-intl** for multi-language support. Locale is stored in the `NEXT_LOCALE` cookie (1-year expiry) and detected from `Accept-Language` on first visit. Default locale is `es`.
+
+## Active languages
+
+| Code | Language | File |
+|------|----------|------|
+| `es` | Español | `messages/es.json` |
+| `en` | English | `messages/en.json` |
+| `fr` | Français | `messages/fr.json` |
+| `it` | Italiano | `messages/it.json` |
+
+## How to add a new language
+
+1. **Create `messages/<code>.json`** — copy the structure from `messages/en.json` and translate every value. Do not change keys.
+
+2. **Update `i18n/request.ts`**:
+   - Add the code to the `Locale` union type
+   - Add the code to the `locales` array
+   - Add a detection branch in `resolveLocale()` (check cookie value + Accept-Language header)
+
+3. **Update the search API** (`src/app/api/search/[service]/route.ts`):
+   - Extend the `locale` resolution at the top of `GET` to recognise the new cookie value
+   - In `searchMovies` and `searchTV`: add a branch to map the code to a TMDB language tag (e.g. `"de"` → `"de-DE"`)
+   - In `searchBooks`: add a branch to pass the correct `langRestrict` value to Google Books
+
+4. **Add the option to the language dropdown** (`src/components/EditProfileModal.tsx`):
+   - Append `{ code: "<code>", flag: "🇩🇪", label: "Deutsch" }` to the `LANGUAGES` array at the top of the file
+
+That's it — no other files need to change.
+
+## Language switcher behaviour
+
+- Changing language in the dropdown only updates local state; **nothing is applied until the user presses Save**.
+- On save, if the locale changed, the cookie is written and `router.refresh()` is called so the UI updates without a full page reload and without closing the modal.
+
 # Database: RLS without recursion
 
 RLS policies must never create circular dependencies between tables. If a policy on table A references table B, table B cannot reference A in its own policy.
