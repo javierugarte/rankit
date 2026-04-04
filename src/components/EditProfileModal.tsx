@@ -184,51 +184,29 @@ export default function EditProfileModal({
             <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
               {t("language")}
             </label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleLocaleChange("en")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "en" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "en" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "en" ? "#c8a96e" : "#8888a0",
-                }}
-              >
-                🇬🇧 English
-              </button>
-              <button
-                onClick={() => handleLocaleChange("es")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "es" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "es" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "es" ? "#c8a96e" : "#8888a0",
-                }}
-              >
-                🇪🇸 Español
-              </button>
-              <button
-                onClick={() => handleLocaleChange("fr")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "fr" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "fr" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "fr" ? "#c8a96e" : "#8888a0",
-                }}
-              >
-                🇫🇷 Français
-              </button>
-              <button
-                onClick={() => handleLocaleChange("it")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "it" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "it" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "it" ? "#c8a96e" : "#8888a0",
-                }}
-              >
-                🇮🇹 Italiano
-              </button>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { code: "en", flag: "🇬🇧", label: "English" },
+                { code: "es", flag: "🇪🇸", label: "Español" },
+                { code: "fr", flag: "🇫🇷", label: "Français" },
+                { code: "it", flag: "🇮🇹", label: "Italiano" },
+              ] as const).map(({ code, flag, label }) => {
+                const active = currentLocale === code;
+                return (
+                  <button
+                    key={code}
+                    onClick={() => handleLocaleChange(code)}
+                    className="py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
+                    style={{
+                      backgroundColor: active ? "rgba(200,169,110,0.2)" : "transparent",
+                      border: active ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
+                      color: active ? "#c8a96e" : "#8888a0",
+                    }}
+                  >
+                    {flag} {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
