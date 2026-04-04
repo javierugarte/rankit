@@ -235,8 +235,8 @@ export default function EditProfileModal({
               {/* Dropdown */}
               {langOpen && (
                 <div
-                  className="absolute left-0 right-0 mt-1 rounded-xl border border-border overflow-hidden z-10"
-                  style={{ backgroundColor: "#1a1a26" }}
+                  className="absolute left-0 right-0 mt-1 rounded-xl border border-border overflow-y-auto z-10"
+                  style={{ backgroundColor: "#1a1a26", maxHeight: "12rem" }}
                 >
                   {LANGUAGES.map(({ code, flag, label }) => {
                     const active = selectedLocale === code;
