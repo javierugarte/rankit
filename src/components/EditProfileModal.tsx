@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Loader2, Camera, KeyRound } from "lucide-react";
+import { Loader2, Camera, KeyRound, ChevronDown, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+
+const LANGUAGES = [
+  { code: "en", flag: "🇬🇧", label: "English" },
+  { code: "es", flag: "🇪🇸", label: "Español" },
+  { code: "fr", flag: "🇫🇷", label: "Français" },
+  { code: "it", flag: "🇮🇹", label: "Italiano" },
+] as const;
 
 interface Props {
   userId: string;
@@ -30,9 +38,23 @@ export default function EditProfileModal({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [selectedLocale, setSelectedLocale] = useState(currentLocale);
+  const [langOpen, setLangOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const t = useTranslations("editProfile");
+  const router = useRouter();
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const displayAvatar = avatarPreview ?? currentAvatarUrl;
   const initials = (username || currentUsername).slice(0, 2).toUpperCase();
@@ -50,8 +72,8 @@ export default function EditProfileModal({
   }
 
   function handleLocaleChange(locale: string) {
-    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-    window.location.reload();
+    setSelectedLocale(locale);
+    setLangOpen(false);
   }
 
   async function handleSave() {
@@ -105,7 +127,15 @@ export default function EditProfileModal({
       return;
     }
 
+    if (selectedLocale !== currentLocale) {
+      document.cookie = `NEXT_LOCALE=${selectedLocale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    }
+
     onSaved(trimmed, newAvatarUrl);
+
+    if (selectedLocale !== currentLocale) {
+      router.refresh();
+    }
   }
 
   return (
@@ -180,44 +210,52 @@ export default function EditProfileModal({
           </div>
 
           {/* Language switcher */}
-          <div className="mb-5">
+          <div className="mb-5" ref={langRef}>
             <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
               {t("language")}
             </label>
-            <div className="flex gap-2">
+            <div className="relative">
+              {/* Trigger */}
               <button
-                onClick={() => handleLocaleChange("es")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "es" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "es" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "es" ? "#c8a96e" : "#8888a0",
-                }}
+                onClick={() => setLangOpen((o) => !o)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-surface text-sm text-text active:scale-[0.98] active:transition-none transition-all"
               >
-                🇪🇸 Español
+                <span className="flex items-center gap-2">
+                  <span>{LANGUAGES.find((l) => l.code === selectedLocale)?.flag}</span>
+                  <span>{LANGUAGES.find((l) => l.code === selectedLocale)?.label}</span>
+                </span>
+                <ChevronDown
+                  size={16}
+                  className="text-muted transition-transform duration-200"
+                  style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
               </button>
-              <button
-                onClick={() => handleLocaleChange("en")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "en" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "en" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "en" ? "#c8a96e" : "#8888a0",
-                }}
-              >
-                🇬🇧 English
-              </button>
-              <button
-                onClick={() => handleLocaleChange("fr")}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
-                style={{
-                  backgroundColor: currentLocale === "fr" ? "rgba(200,169,110,0.2)" : "transparent",
-                  border: currentLocale === "fr" ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
-                  color: currentLocale === "fr" ? "#c8a96e" : "#8888a0",
-                }}
-              >
-                🇫🇷 Français
-              </button>
+
+              {/* Dropdown */}
+              {langOpen && (
+                <div
+                  className="absolute left-0 right-0 mt-1 rounded-xl border border-border overflow-hidden z-10"
+                  style={{ backgroundColor: "#1a1a26" }}
+                >
+                  {LANGUAGES.map(({ code, flag, label }) => {
+                    const active = selectedLocale === code;
+                    return (
+                      <button
+                        key={code}
+                        onClick={() => handleLocaleChange(code)}
+                        className="w-full flex items-center justify-between px-4 py-3 text-sm transition-colors"
+                        style={{ color: active ? "#c8a96e" : "#8888a0" }}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>{flag}</span>
+                          <span>{label}</span>
+                        </span>
+                        {active && <Check size={14} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
