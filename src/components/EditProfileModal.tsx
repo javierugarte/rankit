@@ -184,26 +184,26 @@ export default function EditProfileModal({
             <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
               {t("language")}
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               {([
-                { code: "en", flag: "🇬🇧", label: "English" },
-                { code: "es", flag: "🇪🇸", label: "Español" },
-                { code: "fr", flag: "🇫🇷", label: "Français" },
-                { code: "it", flag: "🇮🇹", label: "Italiano" },
-              ] as const).map(({ code, flag, label }) => {
+                { code: "en", label: "English" },
+                { code: "es", label: "Español" },
+                { code: "fr", label: "Français" },
+                { code: "it", label: "Italiano" },
+              ] as const).map(({ code, label }) => {
                 const active = currentLocale === code;
                 return (
                   <button
                     key={code}
                     onClick={() => handleLocaleChange(code)}
-                    className="py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
+                    className="px-4 py-2 rounded-full text-sm font-medium transition-all active:scale-[0.97] active:transition-none"
                     style={{
                       backgroundColor: active ? "rgba(200,169,110,0.2)" : "transparent",
                       border: active ? "1px solid rgba(200,169,110,0.5)" : "1px solid #2a2a38",
                       color: active ? "#c8a96e" : "#8888a0",
                     }}
                   >
-                    {flag} {label}
+                    {label}
                   </button>
                 );
               })}
