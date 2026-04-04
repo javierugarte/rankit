@@ -122,6 +122,7 @@ The app uses **next-intl** for multi-language support. Locale is stored in the `
 | `en` | English | `messages/en.json` |
 | `fr` | Français | `messages/fr.json` |
 | `it` | Italiano | `messages/it.json` |
+| `pt-BR` | Português (Brasil) | `messages/pt-BR.json` |
 
 ## How to add a new language
 
@@ -137,14 +138,15 @@ The app uses **next-intl** for multi-language support. Locale is stored in the `
    - In `searchMovies` and `searchTV`: add a branch to map the code to a TMDB language tag (e.g. `"de"` → `"de-DE"`)
    - In `searchBooks`: add a branch to pass the correct `langRestrict` value to Google Books
 
-4. **Add the option to the language dropdown** (`src/components/EditProfileModal.tsx`):
+4. **Add the option to the language picker** (`src/components/EditProfileModal.tsx`):
    - Append `{ code: "<code>", flag: "🇩🇪", label: "Deutsch" }` to the `LANGUAGES` array at the top of the file
 
 That's it — no other files need to change.
 
 ## Language switcher behaviour
 
-- Changing language in the dropdown only updates local state; **nothing is applied until the user presses Save**.
+- The language field shows a button that opens a **centered modal picker** (z-[70], above the edit profile sheet). Tapping outside or the X closes it without applying changes.
+- Selecting a language only updates local state; **nothing is applied until the user presses Save**.
 - On save, if the locale changed, the cookie is written and `router.refresh()` is called so the UI updates without a full page reload and without closing the modal.
 
 # Database: RLS without recursion

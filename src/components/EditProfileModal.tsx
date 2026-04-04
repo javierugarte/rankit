@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Loader2, Camera, KeyRound, ChevronDown, Check } from "lucide-react";
+import { Loader2, Camera, KeyRound, ChevronDown, Check, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ const LANGUAGES = [
   { code: "es", flag: "🇪🇸", label: "Español" },
   { code: "fr", flag: "🇫🇷", label: "Français" },
   { code: "it", flag: "🇮🇹", label: "Italiano" },
+  { code: "pt-BR", flag: "🇧🇷", label: "Português (Brasil)" },
 ] as const;
 
 interface Props {
@@ -41,20 +42,9 @@ export default function EditProfileModal({
   const [selectedLocale, setSelectedLocale] = useState(currentLocale);
   const [langOpen, setLangOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const langRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const t = useTranslations("editProfile");
   const router = useRouter();
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) {
-        setLangOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const displayAvatar = avatarPreview ?? currentAvatarUrl;
   const initials = (username || currentUsername).slice(0, 2).toUpperCase();
@@ -210,54 +200,60 @@ export default function EditProfileModal({
           </div>
 
           {/* Language switcher */}
-          <div className="mb-5" ref={langRef}>
+          <div className="mb-5">
             <label className="text-xs text-muted uppercase tracking-wide mb-2 block">
               {t("language")}
             </label>
-            <div className="relative">
-              {/* Trigger */}
-              <button
-                onClick={() => setLangOpen((o) => !o)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-surface text-sm text-text active:scale-[0.98] active:transition-none transition-all"
-              >
-                <span className="flex items-center gap-2">
-                  <span>{LANGUAGES.find((l) => l.code === selectedLocale)?.flag}</span>
-                  <span>{LANGUAGES.find((l) => l.code === selectedLocale)?.label}</span>
-                </span>
-                <ChevronDown
-                  size={16}
-                  className="text-muted transition-transform duration-200"
-                  style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-                />
-              </button>
-
-              {/* Dropdown */}
-              {langOpen && (
-                <div
-                  className="absolute left-0 right-0 mt-1 rounded-xl border border-border overflow-hidden z-10"
-                  style={{ backgroundColor: "#1a1a26" }}
-                >
-                  {LANGUAGES.map(({ code, flag, label }) => {
-                    const active = selectedLocale === code;
-                    return (
-                      <button
-                        key={code}
-                        onClick={() => handleLocaleChange(code)}
-                        className="w-full flex items-center justify-between px-4 py-3 text-sm transition-colors"
-                        style={{ color: active ? "#c8a96e" : "#8888a0" }}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{flag}</span>
-                          <span>{label}</span>
-                        </span>
-                        {active && <Check size={14} />}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => setLangOpen(true)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-surface text-sm text-text active:scale-[0.98] active:transition-none transition-all"
+            >
+              <span className="flex items-center gap-2">
+                <span>{LANGUAGES.find((l) => l.code === selectedLocale)?.flag}</span>
+                <span>{LANGUAGES.find((l) => l.code === selectedLocale)?.label}</span>
+              </span>
+              <ChevronDown size={16} className="text-muted" />
+            </button>
           </div>
+
+          {/* Language picker modal */}
+          {langOpen && (
+            <div
+              className="fixed inset-0 z-[70] flex items-center justify-center px-6"
+              style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+              onClick={() => setLangOpen(false)}
+            >
+              <div
+                className="w-full max-w-xs rounded-2xl border border-border overflow-hidden"
+                style={{ backgroundColor: "#1a1a26" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <span className="text-sm font-medium text-text">{t("language")}</span>
+                  <button onClick={() => setLangOpen(false)} className="text-muted active:scale-90 active:transition-none transition-all">
+                    <X size={16} />
+                  </button>
+                </div>
+                {LANGUAGES.map(({ code, flag, label }) => {
+                  const active = selectedLocale === code;
+                  return (
+                    <button
+                      key={code}
+                      onClick={() => handleLocaleChange(code)}
+                      className="w-full flex items-center justify-between px-4 py-3.5 text-sm transition-colors"
+                      style={{ color: active ? "#c8a96e" : "#8888a0" }}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span>{flag}</span>
+                        <span>{label}</span>
+                      </span>
+                      {active && <Check size={14} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {error && <p className="text-red-400 text-xs mb-4">{error}</p>}
 
