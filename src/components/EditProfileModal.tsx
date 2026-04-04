@@ -72,10 +72,8 @@ export default function EditProfileModal({
   }
 
   function handleLocaleChange(locale: string) {
-    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
     setSelectedLocale(locale);
     setLangOpen(false);
-    router.refresh();
   }
 
   async function handleSave() {
@@ -129,7 +127,15 @@ export default function EditProfileModal({
       return;
     }
 
+    if (selectedLocale !== currentLocale) {
+      document.cookie = `NEXT_LOCALE=${selectedLocale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    }
+
     onSaved(trimmed, newAvatarUrl);
+
+    if (selectedLocale !== currentLocale) {
+      router.refresh();
+    }
   }
 
   return (
