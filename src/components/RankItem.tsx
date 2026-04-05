@@ -22,6 +22,7 @@ interface Props {
   onEdit: () => void;
   isFirst: boolean;
   listType?: string | null;
+  markDoneLabel?: string;
 }
 
 export default function RankItem({
@@ -34,6 +35,7 @@ export default function RankItem({
   onEdit,
   isFirst,
   listType,
+  markDoneLabel,
 }: Props) {
   const isLandscape = getService(listType)?.posterAspect === "landscape";
   return (
@@ -104,7 +106,7 @@ export default function RankItem({
             onClick={onMarkDone}
             className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-muted hover:text-text active:scale-90 active:transition-none"
             style={{ border: "1px solid #2a2a38" }}
-            title="Marcar como visto"
+            title={markDoneLabel}
           >
             <span className="text-xs">✓</span>
           </button>
