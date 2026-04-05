@@ -63,6 +63,24 @@ export default function ListDetailClient({
   const [votesByItem, setVotesByItem] = useState<Record<string, Record<string, number>>>(initialVotesByItem);
   const t = useTranslations("listDetail");
   const ts = useTranslations("sharing");
+
+  const doneTabLabel =
+    list.list_type === "movies" || list.list_type === "tv" ? t("doneWatched")
+    : list.list_type === "books" ? t("doneRead")
+    : list.list_type === "games" ? t("donePlayed")
+    : t("done");
+
+  const doneEmptyLabel =
+    list.list_type === "movies" || list.list_type === "tv" ? t("doneEmptyWatched")
+    : list.list_type === "books" ? t("doneEmptyRead")
+    : list.list_type === "games" ? t("doneEmptyPlayed")
+    : t("doneEmpty");
+
+  const markDoneLabel =
+    list.list_type === "movies" || list.list_type === "tv" ? t("markDoneWatched")
+    : list.list_type === "books" ? t("markDoneRead")
+    : list.list_type === "games" ? t("markDonePlayed")
+    : t("markDone");
   const tLeave = useTranslations("leaveList");
   const tDelete = useTranslations("deleteList");
   const tShareAnon = useTranslations("shareAnon");
@@ -417,7 +435,7 @@ export default function ListDetailClient({
             tab === "done" ? "bg-gold text-bg" : "text-muted hover:text-text"
           }`}
         >
-          {t("done")}
+          {doneTabLabel}
           {doneItems.length > 0 && (
             <span
               className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
@@ -480,6 +498,7 @@ export default function ListDetailClient({
                   onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
                   listType={list.list_type}
+                  markDoneLabel={markDoneLabel}
                 />
               ))}
             </div>
@@ -492,7 +511,7 @@ export default function ListDetailClient({
           {doneItems.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-3xl mb-3">📭</p>
-              <p className="text-muted">{t("doneEmpty")}</p>
+              <p className="text-muted">{doneEmptyLabel}</p>
             </div>
           ) : (
             <div className="space-y-4">

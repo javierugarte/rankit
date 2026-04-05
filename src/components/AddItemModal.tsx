@@ -45,6 +45,12 @@ export default function AddItemModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const t = useTranslations("addItem");
 
+  const markDoneLabel =
+    listType === "movies" || listType === "tv" ? t("markDoneWatched")
+    : listType === "books" ? t("markDoneRead")
+    : listType === "games" ? t("markDonePlayed")
+    : t("markDone");
+
   // Autocomplete state
   const service = getService(listType);
   const [results, setResults] = useState<ExternalResult[]>([]);
@@ -209,7 +215,7 @@ export default function AddItemModal({
                 type="button"
                 onClick={onMarkDone}
                 className="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-green-400 hover:bg-green-400/10 transition-colors"
-                title={t("markDone")}
+                title={markDoneLabel}
               >
                 <CheckCircle size={14} />
               </button>
