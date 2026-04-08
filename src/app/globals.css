@@ -5,8 +5,8 @@
   --color-surface: #111117;
   --color-surface-2: #1a1a24;
   --color-border: #2a2a38;
-  --color-gold: #c8a96e;
-  --color-gold-muted: rgba(200, 169, 110, 0.12);
+  --color-gold: #e05252;
+  --color-gold-muted: rgba(224, 82, 82, 0.12);
   --color-text: #f0f0f5;
   --color-muted: #8888a0;
   --font-brand: Georgia, "Times New Roman", serif;
@@ -37,7 +37,7 @@ a,
 }
 
 ::selection {
-  background-color: rgba(200, 169, 110, 0.3);
+  background-color: rgba(224, 82, 82, 0.3);
 }
 
 ::-webkit-scrollbar {

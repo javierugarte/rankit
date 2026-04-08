@@ -68,7 +68,7 @@ function ResetPasswordForm() {
       <div className="w-full max-w-sm text-center">
         <h1
           className="text-5xl font-bold mb-10"
-          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+          style={{ fontFamily: "Georgia, serif", color: "#e05252" }}
         >
           RankIt
         </h1>
@@ -90,7 +90,7 @@ function ResetPasswordForm() {
       <div className="w-full max-w-sm text-center">
         <h1
           className="text-5xl font-bold mb-10"
-          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+          style={{ fontFamily: "Georgia, serif", color: "#e05252" }}
         >
           RankIt
         </h1>
@@ -104,7 +104,7 @@ function ResetPasswordForm() {
       <div className="text-center mb-10">
         <h1
           className="text-5xl font-bold mb-2"
-          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+          style={{ fontFamily: "Georgia, serif", color: "#e05252" }}
         >
           RankIt
         </h1>

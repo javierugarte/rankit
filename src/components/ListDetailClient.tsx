@@ -372,9 +372,9 @@ export default function ListDetailClient({
             <button
               onClick={() => setShowAddModal(true)}
               className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95 active:transition-none"
-              style={{ backgroundColor: "rgba(200, 169, 110, 0.15)" }}
+              style={{ backgroundColor: "rgba(224, 82, 82, 0.15)" }}
             >
-              <Plus size={20} color="#c8a96e" />
+              <Plus size={20} color="#e05252" />
             </button>
           </div>
         </div>
@@ -384,8 +384,8 @@ export default function ListDetailClient({
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
             style={{
-              backgroundColor: "rgba(200, 169, 110, 0.12)",
-              border: "1px solid rgba(200, 169, 110, 0.2)",
+              backgroundColor: "rgba(224, 82, 82, 0.12)",
+              border: "1px solid rgba(224, 82, 82, 0.2)",
             }}
           >
             {listEmoji}
@@ -456,13 +456,13 @@ export default function ListDetailClient({
           className="mb-4 px-4 py-2.5 rounded-xl text-sm text-center"
           style={{
             backgroundColor: votedItemId
-              ? "rgba(200, 169, 110, 0.08)"
-              : "rgba(200, 169, 110, 0.15)",
-            color: votedItemId ? "#8888a0" : "#c8a96e",
+              ? "rgba(224, 82, 82, 0.08)"
+              : "rgba(224, 82, 82, 0.15)",
+            color: votedItemId ? "#8888a0" : "#e05252",
             border: `1px solid ${
               votedItemId
-                ? "rgba(200, 169, 110, 0.1)"
-                : "rgba(200, 169, 110, 0.3)"
+                ? "rgba(224, 82, 82, 0.1)"
+                : "rgba(224, 82, 82, 0.3)"
             }`,
           }}
         >
@@ -522,7 +522,7 @@ export default function ListDetailClient({
                 >
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-70 transition-opacity active:scale-90 active:transition-none"
-                    style={{ backgroundColor: "rgba(200, 169, 110, 0.2)" }}
+                    style={{ backgroundColor: "rgba(224, 82, 82, 0.2)" }}
                     onClick={() => handleUnmarkDone(item.id)}
                     title={t("markPending")}
                   >
@@ -556,7 +556,7 @@ export default function ListDetailClient({
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             className="text-xs mt-0.5 truncate inline-flex hover:underline"
-                            style={{ color: "#c8a96e" }}
+                            style={{ color: "#e05252" }}
                           >
                             {label}
                           </a>
@@ -647,7 +647,7 @@ export default function ListDetailClient({
               <div className="flex flex-col items-center text-center gap-3 mb-6">
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-                  style={{ backgroundColor: "rgba(200, 169, 110, 0.12)", border: "1px solid rgba(200, 169, 110, 0.2)" }}
+                  style={{ backgroundColor: "rgba(224, 82, 82, 0.12)", border: "1px solid rgba(224, 82, 82, 0.2)" }}
                 >
                   👥
                 </div>
@@ -665,7 +665,7 @@ export default function ListDetailClient({
                   router.push("/login?tab=signup");
                 }}
                 className="block w-full py-3 rounded-2xl text-center text-sm font-semibold transition-opacity active:opacity-70"
-                style={{ backgroundColor: "#c8a96e", color: "#1a1a1a" }}
+                style={{ backgroundColor: "#e05252", color: "#1a1a1a" }}
               >
                 {tShareAnon("createAccount")}
               </button>

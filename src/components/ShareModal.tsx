@@ -139,8 +139,8 @@ export default function ShareModal({
                       <div
                         className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                         style={{
-                          backgroundColor: "rgba(200, 169, 110, 0.2)",
-                          color: "#c8a96e",
+                          backgroundColor: "rgba(224, 82, 82, 0.2)",
+                          color: "#e05252",
                         }}
                       >
                         {m.username[0].toUpperCase()}
@@ -188,8 +188,8 @@ export default function ShareModal({
               disabled={searching || !email.trim()}
               className="px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity disabled:opacity-50 shrink-0"
               style={{
-                backgroundColor: "rgba(200, 169, 110, 0.15)",
-                color: "#c8a96e",
+                backgroundColor: "rgba(224, 82, 82, 0.15)",
+                color: "#e05252",
               }}
             >
               {searching ? (
@@ -202,7 +202,7 @@ export default function ShareModal({
 
           {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
           {success && (
-            <p className="text-xs mt-2" style={{ color: "#c8a96e" }}>
+            <p className="text-xs mt-2" style={{ color: "#e05252" }}>
               ✓ {success}
             </p>
           )}
@@ -212,16 +212,16 @@ export default function ShareModal({
             <div
               className="mt-3 flex items-center justify-between py-2 px-3 rounded-xl border"
               style={{
-                backgroundColor: "rgba(200, 169, 110, 0.06)",
-                borderColor: "rgba(200, 169, 110, 0.3)",
+                backgroundColor: "rgba(224, 82, 82, 0.06)",
+                borderColor: "rgba(224, 82, 82, 0.3)",
               }}
             >
               <div className="flex items-center gap-2">
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
-                    backgroundColor: "rgba(200, 169, 110, 0.2)",
-                    color: "#c8a96e",
+                    backgroundColor: "rgba(224, 82, 82, 0.2)",
+                    color: "#e05252",
                   }}
                 >
                   {foundUser.username[0].toUpperCase()}
@@ -233,8 +233,8 @@ export default function ShareModal({
                 disabled={adding}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity disabled:opacity-50"
                 style={{
-                  backgroundColor: "rgba(200, 169, 110, 0.2)",
-                  color: "#c8a96e",
+                  backgroundColor: "rgba(224, 82, 82, 0.2)",
+                  color: "#e05252",
                 }}
               >
                 {adding ? (

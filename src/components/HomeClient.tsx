@@ -250,7 +250,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
         <div>
           <h1
             className="text-3xl font-bold"
-            style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+            style={{ fontFamily: "Georgia, serif", color: "#e05252" }}
           >
             RankIt
           </h1>
@@ -265,7 +265,7 @@ export default function HomeClient({ lists, sharingMap, totalVotesMap: initialTo
                 ? "text-bg"
                 : "bg-surface border border-border text-muted hover:text-text"
             }`}
-            style={sortMode ? { backgroundColor: "#c8a96e" } : {}}
+            style={sortMode ? { backgroundColor: "#e05252" } : {}}
             aria-label={sortMode ? t("confirmOrder") : t("reorder")}
           >
             {sortMode ? <Check size={18} /> : <ArrowUpDown size={16} />}

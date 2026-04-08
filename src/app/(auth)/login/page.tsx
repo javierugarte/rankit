@@ -105,7 +105,7 @@ export default function LoginPage() {
       <div className="text-center mb-10">
         <h1
           className="text-5xl font-bold mb-2"
-          style={{ fontFamily: "Georgia, serif", color: "#c8a96e" }}
+          style={{ fontFamily: "Georgia, serif", color: "#e05252" }}
         >
           RankIt
         </h1>
@@ -230,9 +230,9 @@ export default function LoginPage() {
           <div
             className="rounded-xl px-4 py-3 text-sm"
             style={{
-              backgroundColor: "rgba(200, 169, 110, 0.1)",
-              border: "1px solid rgba(200, 169, 110, 0.2)",
-              color: "#c8a96e",
+              backgroundColor: "rgba(224, 82, 82, 0.1)",
+              border: "1px solid rgba(224, 82, 82, 0.2)",
+              color: "#e05252",
             }}
           >
             {message}

@@ -151,7 +151,7 @@ export default function EditProfileModal({
             >
               <div
                 className="absolute inset-0 flex items-center justify-center text-2xl font-bold"
-                style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
+                style={{ backgroundColor: "#e05252", color: "#0a0a0f" }}
               >
                 {initials}
               </div>
@@ -241,7 +241,7 @@ export default function EditProfileModal({
                       key={code}
                       onClick={() => handleLocaleChange(code)}
                       className="w-full flex items-center justify-between px-4 py-3.5 text-sm transition-colors"
-                      style={{ color: active ? "#c8a96e" : "#8888a0" }}
+                      style={{ color: active ? "#e05252" : "#8888a0" }}
                     >
                       <span className="flex items-center gap-3">
                         <span>{flag}</span>
@@ -281,7 +281,7 @@ export default function EditProfileModal({
               onClick={handleSave}
               disabled={saving}
               className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.97] active:transition-none"
-              style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
+              style={{ backgroundColor: "#e05252", color: "#0a0a0f" }}
             >
               {saving ? (
                 <Loader2 size={16} className="animate-spin" />

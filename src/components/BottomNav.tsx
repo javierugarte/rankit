@@ -39,8 +39,8 @@ export default function BottomNav() {
           <div
             className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95"
             style={{
-              backgroundColor: "#c8a96e",
-              boxShadow: "0 0 20px rgba(200, 169, 110, 0.4)",
+              backgroundColor: "#e05252",
+              boxShadow: "0 0 20px rgba(224, 82, 82, 0.4)",
             }}
           >
             <Plus size={26} strokeWidth={2.5} color="#0a0a0f" />

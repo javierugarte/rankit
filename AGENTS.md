@@ -7,7 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Project structure
 
-Next.js App Router with Supabase as backend. Mobile-first app with dark design and golden accent (`#c8a96e`).
+Next.js App Router with Supabase as backend. Mobile-first app with dark design and red accent (`#e05252`).
 
 ```
 src/

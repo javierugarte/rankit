@@ -73,7 +73,7 @@ export default function TabShell({ homeProps, profileProps, listDetails, isAnony
   return (
     <div className="flex flex-col min-h-full bg-bg" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       {isAnonymous && (
-        <div className="text-center py-2 px-4 text-xs" style={{ backgroundColor: "rgba(200,169,110,0.1)", borderBottom: "1px solid rgba(200,169,110,0.2)", color: "#c8a96e" }}>
+        <div className="text-center py-2 px-4 text-xs" style={{ backgroundColor: "rgba(224,82,82,0.1)", borderBottom: "1px solid rgba(224,82,82,0.2)", color: "#e05252" }}>
           {t("banner")}{" "}
           <button onClick={handleCreateAccount} className="underline font-medium">{t("createAccount")}</button>
         </div>

@@ -82,7 +82,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
               <button
                 onClick={onClose}
                 className="w-full py-3 rounded-xl text-sm font-semibold"
-                style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
+                style={{ backgroundColor: "#e05252", color: "#0a0a0f" }}
               >
                 {t("close")}
               </button>
@@ -145,7 +145,7 @@ export default function ChangePasswordModal({ email, onClose }: Props) {
                   onClick={handleSave}
                   disabled={saving}
                   className="flex-1 py-3 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.97] active:transition-none"
-                  style={{ backgroundColor: "#c8a96e", color: "#0a0a0f" }}
+                  style={{ backgroundColor: "#e05252", color: "#0a0a0f" }}
                 >
                   {saving ? <Loader2 size={16} className="animate-spin" /> : t("save")}
                 </button>

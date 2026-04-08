@@ -261,8 +261,8 @@ export default function AddItemModal({
               <div
                 className="flex items-center gap-3 p-3 rounded-xl border"
                 style={{
-                  backgroundColor: "rgba(200, 169, 110, 0.08)",
-                  borderColor: "rgba(200, 169, 110, 0.3)",
+                  backgroundColor: "rgba(224, 82, 82, 0.08)",
+                  borderColor: "rgba(224, 82, 82, 0.3)",
                 }}
               >
                 {selectedResult.poster_path && (
@@ -396,7 +396,7 @@ export default function AddItemModal({
               type="submit"
               disabled={loading || !title.trim()}
               className="flex-1 py-3 rounded-xl text-bg text-sm font-semibold transition-opacity disabled:opacity-50"
-              style={{ backgroundColor: "#c8a96e" }}
+              style={{ backgroundColor: "#e05252" }}
             >
               {loading
                 ? editItem

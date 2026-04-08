@@ -6,18 +6,18 @@
       <stop offset="100%" style="stop-color:#0a0a0f"/>
     </linearGradient>
 
-    <!-- Gold gradient for bars -->
-    <linearGradient id="goldBar1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#e8c97e"/>
-      <stop offset="100%" style="stop-color:#c8a96e"/>
+    <!-- Red gradient for bars -->
+    <linearGradient id="redBar1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f07878"/>
+      <stop offset="100%" style="stop-color:#e05252"/>
     </linearGradient>
-    <linearGradient id="goldBar2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#c8a96e"/>
-      <stop offset="100%" style="stop-color:#a88a50"/>
+    <linearGradient id="redBar2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e05252"/>
+      <stop offset="100%" style="stop-color:#c03030"/>
     </linearGradient>
-    <linearGradient id="goldBar3" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#8a6e40"/>
-      <stop offset="100%" style="stop-color:#6a5030"/>
+    <linearGradient id="redBar3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a02020"/>
+      <stop offset="100%" style="stop-color:#802010"/>
     </linearGradient>
 
     <!-- Glow filter for #1 bar -->
@@ -49,42 +49,42 @@
 
   <!-- Subtle grid texture -->
   <g clip-path="url(#iconShape)" opacity="0.04">
-    <line x1="0" y1="256" x2="1024" y2="256" stroke="#c8a96e" stroke-width="1"/>
-    <line x1="0" y1="512" x2="1024" y2="512" stroke="#c8a96e" stroke-width="1"/>
-    <line x1="0" y1="768" x2="1024" y2="768" stroke="#c8a96e" stroke-width="1"/>
-    <line x1="256" y1="0" x2="256" y2="1024" stroke="#c8a96e" stroke-width="1"/>
-    <line x1="512" y1="0" x2="512" y2="1024" stroke="#c8a96e" stroke-width="1"/>
-    <line x1="768" y1="0" x2="768" y2="1024" stroke="#c8a96e" stroke-width="1"/>
+    <line x1="0" y1="256" x2="1024" y2="256" stroke="#e05252" stroke-width="1"/>
+    <line x1="0" y1="512" x2="1024" y2="512" stroke="#e05252" stroke-width="1"/>
+    <line x1="0" y1="768" x2="1024" y2="768" stroke="#e05252" stroke-width="1"/>
+    <line x1="256" y1="0" x2="256" y2="1024" stroke="#e05252" stroke-width="1"/>
+    <line x1="512" y1="0" x2="512" y2="1024" stroke="#e05252" stroke-width="1"/>
+    <line x1="768" y1="0" x2="768" y2="1024" stroke="#e05252" stroke-width="1"/>
   </g>
 
   <!-- Glow halo behind bar #1 -->
-  <ellipse cx="512" cy="560" rx="120" ry="260" fill="#c8a96e" opacity="0.08" filter="url(#glow)"/>
+  <ellipse cx="512" cy="560" rx="120" ry="260" fill="#e05252" opacity="0.08" filter="url(#glow)"/>
 
   <!-- === RANKING BARS === -->
   <!-- Bar #2 — left, shorter, dimmer -->
-  <rect x="238" y="460" width="148" height="300" rx="22" ry="22" fill="url(#goldBar3)"/>
+  <rect x="238" y="460" width="148" height="300" rx="22" ry="22" fill="url(#redBar3)"/>
   <!-- #2 top accent line -->
-  <rect x="238" y="460" width="148" height="5" rx="2" fill="#8a6e40" opacity="0.6"/>
+  <rect x="238" y="460" width="148" height="5" rx="2" fill="#a02020" opacity="0.6"/>
 
-  <!-- Bar #1 — center, tallest, golden, glowing -->
-  <rect x="438" y="280" width="148" height="480" rx="22" ry="22" fill="url(#goldBar1)" filter="url(#glow)"/>
-  <!-- #1 top accent line — bright gold -->
-  <rect x="438" y="280" width="148" height="6" rx="3" fill="#f0d898"/>
+  <!-- Bar #1 — center, tallest, red, glowing -->
+  <rect x="438" y="280" width="148" height="480" rx="22" ry="22" fill="url(#redBar1)" filter="url(#glow)"/>
+  <!-- #1 top accent line — bright red -->
+  <rect x="438" y="280" width="148" height="6" rx="3" fill="#f8a0a0"/>
 
   <!-- Bar #3 — right, shortest, most dim -->
-  <rect x="638" y="560" width="148" height="200" rx="22" ry="22" fill="url(#goldBar3)" opacity="0.7"/>
+  <rect x="638" y="560" width="148" height="200" rx="22" ry="22" fill="url(#redBar3)" opacity="0.7"/>
   <!-- #3 top accent line -->
-  <rect x="638" y="560" width="148" height="5" rx="2" fill="#6a5030" opacity="0.5"/>
+  <rect x="638" y="560" width="148" height="5" rx="2" fill="#802010" opacity="0.5"/>
 
   <!-- === VOTE DOT on bar #1 === -->
   <!-- Pulsing halo -->
-  <circle cx="512" cy="340" r="30" fill="#c8a96e" opacity="0.25" filter="url(#dotGlow)"/>
+  <circle cx="512" cy="340" r="30" fill="#e05252" opacity="0.25" filter="url(#dotGlow)"/>
   <!-- Solid dot -->
-  <circle cx="512" cy="340" r="14" fill="#f0d898" filter="url(#dotGlow)"/>
+  <circle cx="512" cy="340" r="14" fill="#f8a0a0" filter="url(#dotGlow)"/>
 
   <!-- Bottom floor line -->
-  <rect x="190" y="762" width="644" height="4" rx="2" fill="#c8a96e" opacity="0.15"/>
+  <rect x="190" y="762" width="644" height="4" rx="2" fill="#e05252" opacity="0.15"/>
 
-  <!-- Thin gold border on icon -->
-  <rect width="1024" height="1024" rx="230" ry="230" fill="none" stroke="#c8a96e" stroke-width="6" opacity="0.18"/>
+  <!-- Thin red border on icon -->
+  <rect width="1024" height="1024" rx="230" ry="230" fill="none" stroke="#e05252" stroke-width="6" opacity="0.18"/>
 </svg>

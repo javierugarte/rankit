@@ -141,11 +141,11 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                   style={{
                     backgroundColor:
                       emoji === e && !showCustomInput
-                        ? "rgba(200, 169, 110, 0.2)"
+                        ? "rgba(224, 82, 82, 0.2)"
                         : "#111117",
                     border:
                       emoji === e && !showCustomInput
-                        ? "1px solid rgba(200, 169, 110, 0.5)"
+                        ? "1px solid rgba(224, 82, 82, 0.5)"
                         : "1px solid #2a2a38",
                   }}
                 >
@@ -163,17 +163,17 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                 className="w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all"
                 style={{
                   backgroundColor: showCustomInput
-                    ? "rgba(200, 169, 110, 0.2)"
+                    ? "rgba(224, 82, 82, 0.2)"
                     : "#111117",
                   border: showCustomInput
-                    ? "1px solid rgba(200, 169, 110, 0.5)"
+                    ? "1px solid rgba(224, 82, 82, 0.5)"
                     : "1px solid #2a2a38",
                 }}
               >
                 {showCustomInput && isValidEmoji(customValue) ? (
                   <span>{customValue}</span>
                 ) : (
-                  <Plus size={16} color={showCustomInput ? "#c8a96e" : "#8888a0"} />
+                  <Plus size={16} color={showCustomInput ? "#e05252" : "#8888a0"} />
                 )}
               </button>
             </div>
@@ -203,7 +203,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                     borderColor: customError
                       ? "#ef4444"
                       : isValidEmoji(customValue)
-                      ? "rgba(200, 169, 110, 0.5)"
+                      ? "rgba(224, 82, 82, 0.5)"
                       : "#2a2a38",
                   }}
                 />
@@ -247,13 +247,13 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
                   style={{
                     backgroundColor:
                       listType === opt.value
-                        ? "rgba(200, 169, 110, 0.15)"
+                        ? "rgba(224, 82, 82, 0.15)"
                         : "#111117",
                     borderColor:
                       listType === opt.value
-                        ? "rgba(200, 169, 110, 0.5)"
+                        ? "rgba(224, 82, 82, 0.5)"
                         : "#2a2a38",
-                    color: listType === opt.value ? "#c8a96e" : "#8888a0",
+                    color: listType === opt.value ? "#e05252" : "#8888a0",
                   }}
                 >
                   {opt.emoji !== "—" && <span className="mr-1">{opt.emoji}</span>}
@@ -296,7 +296,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
               type="submit"
               disabled={loading || !name.trim()}
               className="flex-1 py-3 rounded-xl text-bg text-sm font-semibold transition-opacity disabled:opacity-50"
-              style={{ backgroundColor: "#c8a96e" }}
+              style={{ backgroundColor: "#e05252" }}
             >
               {loading
                 ? editList ? t("saving") : t("creating")

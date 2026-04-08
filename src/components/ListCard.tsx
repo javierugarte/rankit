@@ -36,7 +36,7 @@ export default function ListCard({
           {/* Emoji */}
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-            style={{ backgroundColor: "rgba(200, 169, 110, 0.1)" }}
+            style={{ backgroundColor: "rgba(224, 82, 82, 0.1)" }}
           >
             {list.emoji}
           </div>

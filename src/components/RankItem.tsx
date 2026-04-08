@@ -42,9 +42,9 @@ export default function RankItem({
     <div
       className="rounded-2xl p-4 flex items-center gap-4 transition-all"
       style={{
-        backgroundColor: isFirst ? "rgba(200, 169, 110, 0.08)" : "#111117",
+        backgroundColor: isFirst ? "rgba(224, 82, 82, 0.08)" : "#111117",
         border: isFirst
-          ? "1px solid rgba(200, 169, 110, 0.3)"
+          ? "1px solid rgba(224, 82, 82, 0.3)"
           : "1px solid #2a2a38",
       }}
     >
@@ -55,7 +55,7 @@ export default function RankItem({
         ) : (
           <span
             className="text-sm font-bold"
-            style={{ color: rank <= 3 ? "#c8a96e" : "#8888a0" }}
+            style={{ color: rank <= 3 ? "#e05252" : "#8888a0" }}
           >
             #{rank}
           </span>
@@ -88,7 +88,7 @@ export default function RankItem({
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               className="text-xs mt-0.5 truncate inline-flex hover:underline"
-              style={{ color: "#c8a96e" }}
+              style={{ color: "#e05252" }}
             >
               {parsed.label}
             </a>
@@ -119,24 +119,24 @@ export default function RankItem({
           className="w-10 rounded-xl flex flex-col items-center justify-center gap-0.5 py-2 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
             backgroundColor: isVoted
-              ? "#c8a96e"
+              ? "#e05252"
               : canVote
-              ? "rgba(200, 169, 110, 0.15)"
-              : "rgba(200, 169, 110, 0.05)",
+              ? "rgba(224, 82, 82, 0.15)"
+              : "rgba(224, 82, 82, 0.05)",
             border: isVoted
               ? "none"
-              : "1px solid rgba(200, 169, 110, 0.3)",
+              : "1px solid rgba(224, 82, 82, 0.3)",
           }}
         >
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
             <path
               d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.2l-3.7 2.1.7-4.1-3-2.9 4.2-.7L7 1z"
-              fill={isVoted ? "#0a0a0f" : "#c8a96e"}
+              fill={isVoted ? "#0a0a0f" : "#e05252"}
             />
           </svg>
           <span
             className="text-[11px] font-semibold leading-none"
-            style={{ color: isVoted ? "#0a0a0f" : "#c8a96e" }}
+            style={{ color: isVoted ? "#0a0a0f" : "#e05252" }}
           >
             {item.total_votes}
           </span>
