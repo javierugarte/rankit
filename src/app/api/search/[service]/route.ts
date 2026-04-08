@@ -38,6 +38,9 @@ export async function GET(
   const cookieLocale = req.cookies.get("NEXT_LOCALE")?.value;
   const locale = cookieLocale === "en" ? "en" : cookieLocale === "fr" ? "fr" : cookieLocale === "it" ? "it" : "es";
 
+  if (service === "books") return searchBooks(q.trim(), locale);
+  if (service === "albums") return searchAlbums(q.trim());
+
   const apiKey = process.env.TMDB_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "TMDB_API_KEY not configured" }, { status: 500 });
@@ -45,7 +48,6 @@ export async function GET(
 
   if (service === "movies") return searchMovies(q.trim(), apiKey, locale);
   if (service === "tv") return searchTV(q.trim(), apiKey, locale);
-  if (service === "books") return searchBooks(q.trim(), locale);
   if (service === "games") return searchGames(q.trim(), process.env.RAWG_API_KEY ?? "");
 
   return NextResponse.json({ error: "Unknown service" }, { status: 400 });
@@ -142,6 +144,42 @@ async function searchGames(query: string, apiKey: string): Promise<NextResponse>
         year: ((r.released as string)?.slice(0, 4) ?? null),
         genre: genres.length > 0 ? genres[0].name : null,
         poster_path: (r.background_image as string | null) ?? null,
+        overview: null,
+      };
+    });
+
+  return NextResponse.json(results);
+}
+
+async function searchAlbums(query: string): Promise<NextResponse> {
+  const url = `https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(query)}&fmt=json&limit=7`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      next: { revalidate: 60 },
+      headers: { "User-Agent": "rankit/1.0 (https://github.com/javierugarte/rankit)" },
+    });
+  } catch {
+    return NextResponse.json({ error: "Network error" }, { status: 502 });
+  }
+
+  if (!res.ok) return NextResponse.json({ error: "MusicBrainz error" }, { status: 502 });
+
+  const data = await res.json();
+
+  const results: ExternalResult[] = (data.releases ?? [])
+    .slice(0, 7)
+    .map((r: Record<string, unknown>) => {
+      const artistCredits = (r["artist-credit"] as { name?: string; artist?: { name: string } }[] | undefined) ?? [];
+      const artist = artistCredits[0]?.name ?? artistCredits[0]?.artist?.name ?? null;
+      const mbid = r.id as string;
+      return {
+        external_id: mbid,
+        title: (r.title ?? "") as string,
+        year: ((r.date as string)?.slice(0, 4) ?? null),
+        genre: artist,
+        poster_path: mbid ? `https://coverartarchive.org/release/${mbid}/front` : null,
         overview: null,
       };
     });
