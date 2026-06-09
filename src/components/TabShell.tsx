@@ -41,7 +41,7 @@ interface ListDetail {
   initialMembers: MemberWithProfile[];
   ownerUsername: string | null;
   allParticipants: MemberWithProfile[];
-  initialVotesByItem: Record<string, Record<string, number>>;
+  initialVotes: { item_id: string; user_id: string; voted_date: string }[];
 }
 
 interface Props {

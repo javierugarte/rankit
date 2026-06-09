@@ -83,8 +83,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       ? supabase.from("items").select("*", { count: "exact", head: true }).eq("completed", true).in("list_id", ownedListIds)
       : Promise.resolve({ count: 0 }),
     listIds.length > 0
-      ? supabase.from("votes").select("item_id, user_id").in("list_id", listIds)
-      : Promise.resolve({ data: [] as { item_id: string; user_id: string }[] }),
+      ? supabase.from("votes").select("item_id, user_id, voted_date").in("list_id", listIds)
+      : Promise.resolve({ data: [] as { item_id: string; user_id: string; voted_date: string }[] }),
   ]);
 
   // ── Build home data ─────────────────────────────────────────────────────────
@@ -120,11 +120,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     }
   }
 
-  // Build votesByItem: item_id → user_id → count
-  const votesByItem: Record<string, Record<string, number>> = {};
-  for (const vote of (allVotesResult.data ?? []) as { item_id: string; user_id: string }[]) {
-    if (!votesByItem[vote.item_id]) votesByItem[vote.item_id] = {};
-    votesByItem[vote.item_id][vote.user_id] = (votesByItem[vote.item_id][vote.user_id] ?? 0) + 1;
+  const votesByList: Record<string, { item_id: string; user_id: string; voted_date: string }[]> = {};
+  const itemListIdMap = new Map(
+    (allItemsResult.data ?? []).map((item) => [item.id, item.list_id])
+  );
+  for (const vote of (allVotesResult.data ?? []) as { item_id: string; user_id: string; voted_date: string }[]) {
+    const voteListId = itemListIdMap.get(vote.item_id);
+    if (!voteListId) continue;
+    if (!votesByList[voteListId]) votesByList[voteListId] = [];
+    votesByList[voteListId].push(vote);
   }
 
   // Build allParticipantsByList: list_id → all participants (owner + members)
@@ -177,10 +181,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const listDetails = allLists.map((list) => {
     const isOwner = list.owner_id === user.id;
     const items = itemsByList[list.id] ?? [];
-    const initialVotesByItem: Record<string, Record<string, number>> = {};
-    for (const item of items) {
-      initialVotesByItem[item.id] = votesByItem[item.id] ?? {};
-    }
     return {
       list,
       initialItems: items,
@@ -190,7 +190,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       initialMembers: isOwner ? (membersByList[list.id] ?? []) : [],
       ownerUsername: isOwner ? null : (ownerUsernameMap[list.id] ?? null),
       allParticipants: allParticipantsByList[list.id] ?? [currentUserProfile],
-      initialVotesByItem,
+      initialVotes: votesByList[list.id] ?? [],
     };
   });
 
