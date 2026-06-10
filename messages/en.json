@@ -43,6 +43,7 @@
     "votedBanner": "✓ Already voted today · Come back in {time}",
     "editList": "Edit list",
     "shareList": "Share list",
+    "voteHistory": "Vote history",
     "leaveList": "Leave list",
     "markDone": "Mark as done",
     "markDoneWatched": "Mark as watched",
@@ -224,5 +225,13 @@
     "vote": "vote",
     "votes": "votes",
     "you": "You"
+  },
+  "voteHistory": {
+    "title": "Vote history",
+    "close": "Close",
+    "empty": "No votes have been cast on this list yet.",
+    "votedFor": "voted for",
+    "unknownUser": "Someone",
+    "unknownItem": "a deleted item"
   }
 }

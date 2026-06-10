@@ -43,6 +43,7 @@
     "votedBanner": "✓ Déjà voté aujourd'hui · Revenez dans {time}",
     "editList": "Modifier la liste",
     "shareList": "Partager la liste",
+    "voteHistory": "Historique des votes",
     "leaveList": "Quitter la liste",
     "markDone": "Marquer comme fait",
     "markDoneWatched": "Marquer comme vu",
@@ -224,5 +225,13 @@
     "vote": "vote",
     "votes": "votes",
     "you": "Vous"
+  },
+  "voteHistory": {
+    "title": "Historique des votes",
+    "close": "Fermer",
+    "empty": "Aucun vote n’a encore été exprimé dans cette liste.",
+    "votedFor": "a voté pour",
+    "unknownUser": "Quelqu’un",
+    "unknownItem": "un élément supprimé"
   }
 }

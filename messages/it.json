@@ -43,6 +43,7 @@
     "votedBanner": "✓ Hai già votato oggi · Torna tra {time}",
     "editList": "Modifica lista",
     "shareList": "Condividi lista",
+    "voteHistory": "Cronologia voti",
     "leaveList": "Abbandona la lista",
     "markDone": "Segna come fatto",
     "markDoneWatched": "Segna come visto",
@@ -224,5 +225,13 @@
     "vote": "voto",
     "votes": "voti",
     "you": "Tu"
+  },
+  "voteHistory": {
+    "title": "Cronologia voti",
+    "close": "Chiudi",
+    "empty": "Non ci sono ancora voti in questa lista.",
+    "votedFor": "ha votato per",
+    "unknownUser": "Qualcuno",
+    "unknownItem": "un elemento eliminato"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
+import { ArrowLeft, CalendarDays, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -13,6 +13,7 @@ import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
 import CreateListModal from "./CreateListModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import VoteHistoryModal, { type ListVote } from "./VoteHistoryModal";
 
 function localToday() {
   const d = new Date();
@@ -29,7 +30,7 @@ interface Props {
   initialMembers: MemberWithProfile[];
   ownerUsername?: string | null;
   allParticipants: MemberWithProfile[];
-  initialVotesByItem: Record<string, Record<string, number>>;
+  initialVotes: ListVote[];
 }
 
 export default function ListDetailClient({
@@ -42,7 +43,7 @@ export default function ListDetailClient({
   ownerUsername,
   initialMembers,
   allParticipants,
-  initialVotesByItem,
+  initialVotes,
 }: Props) {
   const [tab, setTab] = useState<"pending" | "done">("pending");
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -57,10 +58,11 @@ export default function ListDetailClient({
   const [showShareModal, setShowShareModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showVoteHistory, setShowVoteHistory] = useState(false);
   const [voting, setVoting] = useState(false);
   const [timeUntilMidnight, setTimeUntilMidnight] = useState("");
   const [members, setMembers] = useState<MemberWithProfile[]>(initialMembers);
-  const [votesByItem, setVotesByItem] = useState<Record<string, Record<string, number>>>(initialVotesByItem);
+  const [votes, setVotes] = useState<ListVote[]>(initialVotes);
   const t = useTranslations("listDetail");
   const ts = useTranslations("sharing");
 
@@ -125,6 +127,16 @@ export default function ListDetailClient({
         new Date(a.completed_at ?? 0).getTime()
     );
 
+  const votesByItem = votes.reduce<Record<string, Record<string, number>>>(
+    (result, vote) => {
+      if (!result[vote.item_id]) result[vote.item_id] = {};
+      result[vote.item_id][vote.user_id] =
+        (result[vote.item_id][vote.user_id] ?? 0) + 1;
+      return result;
+    },
+    {}
+  );
+
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
@@ -159,6 +171,25 @@ export default function ListDetailClient({
           }
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "votes",
+          filter: `list_id=eq.${list.id}`,
+        },
+        async () => {
+          const { data } = await supabase
+            .from("votes")
+            .select("item_id, user_id, voted_date")
+            .eq("list_id", list.id);
+
+          if (!data) return;
+
+          setVotes(data);
+        }
+      )
       .subscribe();
 
     return () => {
@@ -191,25 +222,21 @@ export default function ListDetailClient({
         return i;
       })
     );
-    setVotesByItem((prev) => {
-      const next = { ...prev };
-      if (prevVotedItemId) {
-        const prevCount = next[prevVotedItemId]?.[userId] ?? 0;
-        next[prevVotedItemId] = { ...(next[prevVotedItemId] ?? {}), [userId]: Math.max(0, prevCount - 1) };
-      }
-      if (!isRevoke) {
-        const newCount = next[itemId]?.[userId] ?? 0;
-        next[itemId] = { ...(next[itemId] ?? {}), [userId]: newCount + 1 };
-      }
-      return next;
+    setVotes((previousVotes) => {
+      const withoutTodayVote = previousVotes.filter(
+        (vote) => !(vote.user_id === userId && vote.voted_date === today)
+      );
+      return isRevoke
+        ? withoutTodayVote
+        : [...withoutTodayVote, { item_id: itemId, user_id: userId, voted_date: today }];
     });
     setVotedItemId(isRevoke ? null : itemId);
 
     // Revert helper
-    const prevVotesByItem = votesByItem;
+    const previousVotes = votes;
     const revert = (restoreVotedId: string | null) => {
       setItems(prevItems);
-      setVotesByItem(prevVotesByItem);
+      setVotes(previousVotes);
       setVotedItemId(restoreVotedId);
       setVoting(false);
     };
@@ -342,6 +369,14 @@ export default function ListDetailClient({
           </button>
 
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => setShowVoteHistory(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
+              aria-label={t("voteHistory")}
+              title={t("voteHistory")}
+            >
+              <CalendarDays size={17} />
+            </button>
             {isOwner && (
               <>
                 <button
@@ -627,6 +662,15 @@ export default function ListDetailClient({
           participants={allParticipants}
           votesByUser={votesByItem[editingItem.id] ?? {}}
           currentUserId={userId}
+        />
+      )}
+
+      {showVoteHistory && (
+        <VoteHistoryModal
+          votes={votes}
+          items={items}
+          participants={allParticipants}
+          onClose={() => setShowVoteHistory(false)}
         />
       )}
 
