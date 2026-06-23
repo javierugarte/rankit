@@ -1,4 +1,4 @@
-export type ServiceId = "movies" | "tv" | "books" | "games";
+export type ServiceId = "movies" | "tv" | "books" | "games" | "albums";
 
 export interface ExternalResult {
   external_id: string;
@@ -56,6 +56,15 @@ export const SERVICES: Record<ServiceId, ServiceConfig> = {
     posterBase: "",
     posterAspect: "landscape",
   },
+  albums: {
+    id: "albums",
+    label: "Álbumes",
+    apiLabel: "MusicBrainz",
+    searchEndpoint: "/api/search/albums",
+    placeholder: "Buscar álbum...",
+    posterBase: "",
+    posterAspect: "portrait",
+  },
 };
 
 export function getService(listType: string | null | undefined): ServiceConfig | null {
@@ -69,6 +78,7 @@ export const LIST_TYPE_OPTIONS: { value: string | null; label: string; emoji: st
   { value: "tv", label: "Series", emoji: "📺" },
   { value: "books", label: "Libros", emoji: "📚" },
   { value: "games", label: "Videojuegos", emoji: "🎮" },
+  { value: "albums", label: "Álbumes", emoji: "🎵" },
 ];
 
 export const TMDB_POSTER_BASE = "https://image.tmdb.org/t/p/w185";
