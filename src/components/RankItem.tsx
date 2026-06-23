@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Item } from "@/lib/supabase/types";
 import { TMDB_POSTER_BASE, getService } from "@/lib/services";
+import OgImage from "./OgImage";
 
 function parseDescription(value: string): { isUrl: true; href: string; label: string } | { isUrl: false } {
   try {
@@ -62,8 +63,8 @@ export default function RankItem({
         )}
       </div>
 
-      {/* Poster */}
-      {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
+      {/* Poster or OG image preview */}
+      {(item.external_data as Record<string, unknown> | null)?.poster_path ? (() => {
         const path = (item.external_data as Record<string, unknown>).poster_path as string;
         const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
         return (
@@ -74,6 +75,9 @@ export default function RankItem({
             <Image src={src} alt={item.title} fill className="object-cover" />
           </div>
         );
+      })() : item.category && (() => {
+        try { new URL(item.category.trim()); return <OgImage url={item.category.trim()} />; }
+        catch { return null; }
       })()}
 
       {/* Content */}
