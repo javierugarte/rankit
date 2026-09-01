@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Item, List } from "@/lib/supabase/types";
-import { TMDB_POSTER_BASE, getService, getTraktUrl } from "@/lib/services";
+import { TMDB_POSTER_BASE, getService } from "@/lib/services";
 import RankItem from "./RankItem";
 import AddItemModal from "./AddItemModal";
 import ShareModal, { type MemberWithProfile } from "./ShareModal";
@@ -534,8 +534,6 @@ export default function ListDetailClient({
                   isFirst={index === 0}
                   listType={list.list_type}
                   markDoneLabel={markDoneLabel}
-                  editLabel={t("editItem")}
-                  traktLabel={t("viewOnTrakt", { title: item.title })}
                 />
               ))}
             </div>
@@ -569,7 +567,7 @@ export default function ListDetailClient({
                     const path = (item.external_data as Record<string, unknown>).poster_path as string;
                     const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
                     const isLandscape = getService(list.list_type)?.posterAspect === "landscape";
-                    const poster = (
+                    return (
                       <div
                         className="rounded overflow-hidden shrink-0 relative opacity-60"
                         style={{ width: isLandscape ? 44 : 28, height: isLandscape ? 25 : 42 }}
@@ -577,37 +575,11 @@ export default function ListDetailClient({
                         <Image src={src} alt={item.title} fill className="object-cover" />
                       </div>
                     );
-                    const traktUrl = getTraktUrl(list.list_type, item.external_id);
-                    return traktUrl ? (
-                      <a
-                        href={traktUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={t("viewOnTrakt", { title: item.title })}
-                        title={t("viewOnTrakt", { title: item.title })}
-                        className="shrink-0 transition-opacity hover:opacity-80"
-                      >
-                        {poster}
-                      </a>
-                    ) : poster;
                   })()}
                   <div className="flex-1 min-w-0">
-                    {getTraktUrl(list.list_type, item.external_id) ? (
-                      <a
-                        href={getTraktUrl(list.list_type, item.external_id) ?? undefined}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={t("viewOnTrakt", { title: item.title })}
-                        title={t("viewOnTrakt", { title: item.title })}
-                        className="text-text text-sm line-through truncate block hover:text-gold transition-colors"
-                      >
-                        {item.title}
-                      </a>
-                    ) : (
-                      <p className="text-text text-sm line-through truncate">
-                        {item.title}
-                      </p>
-                    )}
+                    <p className="text-text text-sm line-through truncate">
+                      {item.title}
+                    </p>
                     {item.category && (() => {
                       try {
                         const url = new URL(item.category.trim());
