@@ -42,6 +42,8 @@
     "voteAvailable": "⚡ Tienes 1 voto disponible hoy",
     "votedBanner": "✓ Ya votaste hoy · Regresa en {time}",
     "editList": "Editar lista",
+    "editItem": "Editar ítem",
+    "viewOnTrakt": "Ver {title} en Trakt",
     "shareList": "Compartir lista",
     "voteHistory": "Historial de votos",
     "leaveList": "Salir de la lista",

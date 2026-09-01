@@ -1,6 +1,7 @@
 import Image from "next/image";
+import { ExternalLink, Pencil } from "lucide-react";
 import type { Item } from "@/lib/supabase/types";
-import { TMDB_POSTER_BASE, getService } from "@/lib/services";
+import { TMDB_POSTER_BASE, getService, getTraktUrl } from "@/lib/services";
 
 function parseDescription(value: string): { isUrl: true; href: string; label: string } | { isUrl: false } {
   try {
@@ -23,6 +24,8 @@ interface Props {
   isFirst: boolean;
   listType?: string | null;
   markDoneLabel?: string;
+  editLabel: string;
+  traktLabel: string;
 }
 
 export default function RankItem({
@@ -36,8 +39,11 @@ export default function RankItem({
   isFirst,
   listType,
   markDoneLabel,
+  editLabel,
+  traktLabel,
 }: Props) {
   const isLandscape = getService(listType)?.posterAspect === "landscape";
+  const traktUrl = getTraktUrl(listType, item.external_id);
   return (
     <div
       className="rounded-2xl p-4 flex items-center gap-4 transition-all"
@@ -66,7 +72,7 @@ export default function RankItem({
       {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
         const path = (item.external_data as Record<string, unknown>).poster_path as string;
         const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
-        return (
+        const poster = (
           <div
             className="rounded overflow-hidden shrink-0 relative"
             style={{ width: isLandscape ? 56 : 36, height: isLandscape ? 32 : 54 }}
@@ -74,11 +80,40 @@ export default function RankItem({
             <Image src={src} alt={item.title} fill className="object-cover" />
           </div>
         );
+        return traktUrl ? (
+          <a
+            href={traktUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={traktLabel}
+            title={traktLabel}
+            className="shrink-0 transition-opacity hover:opacity-80"
+          >
+            {poster}
+          </a>
+        ) : poster;
       })()}
 
       {/* Content */}
-      <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
-        <p className="text-text font-medium text-sm truncate">{item.title}</p>
+      <div
+        className={`flex-1 min-w-0 ${traktUrl ? "" : "cursor-pointer"}`}
+        onClick={traktUrl ? undefined : onEdit}
+      >
+        {traktUrl ? (
+          <a
+            href={traktUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={traktLabel}
+            title={traktLabel}
+            className="text-text font-medium text-sm min-w-0 inline-flex max-w-full items-center gap-1 hover:text-gold transition-colors"
+          >
+            <span className="truncate">{item.title}</span>
+            <ExternalLink size={12} className="shrink-0" aria-hidden="true" />
+          </a>
+        ) : (
+          <p className="text-text font-medium text-sm truncate">{item.title}</p>
+        )}
         {item.category && (() => {
           const parsed = parseDescription(item.category);
           return parsed.isUrl ? (
@@ -100,6 +135,18 @@ export default function RankItem({
 
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
+        {traktUrl && (
+          <button
+            onClick={onEdit}
+            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-muted hover:text-text active:scale-90 active:transition-none"
+            style={{ border: "1px solid #2a2a38" }}
+            title={editLabel}
+            aria-label={editLabel}
+          >
+            <Pencil size={13} aria-hidden="true" />
+          </button>
+        )}
+
         {/* Mark done (only for #1) */}
         {isFirst && (
           <button

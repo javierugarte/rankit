@@ -63,6 +63,18 @@ export function getService(listType: string | null | undefined): ServiceConfig |
   return SERVICES[listType as ServiceId];
 }
 
+export function getTraktUrl(
+  listType: string | null | undefined,
+  externalId: string | null | undefined
+): string | null {
+  const tmdbId = externalId?.trim();
+  if (!tmdbId) return null;
+
+  if (listType !== "movies" && listType !== "tv") return null;
+
+  return `/api/trakt/${listType}/${encodeURIComponent(tmdbId)}`;
+}
+
 export const LIST_TYPE_OPTIONS: { value: string | null; label: string; emoji: string }[] = [
   { value: null, label: "Sin tipo", emoji: "—" },
   { value: "movies", label: "Peliculas", emoji: "🎬" },
