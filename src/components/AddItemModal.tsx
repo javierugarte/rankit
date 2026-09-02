@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { X, Trash2, Search, Loader2, CheckCircle } from "lucide-react";
+import { X, Trash2, Search, Loader2, CheckCircle, ExternalLink } from "lucide-react";
 import type { Item } from "@/lib/supabase/types";
-import { getService, type ExternalResult } from "@/lib/services";
+import { getService, getTraktUrl, type ExternalResult } from "@/lib/services";
 import Image from "next/image";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import VoteBreakdown from "./VoteBreakdown";
@@ -75,6 +75,7 @@ export default function AddItemModal({
   const [externalId, setExternalId] = useState<string | null>(
     (editItem?.external_id as string | null) ?? null
   );
+  const traktUrl = editItem ? getTraktUrl(listType, externalId) : null;
   const [externalData, setExternalData] = useState<Record<string, unknown> | null>(
     (editItem?.external_data as Record<string, unknown> | null) ?? null
   );
@@ -383,6 +384,23 @@ export default function AddItemModal({
           </div>
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
+
+          {traktUrl && (
+            <a
+              href={traktUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:bg-gold/15"
+              style={{
+                color: "#c8a96e",
+                backgroundColor: "rgba(200, 169, 110, 0.08)",
+                border: "1px solid rgba(200, 169, 110, 0.3)",
+              }}
+            >
+              <ExternalLink size={15} aria-hidden="true" />
+              {t("viewOnTrakt")}
+            </a>
+          )}
 
           <div className="flex gap-3 pt-1">
             <button
