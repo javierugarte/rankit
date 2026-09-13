@@ -67,6 +67,7 @@ export default function AddItemModal({
       genre: (data?.genre as string | undefined) ?? null,
       year: (data?.year as string | undefined) ?? null,
       overview: (data?.overview as string | undefined) ?? null,
+      rating: (data?.tmdb_rating as number | undefined) ?? null,
       type: null,
     };
   })();
@@ -129,6 +130,7 @@ export default function AddItemModal({
       year: result.year,
       poster_path: result.poster_path,
       overview: result.overview,
+      tmdb_rating: result.rating ?? null,
     });
     setShowDropdown(false);
     setResults([]);

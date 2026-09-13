@@ -24,6 +24,18 @@ function resolveGenre(genreIds: number[], map: Record<number, string>): string |
   return null;
 }
 
+function resolveRating(result: Record<string, unknown>): number | null {
+  const rating = result.vote_average;
+  const voteCount = result.vote_count;
+  return typeof rating === "number" &&
+    rating >= 0 &&
+    rating <= 10 &&
+    typeof voteCount === "number" &&
+    voteCount > 0
+    ? rating
+    : null;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ service: string }> }
@@ -75,6 +87,7 @@ async function searchMovies(query: string, apiKey: string, locale: string): Prom
       genre: resolveGenre((r.genre_ids as number[]) ?? [], MOVIE_GENRES),
       poster_path: (r.poster_path as string | null) ?? null,
       overview: (r.overview as string | null) ?? null,
+      rating: resolveRating(r),
     }));
 
   return NextResponse.json(results);
@@ -173,6 +186,7 @@ async function searchTV(query: string, apiKey: string, locale: string): Promise<
       genre: resolveGenre((r.genre_ids as number[]) ?? [], TV_GENRES),
       poster_path: (r.poster_path as string | null) ?? null,
       overview: (r.overview as string | null) ?? null,
+      rating: resolveRating(r),
     }));
 
   return NextResponse.json(results);
