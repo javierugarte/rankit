@@ -51,7 +51,8 @@
     "markDonePlayed": "Marquer comme joué",
     "markPending": "Remettre en attente",
     "vote": "1 vote",
-    "votes": "{count} votes"
+    "votes": "{count} votes",
+    "tmdbRating": "Note TMDB : {rating} sur 10"
   },
   "leaveList": {
     "title": "Quitter la liste",

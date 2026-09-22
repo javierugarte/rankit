@@ -86,6 +86,8 @@ Each service's API key lives in `.env.local` as a server-side environment variab
 | `games` | Video games | RAWG | `RAWG_API_KEY` |
 | `albums` | Music albums | MusicBrainz + Cover Art Archive | — (no key) |
 
+Movie and TV items display TMDB's `vote_average`. New items store it in `external_data`; existing items fetch it from TMDB using their external ID. Ratings are hidden gracefully when a title has no votes.
+
 When `posterBase` in `ServiceConfig` is empty (`""`), the `poster_path` stored in `external_data` is an absolute URL. If not empty, the image src is `posterBase + poster_path`.
 
 ## How to add a new service

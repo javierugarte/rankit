@@ -1,16 +1,7 @@
 import Image from "next/image";
 import type { Item } from "@/lib/supabase/types";
 import { TMDB_POSTER_BASE, getService } from "@/lib/services";
-
-function parseDescription(value: string): { isUrl: true; href: string; label: string } | { isUrl: false } {
-  try {
-    const url = new URL(value.trim());
-    const label = url.hostname.replace(/^www\./, "");
-    return { isUrl: true, href: url.href, label };
-  } catch {
-    return { isUrl: false };
-  }
-}
+import ItemMetadata from "./ItemMetadata";
 
 interface Props {
   item: Item;
@@ -38,6 +29,7 @@ export default function RankItem({
   markDoneLabel,
 }: Props) {
   const isLandscape = getService(listType)?.posterAspect === "landscape";
+  const externalData = item.external_data as Record<string, unknown> | null;
   return (
     <div
       className="rounded-2xl p-4 flex items-center gap-4 transition-all"
@@ -63,8 +55,8 @@ export default function RankItem({
       </div>
 
       {/* Poster */}
-      {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
-        const path = (item.external_data as Record<string, unknown>).poster_path as string;
+      {!!externalData?.poster_path && (() => {
+        const path = externalData.poster_path as string;
         const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
         return (
           <div
@@ -79,23 +71,12 @@ export default function RankItem({
       {/* Content */}
       <div className="flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
         <p className="text-text font-medium text-sm truncate">{item.title}</p>
-        {item.category && (() => {
-          const parsed = parseDescription(item.category);
-          return parsed.isUrl ? (
-            <a
-              href={parsed.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-xs mt-0.5 truncate inline-flex hover:underline"
-              style={{ color: "#c8a96e" }}
-            >
-              {parsed.label}
-            </a>
-          ) : (
-            <p className="text-muted text-xs mt-0.5 truncate">{item.category}</p>
-          );
-        })()}
+        <ItemMetadata
+          category={item.category}
+          externalData={externalData}
+          externalId={item.external_id}
+          listType={listType}
+        />
       </div>
 
       {/* Actions */}
