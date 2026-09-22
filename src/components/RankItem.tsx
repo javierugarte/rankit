@@ -14,6 +14,7 @@ interface Props {
   isFirst: boolean;
   listType?: string | null;
   markDoneLabel?: string;
+  onRatingLoaded?: (externalId: string, rating: number) => void;
 }
 
 export default function RankItem({
@@ -27,6 +28,7 @@ export default function RankItem({
   isFirst,
   listType,
   markDoneLabel,
+  onRatingLoaded,
 }: Props) {
   const isLandscape = getService(listType)?.posterAspect === "landscape";
   const externalData = item.external_data as Record<string, unknown> | null;
@@ -76,6 +78,7 @@ export default function RankItem({
           externalData={externalData}
           externalId={item.external_id}
           listType={listType}
+          onRatingLoaded={onRatingLoaded}
         />
       </div>
 

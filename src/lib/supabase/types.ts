@@ -34,6 +34,7 @@ export interface Database {
           name: string;
           emoji: string;
           list_type: string | null;
+          sort_mode: "votes" | "rating";
           owner_id: string;
           created_at: string;
         };
@@ -42,6 +43,7 @@ export interface Database {
           name: string;
           emoji?: string;
           list_type?: string | null;
+          sort_mode?: "votes" | "rating";
           owner_id: string;
           created_at?: string;
         };
@@ -49,6 +51,7 @@ export interface Database {
           name?: string;
           emoji?: string;
           list_type?: string | null;
+          sort_mode?: "votes" | "rating";
         };
         Relationships: [
           {

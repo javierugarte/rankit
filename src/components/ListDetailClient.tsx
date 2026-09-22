@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarDays, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -19,6 +19,11 @@ import ItemMetadata from "./ItemMetadata";
 function localToday() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function itemRating(item: Item): number {
+  const value = (item.external_data as Record<string, unknown> | null)?.tmdb_rating;
+  return typeof value === "number" && Number.isFinite(value) ? value : -1;
 }
 
 interface Props {
@@ -53,6 +58,8 @@ export default function ListDetailClient({
   );
   const [listName, setListName] = useState(list.name);
   const [listEmoji, setListEmoji] = useState(list.emoji);
+  const [listType, setListType] = useState(list.list_type);
+  const [sortMode, setSortMode] = useState(list.sort_mode);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditListModal, setShowEditListModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
@@ -68,21 +75,21 @@ export default function ListDetailClient({
   const ts = useTranslations("sharing");
 
   const doneTabLabel =
-    list.list_type === "movies" || list.list_type === "tv" ? t("doneWatched")
-    : list.list_type === "books" ? t("doneRead")
-    : list.list_type === "games" ? t("donePlayed")
+    listType === "movies" || listType === "tv" ? t("doneWatched")
+    : listType === "books" ? t("doneRead")
+    : listType === "games" ? t("donePlayed")
     : t("done");
 
   const doneEmptyLabel =
-    list.list_type === "movies" || list.list_type === "tv" ? t("doneEmptyWatched")
-    : list.list_type === "books" ? t("doneEmptyRead")
-    : list.list_type === "games" ? t("doneEmptyPlayed")
+    listType === "movies" || listType === "tv" ? t("doneEmptyWatched")
+    : listType === "books" ? t("doneEmptyRead")
+    : listType === "games" ? t("doneEmptyPlayed")
     : t("doneEmpty");
 
   const markDoneLabel =
-    list.list_type === "movies" || list.list_type === "tv" ? t("markDoneWatched")
-    : list.list_type === "books" ? t("markDoneRead")
-    : list.list_type === "games" ? t("markDonePlayed")
+    listType === "movies" || listType === "tv" ? t("markDoneWatched")
+    : listType === "books" ? t("markDoneRead")
+    : listType === "games" ? t("markDonePlayed")
     : t("markDone");
   const tLeave = useTranslations("leaveList");
   const tDelete = useTranslations("deleteList");
@@ -118,7 +125,13 @@ export default function ListDetailClient({
 
   const pendingItems = items
     .filter((i) => !i.completed)
-    .sort((a, b) => b.total_votes - a.total_votes);
+    .sort((a, b) => {
+      if (sortMode === "rating") {
+        const ratingDifference = itemRating(b) - itemRating(a);
+        if (ratingDifference !== 0) return ratingDifference;
+      }
+      return b.total_votes - a.total_votes;
+    });
 
   const doneItems = items
     .filter((i) => i.completed)
@@ -355,6 +368,22 @@ export default function ListDetailClient({
     });
   }
 
+  const handleRatingLoaded = useCallback((externalId: string, rating: number) => {
+    setItems((previousItems) =>
+      previousItems.map((item) =>
+        item.external_id === externalId
+          ? {
+              ...item,
+              external_data: {
+                ...((item.external_data as Record<string, unknown> | null) ?? {}),
+                tmdb_rating: rating,
+              },
+            }
+          : item
+      )
+    );
+  }, []);
+
   return (
     <div className="max-w-lg mx-auto px-4 pt-10 pb-4">
       {/* Header */}
@@ -533,8 +562,9 @@ export default function ListDetailClient({
                   onMarkDone={() => handleMarkDone(item.id)}
                   onEdit={() => setEditingItem(item)}
                   isFirst={index === 0}
-                  listType={list.list_type}
+                  listType={listType}
                   markDoneLabel={markDoneLabel}
+                  onRatingLoaded={handleRatingLoaded}
                 />
               ))}
             </div>
@@ -567,7 +597,7 @@ export default function ListDetailClient({
                   {!!(item.external_data as Record<string, unknown> | null)?.poster_path && (() => {
                     const path = (item.external_data as Record<string, unknown>).poster_path as string;
                     const src = path.startsWith("http") ? path : `${TMDB_POSTER_BASE}${path}`;
-                    const isLandscape = getService(list.list_type)?.posterAspect === "landscape";
+                    const isLandscape = getService(listType)?.posterAspect === "landscape";
                     return (
                       <div
                         className="rounded overflow-hidden shrink-0 relative opacity-60"
@@ -585,7 +615,8 @@ export default function ListDetailClient({
                       category={item.category}
                       externalData={item.external_data as Record<string, unknown> | null}
                       externalId={item.external_id}
-                      listType={list.list_type}
+                      listType={listType}
+                      onRatingLoaded={handleRatingLoaded}
                     />
                   </div>
                   <span className="text-muted text-xs">
@@ -602,12 +633,20 @@ export default function ListDetailClient({
       {showEditListModal && (
         <CreateListModal
           userId={userId}
-          editList={{ ...list, name: listName, emoji: listEmoji }}
+          editList={{
+            ...list,
+            name: listName,
+            emoji: listEmoji,
+            list_type: listType,
+            sort_mode: sortMode,
+          }}
           onClose={() => setShowEditListModal(false)}
           onCreated={() => {}}
           onUpdated={(updated) => {
             setListName(updated.name);
             setListEmoji(updated.emoji);
+            setListType(updated.list_type);
+            setSortMode(updated.sort_mode);
             setShowEditListModal(false);
           }}
           onDelete={() => {
@@ -621,7 +660,7 @@ export default function ListDetailClient({
         <AddItemModal
           listId={list.id}
           userId={userId}
-          listType={list.list_type}
+          listType={listType}
           onClose={() => setShowAddModal(false)}
           onSaved={onItemSaved}
         />
@@ -632,7 +671,7 @@ export default function ListDetailClient({
         <AddItemModal
           listId={list.id}
           userId={userId}
-          listType={list.list_type}
+          listType={listType}
           editItem={editingItem}
           onClose={() => setEditingItem(null)}
           onSaved={onItemSaved}
