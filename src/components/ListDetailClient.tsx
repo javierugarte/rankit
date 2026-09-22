@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CalendarDays, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
+import { ArrowLeft, Plus, UserPlus, Pencil, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -399,14 +399,6 @@ export default function ListDetailClient({
           </button>
 
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowVoteHistory(true)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted hover:text-text hover:bg-surface active:scale-95 active:transition-none"
-              aria-label={t("voteHistory")}
-              title={t("voteHistory")}
-            >
-              <CalendarDays size={17} />
-            </button>
             {isOwner && (
               <>
                 <button
@@ -652,6 +644,7 @@ export default function ListDetailClient({
           onDelete={() => {
             setShowDeleteConfirm(true);
           }}
+          onShowVoteHistory={() => setShowVoteHistory(true)}
         />
       )}
 
