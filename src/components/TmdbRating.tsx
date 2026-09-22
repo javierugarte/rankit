@@ -69,14 +69,11 @@ export default function TmdbRating({ externalId, initialRating, listType }: Prop
 
   return (
     <span
-      className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold"
+      className="shrink-0 text-[11px] font-semibold text-muted"
       aria-label={label}
       title={label}
     >
-      <span className="rounded-sm bg-[#01b4e4] px-1 py-0.5 text-[9px] font-black leading-none text-[#032541]">
-        TMDB
-      </span>
-      <span className="text-muted">{formattedRating}</span>
+      {formattedRating}
     </span>
   );
 }
