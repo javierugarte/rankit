@@ -21,6 +21,7 @@ create table public.lists (
   name text not null,
   emoji text default '🎬' not null,
   list_type text,
+  sort_mode text default 'votes' not null check (sort_mode in ('votes', 'rating')),
   owner_id uuid references public.profiles(id) on delete cascade not null,
   created_at timestamptz default now() not null
 );

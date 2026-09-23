@@ -57,7 +57,7 @@ Anonymous (demo) users are detected via `user.is_anonymous`. To send an anonymou
 Supabase with the following tables (see `supabase/schema.sql` for the full schema):
 
 - `profiles` — users (1:1 with `auth.users`, created automatically via trigger)
-- `lists` — item lists, each with an `owner_id`
+- `lists` — item lists, each with an `owner_id` and a `sort_mode` (`votes` or `rating`)
 - `list_members` — N:M relationship between lists and collaborator users
 - `items` — list elements, with votes and completed state
 - `votes` — one vote per user per list per day (`unique (user_id, list_id, voted_date)`)
@@ -86,7 +86,7 @@ Each service's API key lives in `.env.local` as a server-side environment variab
 | `games` | Video games | RAWG | `RAWG_API_KEY` |
 | `albums` | Music albums | MusicBrainz + Cover Art Archive | — (no key) |
 
-Movie and TV items display TMDB's `vote_average`. New items store it in `external_data`; existing items fetch it from TMDB using their external ID. Ratings are hidden gracefully when a title has no votes.
+Movie and TV items display TMDB's `vote_average`. New items store it in `external_data`; existing items fetch it from TMDB using their external ID. Ratings are hidden gracefully when a title has no votes. These lists can use `sort_mode = 'rating'` to sort by TMDB rating instead of votes.
 
 When `posterBase` in `ServiceConfig` is empty (`""`), the `poster_path` stored in `external_data` is an absolute URL. If not empty, the image src is `posterBase + poster_path`.
 

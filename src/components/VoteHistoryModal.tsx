@@ -43,7 +43,7 @@ export default function VoteHistoryModal({ votes, items, participants, onClose }
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center"
+      className="fixed inset-0 z-[70] flex items-end justify-center"
       style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
       onClick={onClose}
     >

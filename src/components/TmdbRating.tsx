@@ -11,6 +11,7 @@ interface Props {
   externalId: string | null;
   initialRating?: unknown;
   listType?: string | null;
+  onRatingLoaded?: (externalId: string, rating: number) => void;
 }
 
 const ratingRequests = new Map<string, Promise<number | null>>();
@@ -43,7 +44,12 @@ function fetchRating(listType: string, externalId: string): Promise<number | nul
   return request;
 }
 
-export default function TmdbRating({ externalId, initialRating, listType }: Props) {
+export default function TmdbRating({
+  externalId,
+  initialRating,
+  listType,
+  onRatingLoaded,
+}: Props) {
   const [rating, setRating] = useState(() => parseRating(initialRating));
   const t = useTranslations("listDetail");
 
@@ -54,13 +60,15 @@ export default function TmdbRating({ externalId, initialRating, listType }: Prop
 
     let active = true;
     void fetchRating(listType, externalId).then((nextRating) => {
-      if (active) setRating(nextRating);
+      if (!active) return;
+      setRating(nextRating);
+      if (nextRating !== null) onRatingLoaded?.(externalId, nextRating);
     });
 
     return () => {
       active = false;
     };
-  }, [externalId, listType, rating]);
+  }, [externalId, listType, onRatingLoaded, rating]);
 
   if (rating === null) return null;
 
@@ -69,14 +77,11 @@ export default function TmdbRating({ externalId, initialRating, listType }: Prop
 
   return (
     <span
-      className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold"
+      className="shrink-0 text-[11px] font-semibold text-muted"
       aria-label={label}
       title={label}
     >
-      <span className="rounded-sm bg-[#01b4e4] px-1 py-0.5 text-[9px] font-black leading-none text-[#032541]">
-        TMDB
-      </span>
-      <span className="text-muted">{formattedRating}</span>
+      {formattedRating}
     </span>
   );
 }

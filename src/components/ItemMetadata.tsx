@@ -7,6 +7,7 @@ interface Props {
   externalData: Record<string, unknown> | null;
   externalId: string | null;
   listType?: string | null;
+  onRatingLoaded?: (externalId: string, rating: number) => void;
 }
 
 function parseDescription(value: string): { href: string; label: string } | null {
@@ -18,7 +19,13 @@ function parseDescription(value: string): { href: string; label: string } | null
   }
 }
 
-export default function ItemMetadata({ category, externalData, externalId, listType }: Props) {
+export default function ItemMetadata({
+  category,
+  externalData,
+  externalId,
+  listType,
+  onRatingLoaded,
+}: Props) {
   const hasTmdbRating = listType === "movies" || listType === "tv";
   if (!category && !hasTmdbRating) return null;
 
@@ -46,6 +53,7 @@ export default function ItemMetadata({ category, externalData, externalId, listT
           externalId={externalId}
           initialRating={externalData?.tmdb_rating}
           listType={listType}
+          onRatingLoaded={onRatingLoaded}
         />
       )}
     </div>

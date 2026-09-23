@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { X, Trash2, Plus } from "lucide-react";
+import { CalendarDays, ChevronRight, X, Trash2, Plus } from "lucide-react";
 import type { List } from "@/lib/supabase/types";
 import { LIST_TYPE_OPTIONS, getService } from "@/lib/services";
 import { useTranslations } from "next-intl";
@@ -23,6 +23,8 @@ const EMOJI_OPTIONS = [
   "🏆",
 ];
 
+const SORT_MODES = ["votes", "rating"] as const;
+
 function isValidEmoji(str: string): boolean {
   if (!str.trim()) return false;
   try {
@@ -41,15 +43,27 @@ interface Props {
   editList?: List;
   onUpdated?: (list: List) => void;
   onDelete?: () => void;
+  onShowVoteHistory?: () => void;
 }
 
-export default function CreateListModal({ userId, onClose, onCreated, editList, onUpdated, onDelete }: Props) {
+export default function CreateListModal({
+  userId,
+  onClose,
+  onCreated,
+  editList,
+  onUpdated,
+  onDelete,
+  onShowVoteHistory,
+}: Props) {
   const initialEmoji = editList?.emoji ?? "🎬";
   const isInitialCustom = !EMOJI_OPTIONS.includes(initialEmoji);
 
   const [name, setName] = useState(editList?.name ?? "");
   const [emoji, setEmoji] = useState(initialEmoji);
   const [listType, setListType] = useState<string | null>(editList?.list_type ?? null);
+  const [sortMode, setSortMode] = useState<"votes" | "rating">(
+    editList?.sort_mode ?? "votes"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCustomInput, setShowCustomInput] = useState(isInitialCustom);
@@ -59,6 +73,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
 
   const supabase = createClient();
   const t = useTranslations("createList");
+  const tVoteHistory = useTranslations("voteHistory");
   const ts = useTranslations("serviceLabels");
 
   async function handleCreate(e: React.FormEvent) {
@@ -67,11 +82,18 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
 
     setLoading(true);
     setError(null);
+    const supportsRating = listType === "movies" || listType === "tv";
+    const nextSortMode = supportsRating ? sortMode : "votes";
 
     if (editList) {
       const { data, error } = await supabase
         .from("lists")
-        .update({ name: name.trim(), emoji, list_type: listType })
+        .update({
+          name: name.trim(),
+          emoji,
+          list_type: listType,
+          sort_mode: nextSortMode,
+        })
         .eq("id", editList.id)
         .select()
         .single();
@@ -88,6 +110,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
         name: name.trim(),
         emoji,
         list_type: listType,
+        sort_mode: nextSortMode,
         owner_id: userId,
       }).select();
 
@@ -106,7 +129,7 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
       style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-lg bg-surface-2 rounded-t-3xl p-6 border-t border-border" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-border bg-surface-2 p-6" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
         {/* Handle */}
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6" />
 
@@ -268,8 +291,51 @@ export default function CreateListModal({ userId, onClose, onCreated, editList, 
             )}
           </div>
 
+          {(listType === "movies" || listType === "tv") && (
+            <div>
+              <label className="block text-xs text-muted mb-2 uppercase tracking-wider">
+                {t("sortLabel")}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {SORT_MODES.map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setSortMode(mode)}
+                    className="py-2.5 rounded-xl text-sm font-medium transition-all border"
+                    style={{
+                      backgroundColor:
+                        sortMode === mode
+                          ? "rgba(200, 169, 110, 0.15)"
+                          : "#111117",
+                      borderColor:
+                        sortMode === mode
+                          ? "rgba(200, 169, 110, 0.5)"
+                          : "#2a2a38",
+                      color: sortMode === mode ? "#c8a96e" : "#8888a0",
+                    }}
+                  >
+                    {mode === "votes" ? t("sortVotes") : t("sortRating")}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {error && (
             <p style={{ color: "#f87171", fontSize: "0.875rem" }}>{error}</p>
+          )}
+
+          {editList && onShowVoteHistory && (
+            <button
+              type="button"
+              onClick={onShowVoteHistory}
+              className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left text-sm font-medium text-text transition-colors hover:border-gold/40"
+            >
+              <CalendarDays size={17} className="text-gold" />
+              <span className="flex-1">{tVoteHistory("title")}</span>
+              <ChevronRight size={16} className="text-muted" />
+            </button>
           )}
 
           {editList && onDelete && (
