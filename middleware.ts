@@ -3,6 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resolveLocale } from "./i18n/request";
 
 export async function middleware(request: NextRequest) {
+  // The read-only list endpoint authenticates with its own API key.
+  if (/^\/api\/lists\/[^/]+\/?$/.test(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

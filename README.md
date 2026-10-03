@@ -117,6 +117,38 @@ API keys are server-side only (never sent to the client). Searches are proxied t
 
 ---
 
+## Read-only list API
+
+`GET /api/lists/{id}` returns a list and all its items as JSON. `{id}` must be the list's UUID. Items are ordered by creation date, then ID. The endpoint accepts only an API key in the `x-api-key` request header; it does not require a user session.
+
+Configure these server-side environment variables before using it:
+
+```env
+RANKIT_READ_API_KEY=your-long-random-api-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+```
+
+The read API key grants read access to **any list whose ID is known**. Keep both keys secret and never prefix them with `NEXT_PUBLIC_`. The service role key is used only by this server endpoint to read data protected by RLS. Generate a strong read API key, for example with `openssl rand -hex 32`.
+
+For the ToWatchTV iOS/tvOS app, configure a separate key restricted to its two lists. A key embedded in an installed app can be extracted, so do not put `RANKIT_READ_API_KEY` or the Supabase service role key in the app:
+
+```env
+RANKIT_TOWATCHTV_API_KEY=another-long-random-key
+RANKIT_TOWATCHTV_SERIES_LIST_ID=6fb7a47a-d861-41e9-b0fb-17b481c1ddb6
+RANKIT_TOWATCHTV_MOVIES_LIST_ID=3d599ef0-c540-49f7-98c3-4d7cc9e7309b
+```
+
+This key returns `404` for all other list IDs. The general read key remains available for server-side integrations.
+
+```bash
+curl -H "x-api-key: $RANKIT_READ_API_KEY" \
+  "https://your-domain.example/api/lists/00000000-0000-0000-0000-000000000000"
+```
+
+Responses: `200` with `{ "list": { ... }, "items": [ ... ] }`, `400` for an invalid ID, `401` for a missing or invalid key, `404` if the list does not exist, and `503` if the endpoint is not configured. Responses are not cached.
+
+---
+
 ## Internationalisation
 
 The app ships with four languages: **Español** (default), **English**, **Français** and **Italiano**. Users switch language from Edit Profile; the change is applied on save.
