@@ -190,6 +190,10 @@ export interface Database {
         Args: { p_list_id: string };
         Returns: string;
       };
+      cast_list_vote: {
+        Args: { p_list_id: string; p_item_id: string; p_voted_date?: string };
+        Returns: string | null;
+      };
     };
     Enums: {
       [_ in never]: never;

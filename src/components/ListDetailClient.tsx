@@ -255,38 +255,10 @@ export default function ListDetailClient({
       setVoting(false);
     };
 
-    // Remove existing vote from DB
-    if (prevVotedItemId) {
-      const { error: deleteError } = await supabase
-        .from("votes")
-        .delete()
-        .eq("user_id", userId)
-        .eq("list_id", list.id)
-        .eq("voted_date", today);
-
-      if (deleteError) {
-        revert(prevVotedItemId);
-        return;
-      }
-
-      const oldVotes = prevItems.find((i) => i.id === prevVotedItemId)?.total_votes ?? 0;
-      await supabase
-        .from("items")
-        .update({ total_votes: Math.max(0, oldVotes - 1) })
-        .eq("id", prevVotedItemId);
-    }
-
-    if (isRevoke) {
-      setVoting(false);
-      return;
-    }
-
-    // Insert new vote
-    const { error: voteError } = await supabase.from("votes").insert({
-      item_id: itemId,
-      user_id: userId,
-      list_id: list.id,
-      voted_date: today,
+    const { data: selectedItemId, error: voteError } = await supabase.rpc("cast_list_vote", {
+      p_list_id: list.id,
+      p_item_id: itemId,
+      p_voted_date: today,
     });
 
     if (voteError) {
@@ -294,12 +266,7 @@ export default function ListDetailClient({
       return;
     }
 
-    const newVotes = prevItems.find((i) => i.id === itemId)?.total_votes ?? 0;
-    await supabase
-      .from("items")
-      .update({ total_votes: newVotes + 1 })
-      .eq("id", itemId);
-
+    setVotedItemId(selectedItemId);
     setVoting(false);
   }
 
