@@ -62,7 +62,7 @@ Supabase with the following tables (see `supabase/schema.sql` for the full schem
 - `items` — list elements, with votes and completed state
 - `votes` — one vote per user per list per day (`unique (user_id, list_id, voted_date)`)
 
-All tables have RLS enabled. Available RPC functions: `get_profile_by_email`, `get_list_owner_id`.
+All tables have RLS enabled. Available RPC functions: `get_profile_by_email`, `get_list_owner_id`, `cast_list_vote`.
 
 # Database: migrations
 
