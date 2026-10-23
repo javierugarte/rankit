@@ -151,6 +151,26 @@ export default function ListDetailClient({
     {}
   );
 
+  // Older deployments could leave items.total_votes below the number of
+  // historical vote rows. Keep the displayed counter from going backwards
+  // while the atomic database function repairs that value on the next vote.
+  useEffect(() => {
+    const counts = votes.reduce<Record<string, number>>((result, vote) => {
+      result[vote.item_id] = (result[vote.item_id] ?? 0) + 1;
+      return result;
+    }, {});
+    setItems((previous) => {
+      let changed = false;
+      const next = previous.map((item) => {
+        const repairedTotal = Math.max(item.total_votes, counts[item.id] ?? 0);
+        if (repairedTotal === item.total_votes) return item;
+        changed = true;
+        return { ...item, total_votes: repairedTotal };
+      });
+      return changed ? next : previous;
+    });
+  }, [votes]);
+
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
@@ -267,6 +287,18 @@ export default function ListDetailClient({
     }
 
     setVotedItemId(selectedItemId);
+    // Re-read the affected list so a corrected counter is visible immediately,
+    // even when Realtime delivery arrives after the optimistic state update.
+    const { data: refreshedItems } = await supabase
+      .from("items")
+      .select("*")
+      .eq("list_id", list.id);
+    if (refreshedItems) setItems(refreshedItems);
+    const { data: refreshedVotes } = await supabase
+      .from("votes")
+      .select("item_id, user_id, voted_date")
+      .eq("list_id", list.id);
+    if (refreshedVotes) setVotes(refreshedVotes);
     setVoting(false);
   }
 

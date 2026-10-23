@@ -226,7 +226,7 @@ create or replace function public.sync_item_vote_total()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 begin
   if tg_op = 'INSERT' then
@@ -251,48 +251,56 @@ create or replace function public.cast_list_vote(
 returns uuid
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
+  actor_id uuid := auth.uid();
   previous_item_id uuid;
 begin
-  if auth.uid() is null then
-    raise exception 'Authentication is required' using errcode = '42501';
+  if actor_id is null then
+    raise exception 'Not authenticated' using errcode = '42501';
   end if;
 
+  perform pg_advisory_xact_lock(
+    hashtextextended(actor_id::text || ':' || p_list_id::text || ':' || p_voted_date::text, 0)
+  );
+
   if not exists (
-    select 1 from public.lists
-    where id = p_list_id
-      and (owner_id = auth.uid() or exists (
-        select 1 from public.list_members
-        where list_id = p_list_id and user_id = auth.uid()
+    select 1 from public.lists l
+    where l.id = p_list_id
+      and (l.owner_id = actor_id or exists (
+        select 1 from public.list_members lm
+        where lm.list_id = p_list_id and lm.user_id = actor_id
       ))
   ) then
-    raise exception 'You do not have access to this list' using errcode = '42501';
+    raise exception 'Not a list member' using errcode = '42501';
   end if;
 
   if not exists (
-    select 1 from public.items where id = p_item_id and list_id = p_list_id
+    select 1 from public.items i where i.id = p_item_id and i.list_id = p_list_id
   ) then
-    raise exception 'The item does not belong to this list' using errcode = '22023';
+    raise exception 'Item does not belong to this list' using errcode = '23503';
   end if;
 
-  select item_id into previous_item_id from public.votes
-  where user_id = auth.uid() and list_id = p_list_id and voted_date = p_voted_date;
+  select item_id into previous_item_id
+  from public.votes
+  where user_id = actor_id and list_id = p_list_id and voted_date = p_voted_date
+  for update;
 
+  -- votes_sync_item_total updates items.total_votes for each row change.
   if previous_item_id = p_item_id then
     delete from public.votes
-    where user_id = auth.uid() and list_id = p_list_id and voted_date = p_voted_date;
+    where user_id = actor_id and list_id = p_list_id and voted_date = p_voted_date;
     return null;
   end if;
 
   if previous_item_id is not null then
     delete from public.votes
-    where user_id = auth.uid() and list_id = p_list_id and voted_date = p_voted_date;
+    where user_id = actor_id and list_id = p_list_id and voted_date = p_voted_date;
   end if;
 
   insert into public.votes (item_id, user_id, list_id, voted_date)
-  values (p_item_id, auth.uid(), p_list_id, p_voted_date);
+  values (p_item_id, actor_id, p_list_id, p_voted_date);
   return p_item_id;
 end;
 $$;
