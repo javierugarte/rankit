@@ -91,17 +91,25 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const totalVotesMap: Record<string, number> = {};
   const leaderMap: Record<string, string> = {};
   const itemsByList: Record<string, Item[]> = {};
+  const voteCountByItem: Record<string, number> = {};
+  for (const vote of (allVotesResult.data ?? []) as { item_id: string }[]) {
+    voteCountByItem[vote.item_id] = (voteCountByItem[vote.item_id] ?? 0) + 1;
+  }
 
   for (const item of allItemsResult.data ?? []) {
+    const repairedTotal = Math.max(item.total_votes, voteCountByItem[item.id] ?? 0);
+    const displayItem = repairedTotal === item.total_votes
+      ? item
+      : { ...item, total_votes: repairedTotal };
     // Group all items for list detail
-    if (!itemsByList[item.list_id]) itemsByList[item.list_id] = [];
-    itemsByList[item.list_id].push(item);
+    if (!itemsByList[displayItem.list_id]) itemsByList[displayItem.list_id] = [];
+    itemsByList[displayItem.list_id].push(displayItem);
 
     // Only non-completed items count for home stats
-    if (!item.completed) {
-      totalVotesMap[item.list_id] = (totalVotesMap[item.list_id] ?? 0) + item.total_votes;
-      if (!(item.list_id in leaderMap) && item.total_votes > 0) {
-        leaderMap[item.list_id] = item.title;
+    if (!displayItem.completed) {
+      totalVotesMap[displayItem.list_id] = (totalVotesMap[displayItem.list_id] ?? 0) + displayItem.total_votes;
+      if (!(displayItem.list_id in leaderMap) && displayItem.total_votes > 0) {
+        leaderMap[displayItem.list_id] = displayItem.title;
       }
     }
   }
