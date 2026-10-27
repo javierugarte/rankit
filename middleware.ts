@@ -3,8 +3,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resolveLocale } from "./i18n/request";
 
 export async function middleware(request: NextRequest) {
-  // The read-only list endpoint authenticates with its own API key.
-  if (/^\/api\/lists\/[^/]+\/?$/.test(request.nextUrl.pathname)) {
+  // API routes validate their own credentials. The TV pairing endpoints use a
+  // short-lived code plus a per-device secret, and the approval endpoint
+  // validates the Rankit bearer token itself.
+  if (
+    /^\/api\/lists\/[^/]+\/?$/.test(request.nextUrl.pathname) ||
+    /^\/api\/tv-pairings(?:\/[^/]+(?:\/exchange)?|\/approve)?\/?$/.test(request.nextUrl.pathname)
+  ) {
     return NextResponse.next();
   }
 
