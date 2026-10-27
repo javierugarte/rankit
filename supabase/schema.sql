@@ -57,6 +57,23 @@ create table public.votes (
   unique (user_id, list_id, voted_date)
 );
 
+-- A short-lived, one-time pairing request lets a signed-in iPhone approve a
+-- dedicated Rankit session for an Apple TV. Values are hashed before storage.
+create table public.towatchtv_device_pairings (
+  id uuid primary key default gen_random_uuid(),
+  code_hash text not null unique,
+  device_secret_hash text not null unique,
+  user_id uuid references public.profiles(id) on delete cascade,
+  status text not null default 'pending' check (status in ('pending', 'approved', 'consumed')),
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now(),
+  approved_at timestamptz,
+  consumed_at timestamptz
+);
+
+create index towatchtv_device_pairings_expiry_index
+  on public.towatchtv_device_pairings (expires_at);
+
 -- =============================================
 -- 2. HABILITAR RLS EN TODAS LAS TABLAS
 -- =============================================
@@ -66,6 +83,7 @@ alter table public.lists enable row level security;
 alter table public.list_members enable row level security;
 alter table public.items enable row level security;
 alter table public.votes enable row level security;
+alter table public.towatchtv_device_pairings enable row level security;
 
 -- =============================================
 -- 3. POLÍTICAS RLS — PROFILES

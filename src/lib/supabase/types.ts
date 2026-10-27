@@ -177,6 +177,46 @@ export interface Database {
           }
         ];
       };
+      towatchtv_device_pairings: {
+        Row: {
+          id: string;
+          code_hash: string;
+          device_secret_hash: string;
+          user_id: string | null;
+          status: "pending" | "approved" | "consumed";
+          expires_at: string;
+          created_at: string;
+          approved_at: string | null;
+          consumed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          code_hash: string;
+          device_secret_hash: string;
+          user_id?: string | null;
+          status?: "pending" | "approved" | "consumed";
+          expires_at: string;
+          created_at?: string;
+          approved_at?: string | null;
+          consumed_at?: string | null;
+        };
+        Update: {
+          user_id?: string | null;
+          status?: "pending" | "approved" | "consumed";
+          expires_at?: string;
+          approved_at?: string | null;
+          consumed_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "towatchtv_device_pairings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
